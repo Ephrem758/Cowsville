@@ -33,3 +33,16 @@ def sign_in(request):
 
 def sign_up(request):
     return render(request, 'sign-up.html')
+
+
+# def search_view(request):
+#     query = request.GET.get('q')  # Get the search input
+#     # For now, we're not filtering anything, but you can store the query for later use
+#     context = {
+#         'query': query,
+#         'total_sales': 10000,  # Example existing data
+#         'growth_rate': 12,     # Example existing data
+#         # Add all other existing context data here
+#     }
+
+    return render(request, 'your_template.html', context)
