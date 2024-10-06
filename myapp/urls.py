@@ -19,6 +19,7 @@ urlpatterns = [
     # path('profile/', views.profile, name='profile'),
     path('sign-in/', views.sign_in, name='sign_in'),
     path('sign-up/', views.sign_up, name='sign_up'),
+    path('farm-details/', views.farm_details, name='farm_details'),
     # path('pages/sign-in/', views.sign_in, name='sign_in'),
     # path('pages/dashboard/', views.dashboard, name='dashboard'),
     # path('pages/tables/', views.tables, name='tables'),
