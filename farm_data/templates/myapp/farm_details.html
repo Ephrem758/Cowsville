@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm and Cow Details</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    /* Custom styling for text and layout */
+    .card-title {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .cow-card {
+      background-color: #f0f4f7;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .cow-card .card-content {
+      font-size: 1.2rem;
+    }
+
+    .sidenav .user-view img {
+      border-radius: 50%;
+    }
+
+    /* Custom alignment for farm cards */
+    .farm-card {
+      margin-right: 15px;
+    }
+
+    .large-avatar {
+      height: 100px;
+      width: 100px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body class="grey lighten-4">
+
+  <!-- Sidebar -->
+  <ul id="slide-out" class="sidenav sidenav-fixed">
+    <li>
+      <div class="user-view">
+        <div class="background">
+          <img src="https://materializecss.com/images/office.jpg">
+        </div>
+        <a href="#user">
+          <!-- Updated avatar image -->
+          <img class="circle large-avatar" src="https://via.placeholder.com/100.png/09f/fff">
+        </a>
+        <a href="#name"><span class="white-text name">Farm Manager</span></a>
+        <a href="#email"><span class="white-text email">manager@farm.com</span></a>
+      </div>
+    </li>
+    <li><a href="#!" class="waves-effect"><i class="material-icons">dashboard</i>Dashboard</a></li>
+    <li><a href="#!" class="waves-effect"><i class="material-icons">info</i>Farm Info</a></li>
+    <li><a href="#!" class="waves-effect"><i class="material-icons">pets</i>Cows</a></li>
+    <li><div class="divider"></div></li>
+    <li><a class="subheader">Settings</a></li>
+    <li><a href="#!" class="waves-effect"><i class="material-icons">settings</i>Account</a></li>
+  </ul>
+
+  <!-- Main Content -->
+  <main style="margin-left: 300px; padding: 20px;">
+    <div class="container">
+      <div class="row">
+        <div class="col s12">
+          <h5>Farm and Cow Details</h5>
+        </div>
+      </div>
+
+      <!-- Farm Selection -->
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <form method="get" action="">
+            <select name="farm_id" onchange="this.form.submit()">
+              <option value="" disabled selected>Choose a Farm</option>
+              {% for f in farms %}
+              <option value="{{ f.id }}" {% if farm and farm.id == f.id %}selected{% endif %}>{{ f.owner_name }}</option>
+              {% endfor %}
+            </select>
+            <label>Select Farm</label>
+          </form>
+        </div>
+      </div>
+
+      {% if farm %}
+      <!-- Display Farm Details in Cards -->
+      <div class="row">
+        <!-- Multiple farm cards side by side -->
+        <div class="col s12 m4 farm-card">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Farm Name</span>
+              <p>{{ farm.owner_name }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m4 farm-card">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Telephone</span>
+              <p>{{ farm.telephone }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m4 farm-card">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Total Daily Milk</span>
+              <p>{{ farm.tdm }} Liters</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cow Selection -->
+      <div class="row">
+        <div class="input-field col s12 m6">
+          <form method="get" action="">
+            <input type="hidden" name="farm_id" value="{{ farm.id }}">
+            <select name="cow_id" onchange="this.form.submit()">
+              <option value="" disabled selected>Choose a Cow</option>
+              {% for cow in cows %}
+              <option value="{{ cow.cow_id }}" {% if cow_details and cow_details.cow_id == cow.cow_id %}selected{% endif %}>
+                {{ cow.cow_id }} - {{ cow.breed }}
+              </option>
+              {% endfor %}
+            </select>
+            <label>Select Cow</label>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if cow_details %}
+      <!-- Display Cow Details in a Large Card -->
+      <div class="row">
+        <div class="col s12">
+          <div class="cow-card card">
+            <div class="card-content">
+              <span class="card-title">Cow Details</span>
+              <p><strong>Cow ID:</strong> {{ cow_details.cow_id }}</p>
+              <p><strong>Breed:</strong> {{ cow_details.breed }}</p>
+              <p><strong>Age (Months):</strong> {{ cow_details.age_months }}</p>
+              <p><strong>Body Weight:</strong> {{ cow_details.body_weight }} kg</p>
+              <p><strong>Daily Milk Yield:</strong> {{ cow_details.dmy }} Liters</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    // Initialize the materialize components
+    document.addEventListener('DOMContentLoaded', function() {
+      var elems = document.querySelectorAll('select');
+      var instances = M.FormSelect.init(elems);
+    });
+  </script>
+
+</body>
+
+</html>
