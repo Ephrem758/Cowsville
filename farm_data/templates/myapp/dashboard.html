@@ -72,10 +72,26 @@
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
           <h6 class="font-weight-bolder mb-0">Dashboard</h6>
+          
         </nav>
         
         </div>
+        
       </div>
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Farm ID" aria-label="search" 
+               style="border: 1px solid #ccc; text-align: center; color: black; 
+                      background-color: white; border-radius: 5px; width: 200px; height: 38px;">
+        <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
+    </form>
+    
+    <style>
+      /* Add styles for the placeholder */
+      input::placeholder {
+          color: #888; /* Lighter gray for better visibility */
+          font-weight: normal; /* Normal weight for placeholder */
+      }
+      </style>
     </nav>
     <!-- End Navbar -->
 
@@ -130,8 +146,8 @@
                 <i class="material-icons opacity-10">person</i>
               </div>
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Date of AI</p>
-                <h4 class="mb-0">20/05/2024</h4>
+                <p class="text-sm mb-0 text-capitalize">Address</p>
+                <h4 class="mb-0">kebele 01</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
@@ -147,8 +163,8 @@
                 <i class="material-icons opacity-10">weekend</i>
               </div>
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Time of standing estrus</p>
-                <h4 class="mb-0">5:00AM</h4>
+                <p class="text-sm mb-0 text-capitalize">Phone number</p>
+                <h4 class="mb-0">0946436734</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
@@ -159,7 +175,19 @@
         </div>
       </div>
 
+
+
+      
+
       <div class="row mt-4">
+
+
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Cow ID" aria-label="search" 
+                 style="border: 1px solid #ccc; text-align: center; color: black; 
+                        background-color: white; border-radius: 5px; width: 200px; height: 38px;">
+          <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
+        </form>
     
       {% comment %} important graph {% endcomment %}
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
