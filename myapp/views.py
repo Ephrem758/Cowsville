@@ -37,6 +37,7 @@ def sign_up(request):
     return render(request, 'sign-up.html')
 
 
+
 def farm_details(request):
     farms = Farm.objects.all()  # Get all farms for the dropdown
     farm = None
@@ -62,3 +63,16 @@ def farm_details(request):
         'cow_details': cow_details,
         'cow_id': cow_id
     })
+
+# def search_view(request):
+#     query = request.GET.get('q')  # Get the search input
+#     # For now, we're not filtering anything, but you can store the query for later use
+#     context = {
+#         'query': query,
+#         'total_sales': 10000,  # Example existing data
+#         'growth_rate': 12,     # Example existing data
+#         # Add all other existing context data here
+#     }
+#
+ #   return render(request, 'your_template.html', context)
+
