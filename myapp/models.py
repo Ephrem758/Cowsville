@@ -4,6 +4,7 @@ from multiselectfield import MultiSelectField
 
 class Farm(models.Model):
     # Basic Information
+    farm_id = models.CharField(max_length=50, unique=True, null=True, blank=True)
     owner_name = models.CharField(max_length=100)
     address = models.TextField()
     telephone = models.CharField(max_length=15)
