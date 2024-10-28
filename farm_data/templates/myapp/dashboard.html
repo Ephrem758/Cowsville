@@ -227,8 +227,8 @@
       <div class="row mt-4">
 
 
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Cow ID" aria-label="search" 
+        <form class="d-flex" method="GET" action="{% url 'search_animal' %}">
+          <input class="form-control me-2" type="search" name = "cow_id" placeholder="Cow ID" aria-label="search" 
                  style="border: 1px solid #ccc; text-align: center; color: black; 
                         background-color: white; border-radius: 5px; width: 200px; height: 38px;">
           <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
@@ -274,22 +274,28 @@
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
-                  <h6>Projects</h6>
-                  <p class="text-sm mb-0">
+                  <h6>Farm details</h6>
+                  {% comment %} <p class="text-sm mb-0">
                     <i class="fa fa-check text-info" aria-hidden="true"></i>
-                    <span class="font-weight-bold ms-1">30 done</span> this month
-                  </p>
+                    <span class="font-weight-bold ms-1">
+                      {% if animal %}
+                      Total daily milk of: {{ animal.tdm }} 
+                    {% else %}
+                            none
+                    {% endif %}
+                    </span> L produced
+                  </p> {% endcomment %}
                 </div>
                 <div class="col-lg-6 col-5 my-auto text-end">
                   <div class="dropdown float-lg-end pe-4">
                     <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
                       <i class="fa fa-ellipsis-v text-secondary"></i>
                     </a>
-                    <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
+                    {% comment %} <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
                       <li><a class="dropdown-item border-radius-md" href="javascript:;">Action</a></li>
                       <li><a class="dropdown-item border-radius-md" href="javascript:;">Another action</a></li>
                       <li><a class="dropdown-item border-radius-md" href="javascript:;">Something else here</a></li>
-                    </ul>
+                    </ul> {% endcomment %}
                   </div>
                 </div>
               </div>
@@ -299,13 +305,30 @@
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Companies</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Members</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Budget</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Completion</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cow ID</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Gyn status</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lactation No</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">parity</th>
                     </tr>
                   </thead>
+
+
                   <tbody>
+                    {% for a in animal %}
+                    <tr>
+                      <td>{{ a.cow_id }}</td>
+                      <td>{{ a.gyn_status }}</td>
+                      <td>{{ a.lactation_no }}</td>
+                      <td>{{ a.parity }}</td>
+                  </tr>
+                    {% comment %} {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No animals found for this farm ID</td>
+                    </tr> {% endcomment %}
+                    {% endfor %}
+                </tbody>
+                  {% comment %} here {% endcomment %}
+                  {% comment %} <tbody>
                     <tr>
                       <td>
                         <div class="d-flex px-2 py-1">
@@ -537,7 +560,10 @@
                         </div>
                       </td>
                     </tr>
-                  </tbody>
+                  </tbody> {% endcomment %}
+
+                  {% comment %} here {% endcomment %}
+
                 </table>
               </div>
             </div>
@@ -546,10 +572,16 @@
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header pb-0">
-              <h6>Orders overview</h6>
+              <h6>Cow details</h6>
               <p class="text-sm">
                 <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
-                <span class="font-weight-bold">24%</span> this month
+                <span class="font-weight-bold">
+                  {% if animal %}
+                      Cow ID: {{ animal.cow_id }} 
+                    {% else %}
+                         Cow ID:  0
+                    {% endif %}
+                </span> 
               </p>
             </div>
             <div class="card-body p-3">
@@ -559,8 +591,14 @@
                     <i class="material-icons text-success text-gradient">notifications</i>
                   </span>
                   <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">
+                      {% if animal %}
+                      Heat signs: {{ animal.heat_signs }} 
+                    {% else %}
+                         Heat signs:   none
+                    {% endif %}
+                    </h6>
+                    {% comment %} <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p> {% endcomment %}
                   </div>
                 </div>
                 <div class="timeline-block mb-3">
@@ -568,46 +606,87 @@
                     <i class="material-icons text-danger text-gradient">code</i>
                   </span>
                   <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">New order #1832412</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">
+                      {% if animal %}
+                      DALC: {{ animal.dalc }} 
+                    {% else %}
+                          DALC:  0
+                    {% endif %}
+                    </h6>
+                    {% comment %} <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p> {% endcomment %}
                   </div>
                 </div>
+
+                {% comment %} date of AI  {% endcomment %}
                 <div class="timeline-block mb-3">
                   <span class="timeline-step">
                     <i class="material-icons text-info text-gradient">shopping_cart</i>
                   </span>
                   <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">Server payments for April</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">
+                      {% if animal %}
+                      Date of AI: {{ animal.date_of_AI }} 
+                    {% else %}
+                            Date of AI: 0
+                    {% endif %}
+                    </h6>
+                    {% comment %} <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p> {% endcomment %}
                   </div>
                 </div>
+                {% comment %} date if AI {% endcomment %}
+
+                {% comment %} Insemination number {% endcomment %}
                 <div class="timeline-block mb-3">
                   <span class="timeline-step">
                     <i class="material-icons text-warning text-gradient">credit_card</i>
                   </span>
                   <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">New card added for order #4395133</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p>
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">
+                      {% if animal %}
+                      Insemination number: {{ animal.insemination_number }} 
+                    {% else %}
+                            Insemination number: 0
+                    {% endif %}
+                    </h6>
+                    {% comment %} <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p> {% endcomment %}
                   </div>
                 </div>
+
+                {% comment %} Insemination number end {% endcomment %}
+
                 <div class="timeline-block mb-3">
                   <span class="timeline-step">
                     <i class="material-icons text-primary text-gradient">key</i>
                   </span>
                   <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">Unlock packages for development</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p>
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">
+                      {% if animal %}
+                      Breed: {{ animal.breed }} 
+                    {% else %}
+                           Breed: 0
+                    {% endif %}
+                    </h6>
+                    {% comment %} <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p> {% endcomment %}
                   </div>
                 </div>
+
+                {% comment %} day count since last heat sign {% endcomment %}
                 <div class="timeline-block">
                   <span class="timeline-step">
                     <i class="material-icons text-dark text-gradient">payments</i>
                   </span>
                   <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">New order #9583120</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
+                    <h6 class="text-dark text-sm font-weight-bold mb-0">
+                      {% if animal %}
+                      day count since last heat sign: {{animal.heat_sign_start_date}} 
+                    {% else %}
+                            day count since last heat sign: 0
+                    {% endif %}
+                    </h6>
+                    {% comment %} <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p> {% endcomment %}
                   </div>
                 </div>
+                {% comment %} day count since last heat sign end {% endcomment %}
               </div>
             </div>
           </div>
