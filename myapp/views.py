@@ -78,16 +78,34 @@ def search_farm(request):
     
     return render(request, 'dashboard.html', {'farm': farm})
 
-
 def search_animal(request):
     animal = None
-    if 'cow_id' in request.GET:
+    
+    # Check if a specific cow_id is provided
+    if 'cow_id' in request.GET and request.GET['cow_id']:
         cow_id = request.GET['cow_id']
         try:
-            animal = Animal.objects.get(cow_id=cow_id)
+            animal = [Animal.objects.get(cow_id=cow_id)]  # Wrap in a list to make it iterable
         except Animal.DoesNotExist:
-            animal = None
+            animal = []  # Empty list if no matching animal is found
+    else:
+        # If no cow_id is provided, retrieve all animals
+        animal = list(Animal.objects.all())
+    
     return render(request, 'dashboard.html', {'animal': animal})
+
+
+# def search_animal(request):
+#     animal = None
+#     if 'cow_id' in request.GET:
+#         cow_id = request.GET['cow_id']
+#         try:
+#             animal = Animal.objects.get(cow_id=cow_id)
+#         except Animal.DoesNotExist:
+#             animal = None
+#     return render(request, 'dashboard.html', {'animal': animal})
+
+
 
 # def search_view(request):
 #     query = request.GET.get('q')  # Get the search input
