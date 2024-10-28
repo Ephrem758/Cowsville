@@ -71,15 +71,24 @@
     <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
       <div class="container-fluid py-1 px-3">
         <nav aria-label="breadcrumb">
-          <h6 class="font-weight-bolder mb-0">Dashboard</h6>
+          <h6 class="font-weight-bolder mb-0">
+            {% if farm %}
+                            {{ farm.owner_name }}
+                        {% else %}
+                            Dashboard
+                        {% endif %}
+
+          </h6>
           
         </nav>
         
         </div>
         
       </div>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Farm ID" aria-label="search" 
+
+      {% comment %} search button {% endcomment %}
+      <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
+        <input class="form-control me-2" type="search" name="farm_id" placeholder="Farm ID" aria-label="search"
                style="border: 1px solid #ccc; text-align: center; color: black; 
                       background-color: white; border-radius: 5px; width: 200px; height: 38px;">
         <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
@@ -113,7 +122,16 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Total Cows</p>
-                <h4 class="mb-0">2K</h4>
+
+                {% comment %} dynamic total cows {% endcomment %}
+
+                <h4 class="mb-0">
+                        {% if farm %}
+                            {{ farm.herd_size }}
+                        {% else %}
+                            2K
+                        {% endif %}
+                    </h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
@@ -130,7 +148,16 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Daily milk allowance</p>
-                <h4 class="mb-0">2,300L</h4>
+
+                {% comment %} dynamic milk allowance {% endcomment %}
+
+                <h4 class="mb-0">
+                        {% if farm %}
+                            {{ farm.tdm }} L
+                        {% else %}
+                            2,300L
+                        {% endif %}
+                    </h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
@@ -147,7 +174,16 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Address</p>
-                <h4 class="mb-0">kebele 01</h4>
+
+                {% comment %} dynamic address {% endcomment %}
+                
+                <h4 class="mb-0">
+                  {% if farm %}
+                      {{ farm.address }} L
+                  {% else %}
+                      Kebele 01
+                  {% endif %}
+              </h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
@@ -164,7 +200,16 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Phone number</p>
-                <h4 class="mb-0">0946436734</h4>
+
+                {% comment %} dynamic phone {% endcomment %}
+
+                <h4 class="mb-0">
+                        {% if farm %}
+                            {{ farm.telephone }} L
+                        {% else %}
+                        0946436734
+                        {% endif %}
+                    </h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">

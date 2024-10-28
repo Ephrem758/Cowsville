@@ -38,31 +38,56 @@ def sign_up(request):
 
 
 
-def farm_details(request):
-    farms = Farm.objects.all()  # Get all farms for the dropdown
+# def farm_details(request):
+#     farms = Farm.objects.all()  # Get all farms for the dropdown
+#     farm = None
+#     cows = None
+#     cow_details = None
+#     cow_id = None
+
+#     if request.method == 'GET':
+#         farm_id = request.GET.get('farm_id', None)
+#         cow_id = request.GET.get('cow_id', None)
+        
+#         if farm_id:
+#             farm = get_object_or_404(Farm, id=farm_id)
+#             cows = Animal.objects.filter(farm=farm)
+        
+#         if cow_id:
+#             cow_details = get_object_or_404(Animal, cow_id=cow_id)
+
+#     return render(request, 'farm_details.html', {
+#         'farms': farms,
+#         'farm': farm,
+#         'cows': cows,
+#         'cow_details': cow_details,
+#         'cow_id': cow_id
+#     })
+
+from django.shortcuts import render, get_object_or_404
+from .models import Farm
+
+def search_farm(request):
     farm = None
-    cows = None
-    cow_details = None
-    cow_id = None
+    if 'farm_id' in request.GET:
+        farm_id = request.GET['farm_id']
+        try:
+            farm = Farm.objects.get(farm_id=farm_id)
+        except Farm.DoesNotExist:
+            farm = None
+    
+    return render(request, 'dashboard.html', {'farm': farm})
 
-    if request.method == 'GET':
-        farm_id = request.GET.get('farm_id', None)
-        cow_id = request.GET.get('cow_id', None)
-        
-        if farm_id:
-            farm = get_object_or_404(Farm, id=farm_id)
-            cows = Animal.objects.filter(farm=farm)
-        
-        if cow_id:
-            cow_details = get_object_or_404(Animal, cow_id=cow_id)
 
-    return render(request, 'farm_details.html', {
-        'farms': farms,
-        'farm': farm,
-        'cows': cows,
-        'cow_details': cow_details,
-        'cow_id': cow_id
-    })
+def search_animal(request):
+    animal = None
+    if 'cow_id' in request.GET:
+        cow_id = request.GET['cow_id']
+        try:
+            animal = Animal.objects.get(cow_id=cow_id)
+        except Animal.DoesNotExist:
+            animal = None
+    return render(request, 'dashboard.html', {'animal': animal})
 
 # def search_view(request):
 #     query = request.GET.get('q')  # Get the search input
