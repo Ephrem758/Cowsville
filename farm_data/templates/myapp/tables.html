@@ -140,6 +140,24 @@
         </nav>
         
       </div>
+      {% comment %} search bar  {% endcomment %}
+      <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
+        <input type="hidden" name="page" value="tables">
+        <input class="form-control me-2" type="search" name="farm_id" placeholder="Farm ID" aria-label="search"
+               style="border: 1px solid #ccc; text-align: center; color: black; 
+                      background-color: white; border-radius: 5px; width: 200px; height: 38px;">
+        <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
+    </form>
+    
+    
+    <style>
+      /* Add styles for the placeholder */
+      input::placeholder {
+          color: #888; /* Lighter gray for better visibility */
+          font-weight: normal; /* Normal weight for placeholder */
+      }
+      </style>
+      {% comment %} end of farm ID search bar {% endcomment %}
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
@@ -156,14 +174,47 @@
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Farmer</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Feeding</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Health</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cow ID</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Vaccination</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">After Insemimation</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date of AI</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Parity</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">indemination no</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Udder health</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sire breed</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lactation No</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Gyn status</th>
                       <th class="text-secondary opacity-7"></th>
                     </tr>
                   </thead>
+
+
                   <tbody>
+                    {% if animal %}
+                        {% for a in animal %}
+                            <tr>
+                                <td>{{ a.cow_id }}</td>
+                                <td>{{ a.vaccination_date }}</td>
+                                <td class="text-center">{{ a.after_insemination }}</td>
+                                <td class="text-center">{{ a.date_of_ai }}</td>
+                                <td class="text-center">{{ a.parity }}</td>
+                                <td class="text-center">{{ a.insem_no }}</td>
+                                <td class="text-center">{{ a.udder_health  }}</td>
+                                <td class="text-center">{{ a.breed  }}</td>
+                                <td class="text-center">{{ a.lactation_no  }}</td>
+                                <td class="text-center">{{ a.gyn_status  }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">No cows found for this farm.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                
+                  {% comment %} old body {% endcomment %}
+
+                  {% comment %} <tbody>
                     <tr>
                       <td>
                         <div class="d-flex px-2 py-1">
@@ -332,7 +383,11 @@
                         </a>
                       </td>
                     </tr>
-                  </tbody>
+                  </tbody> {% endcomment %}
+
+                  {% comment %} old body {% endcomment %}
+
+
                 </table>
               </div>
             </div>
