@@ -73,7 +73,7 @@
         <nav aria-label="breadcrumb">
           <h6 class="font-weight-bolder mb-0">
             {% if farm %}
-                            {{ farm.owner_name }}
+                            {{ farm.owner_name }}'s Farm
                         {% else %}
                             Dashboard
                         {% endif %}
@@ -87,12 +87,21 @@
       </div>
 
       {% comment %} search button {% endcomment %}
+
       <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
+        <input type="hidden" name="page" value="dashboard">
         <input class="form-control me-2" type="search" name="farm_id" placeholder="Farm ID" aria-label="search"
                style="border: 1px solid #ccc; text-align: center; color: black; 
                       background-color: white; border-radius: 5px; width: 200px; height: 38px;">
         <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
     </form>
+
+      {% comment %} <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
+        <input class="form-control me-2" type="search" name="farm_id" placeholder="Farm ID" aria-label="search"
+               style="border: 1px solid #ccc; text-align: center; color: black; 
+                      background-color: white; border-radius: 5px; width: 200px; height: 38px;">
+        <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
+    </form> {% endcomment %}
     
     <style>
       /* Add styles for the placeholder */
@@ -300,19 +309,44 @@
                 </div>
               </div>
             </div>
-            <div class="card-body px-0 pb-2">
+
+            {% comment %} here {% endcomment %}
+            {% comment %} <div class="card-body px-0 pb-2">
               <div class="table-responsive">
                 <table class="table align-items-center mb-0">
                   <thead>
-                    <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cow ID</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Gyn status</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lactation No</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">parity</th>
-                    </tr>
+                      <tr>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cow ID</th>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Vaccination</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">After Insemination</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date of AI</th>
+                          <th class="text-secondary opacity-7"></th>
+                      </tr>
                   </thead>
+                  <tbody>
+                      {% if animal %}
+                          {% for a in animal %}
+                              <tr>
+                                  <td>{{ a.cow_id }}</td>
+                                  <td>{{ a.vaccination_date }}</td>
+                                  <td class="text-center">{{ a.after_insemination }}</td>
+                                  <td class="text-center">{{ a.date_of_ai }}</td>
+                              </tr>
+                          {% endfor %}
+                      {% else %}
+                          <tr>
+                              <td colspan="4" class="text-center">No cows found for this farm.</td>
+                          </tr>
+                      {% endif %}
+                  </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> {% endcomment %}
 
 
+{% comment %} 
                   <tbody>
                     {% for a in animal %}
                     <tr>
@@ -320,13 +354,12 @@
                       <td>{{ a.gyn_status }}</td>
                       <td>{{ a.lactation_no }}</td>
                       <td>{{ a.parity }}</td>
-                  </tr>
+                  </tr> {% endcomment %}
                     {% comment %} {% empty %}
                     <tr>
                         <td colspan="4" class="text-center">No animals found for this farm ID</td>
                     </tr> {% endcomment %}
-                    {% endfor %}
-                </tbody>
+                    
                   {% comment %} here {% endcomment %}
                   {% comment %} <tbody>
                     <tr>
@@ -564,11 +597,8 @@
 
                   {% comment %} here {% endcomment %}
 
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+                
+              
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header pb-0">

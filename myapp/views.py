@@ -67,43 +67,94 @@ def sign_up(request):
 from django.shortcuts import render, get_object_or_404
 from .models import Farm
 
+
+# used to handle the search but not for the table
+
+# def search_farm(request):
+#     farm = None
+#     if 'farm_id' in request.GET:
+#         farm_id = request.GET['farm_id']
+#         try:
+#             farm = Farm.objects.get(farm_id=farm_id)
+#         except Farm.DoesNotExist:
+#             farm = None
+    
+#     return render(request, 'dashboard.html', {'farm': farm})
+
+
+
+
 def search_farm(request):
     farm = None
+    animal = []  # Use `animal` as the key to match other pages
     if 'farm_id' in request.GET:
         farm_id = request.GET['farm_id']
         try:
             farm = Farm.objects.get(farm_id=farm_id)
+            # Fetch all animals related to this farm
+            animal = list(Animal.objects.filter(farm_id=farm))
         except Farm.DoesNotExist:
             farm = None
-    
-    return render(request, 'dashboard.html', {'farm': farm})
 
-def search_animal(request):
-    animal = None
-    
-    # Check if a specific cow_id is provided
-    if 'cow_id' in request.GET and request.GET['cow_id']:
-        cow_id = request.GET['cow_id']
-        try:
-            animal = [Animal.objects.get(cow_id=cow_id)]  # Wrap in a list to make it iterable
-        except Animal.DoesNotExist:
-            animal = []  # Empty list if no matching animal is found
-    else:
-        # If no cow_id is provided, retrieve all animals
-        animal = list(Animal.objects.all())
-    
-    return render(request, 'dashboard.html', {'animal': animal})
+    # Determine the page to render based on a query parameter (default to dashboard)
+    page = request.GET.get('page', 'dashboard')
+    template_name = 'tables.html' if page == 'tables' else 'dashboard.html'
+
+    return render(request, template_name, {'farm': farm, 'animal': animal})
 
 
+
+
+# itterable
 # def search_animal(request):
 #     animal = None
-#     if 'cow_id' in request.GET:
+    
+#     # Check if a specific cow_id is provided
+#     if 'cow_id' in request.GET and request.GET['cow_id']:
 #         cow_id = request.GET['cow_id']
 #         try:
-#             animal = Animal.objects.get(cow_id=cow_id)
+#             animal = [Animal.objects.get(cow_id=cow_id)]  # Wrap in a list to make it iterable
 #         except Animal.DoesNotExist:
-#             animal = None
+#             animal = []  # Empty list if no matching animal is found
+#     else:
+#         # If no cow_id is provided, retrieve all animals
+#         animal = list(Animal.objects.all())
+    
 #     return render(request, 'dashboard.html', {'animal': animal})
+
+
+
+# both iterable and non-iterable
+# def search_animal(request):
+#     animal = []
+    
+#     # Check if a specific cow_id is provided
+#     if 'cow_id' in request.GET and request.GET['cow_id']:
+#         cow_id = request.GET['cow_id']
+#         try:
+#             # Retrieve a single animal object and wrap it in a list to make it iterable
+#             animal_instance = Animal.objects.get(cow_id=cow_id)
+#             animal = [animal_instance]
+#         except Animal.DoesNotExist:
+#             animal = []  # Empty list if no matching animal is found
+#     else:
+#         # If no cow_id is provided, retrieve all animals
+#         animal = list(Animal.objects.all())
+    
+#     return render(request, 'dashboard.html', {'animal': animal})
+
+
+
+# non-iterable
+def search_animal(request):
+    animal = None
+    if 'cow_id' in request.GET:
+        cow_id = request.GET['cow_id']
+        try:
+            animal = Animal.objects.get(cow_id=cow_id)
+        except Animal.DoesNotExist:
+            animal = None
+    return render(request, 'dashboard.html', {'animal': animal})
 
 
 
