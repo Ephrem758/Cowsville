@@ -244,7 +244,7 @@
         </form>
     
       {% comment %} important graph {% endcomment %}
-        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+        {% comment %} <div class="col-lg-4 col-md-6 mt-4 mb-4">
           <div class="card z-index-2  ">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
               <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -263,14 +263,297 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> {% endcomment %}
 
         {% comment %} important graph END {% endcomment %}
 
 
 
 
+        {% comment %} new graph start {% endcomment %}
         
+        <!-- Fertility Window Graph -->
+{% comment %} <div style="width: 100%; max-width: 600px; height: 300px;">
+  <canvas id="fertility-chart"></canvas>
+</div>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Load Chart.js Annotation Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0"></script>
+
+<script>
+  // Static heat sign time example (set as 1:00 PM)
+  const heatSignTime = new Date();
+  heatSignTime.setHours(13, 0, 0, 0); // H = 1:00 PM
+
+  // Calculate time labels for every 2 hours from heat sign time up to H + 18 hrs
+  const timeLabels = [];
+  for (let i = 0; i <= 18; i += 2) {
+    const labelTime = new Date(heatSignTime.getTime() + i * 60 * 60 * 1000);
+    timeLabels.push(labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  }
+
+  // Define probability data for each 6-hour interval and colors
+  const probabilityData = [90, 60, 30];
+  const backgroundColors = [
+    "rgba(76, 175, 80, 0.8)",  // Green for 0-6 hrs
+    "rgba(255, 193, 7, 0.8)",  // Yellow for 6-12 hrs
+    "rgba(244, 67, 54, 0.8)"   // Red for 12-18 hrs
+  ];
+
+  // Calculate hours passed since heat sign to determine the pointer position
+  const currentTime = new Date();
+  const hoursPassed = Math.min(18, (currentTime - heatSignTime) / (60 * 60 * 1000)); // Cap at 18 hrs
+  const pointerPosition = hoursPassed / 2; // X-axis index for pointer (0 to 9 for 18 hours in 2-hour intervals)
+
+  // Initialize the chart
+  var ctx = document.getElementById("fertility-chart").getContext("2d");
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: timeLabels, // X-axis time labels
+      datasets: [{
+        label: "Probability of Pregnancy",
+        data: [90, 90, 90, 60, 60, 60, 30, 30, 30], // Repeating each probability level to match each 2-hour interval
+        backgroundColor: [
+          ...Array(3).fill("rgba(76, 175, 80, 0.8)"), // Green for 0-6 hrs
+          ...Array(3).fill("rgba(255, 193, 7, 0.8)"), // Yellow for 6-12 hrs
+          ...Array(3).fill("rgba(244, 67, 54, 0.8)")  // Red for 12-18 hrs
+        ],
+        barPercentage: 1.0,
+        categoryPercentage: 1.0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `Time: ${timeLabels[Math.floor(pointerPosition)]} (${Math.floor(hoursPassed)} hrs passed)`;
+            }
+          }
+        },
+        annotation: {
+          annotations: {
+            pointerDot: {
+              type: "point",
+              xValue: pointerPosition,
+              yValue: probabilityData[Math.floor(pointerPosition / 3)], // Determine the y-value from probabilityData
+              backgroundColor: "black",
+              radius: 6,
+              borderWidth: 2,
+              borderColor: "white",
+              label: {
+                enabled: true,
+                content: `Current Time: ${Math.floor(hoursPassed)} hrs`,
+                position: "top",
+                backgroundColor: "rgba(0,0,0,0.7)",
+                color: "white",
+                font: { size: 12 }
+              }
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: { color: "#333" },
+          grid: {
+            color: "rgba(0, 0, 0, 0.1)",
+            borderDash: [5, 5]
+          },
+          title: {
+            display: true,
+            text: "Probability (%)",
+            color: "#333",
+            font: { size: 14 }
+          }
+        },
+        x: {
+          ticks: { color: "#333" },
+          grid: { display: false },
+          title: {
+            display: true,
+            text: "Time (hours after heat sign)",
+            color: "#333",
+            font: { size: 14 }
+          }
+        }
+      }
+    }
+  });
+</script>
+ {% endcomment %}
+
+
+
+
+        
+  {% comment %} new graph end        {% endcomment %}
+
+
+
+
+
+
+       
+  
+      {% comment %} final dynamic graph start {% endcomment %}
+
+
+<!-- Fertility Window Graph or Message -->
+<div style="width: 100%; max-width: 600px; height: 300px;">
+  {% if animal %}
+    <canvas id="fertility-chart"></canvas>
+  {% else %}
+    <p>No cow ID found</p>
+  {% endif %}
+</div>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0"></script>
+
+<script>
+  {% if animal %}
+    // Set heat sign start time from database or default to 2:00 AM if missing
+    let heatSignTime = "{{ animal.heat_sign_start_time|date:'Y-m-d H:i:s' }}" || "2000-01-01 02:00:00";
+    heatSignTime = new Date(heatSignTime);
+
+    // Ensure heatSignTime is valid
+    if (!isNaN(heatSignTime.getTime())) {
+      // Set default current time and make sure it follows heatSignTime within the same 24-hour period
+      const currentTime = new Date();
+      
+      // Calculate hours and minutes difference only within the same day cycle
+      const hoursDiff = currentTime.getHours() - heatSignTime.getHours();
+      const minutesDiff = (currentTime.getMinutes() - heatSignTime.getMinutes()) / 60;
+      let hoursPassed = hoursDiff + minutesDiff;
+
+      // Clamp hoursPassed to ensure it's within 0-18 hours
+      hoursPassed = Math.min(18, Math.max(0, hoursPassed));
+
+      // Generate time labels from heatSignTime to heatSignTime + 18 hrs
+      const timeLabels = [];
+      for (let i = 0; i <= 18; i += 2) {
+        const labelTime = new Date(heatSignTime.getTime() + i * 60 * 60 * 1000);
+        timeLabels.push(labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      }
+
+      // Calculate pointer position on x-axis (mapped to 0-9 range)
+      const pointerPosition = hoursPassed / 2;
+      const pointerYValue = hoursPassed <= 6 ? 90 : hoursPassed <= 12 ? 60 : 30; // Set y-value based on color sections
+
+      // Debugging log statements to verify values
+      console.log("Heat Sign Time:", heatSignTime);
+      console.log("Current Time:", currentTime);
+      console.log("Hours Passed:", hoursPassed);
+      console.log("Pointer Position:", pointerPosition);
+
+      // Initialize the chart
+      var ctx = document.getElementById("fertility-chart").getContext("2d");
+
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: timeLabels, // X-axis time labels (0-18 hours)
+          datasets: [{
+            label: "Probability of Pregnancy",
+            data: [90, 90, 90, 60, 60, 60, 30, 30, 30], // Probability data across 0-6, 6-12, 12-18 hours
+            backgroundColor: [
+              ...Array(3).fill("rgba(76, 175, 80, 0.8)"), // Green for 0-6 hrs
+              ...Array(3).fill("rgba(255, 193, 7, 0.8)"), // Yellow for 6-12 hrs
+              ...Array(3).fill("rgba(244, 67, 54, 0.8)")  // Red for 12-18 hrs
+            ],
+            barPercentage: 1.0,
+            categoryPercentage: 1.0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `Time: ${timeLabels[Math.floor(pointerPosition)]} (${Math.floor(hoursPassed)} hrs passed)`;
+                }
+              }
+            },
+            annotation: {
+              annotations: {
+                pointerDot: {
+                  type: "point",
+                  xValue: pointerPosition,
+                  yValue: pointerYValue,
+                  backgroundColor: "black",
+                  radius: 6,
+                  borderWidth: 2,
+                  borderColor: "white",
+                  label: {
+                    enabled: true,
+                    content: `Current Time: ${Math.floor(hoursPassed)} hrs`,
+                    position: "top",
+                    backgroundColor: "rgba(0,0,0,0.7)",
+                    color: "white",
+                    font: { size: 12 }
+                  }
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: { color: "#333" },
+              grid: {
+                color: "rgba(0, 0, 0, 0.1)",
+                borderDash: [5, 5]
+              },
+              title: {
+                display: true,
+                text: "Probability (%)",
+                color: "#333",
+                font: { size: 14 }
+              }
+            },
+            x: {
+              ticks: { color: "#333" },
+              grid: { display: false },
+              title: {
+                display: true,
+                text: "Time (hours after heat sign)",
+                color: "#333",
+                font: { size: 14 }
+              }
+            }
+          }
+        }
+      });
+    }
+  {% endif %}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+       {% comment %} final dynamic graph end {% endcomment %}
         
        
       </div> 
@@ -283,7 +566,7 @@
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
-                  <h6>Farm details</h6>
+                  {% comment %} <h6>Farm details</h6> {% endcomment %}
                   {% comment %} <p class="text-sm mb-0">
                     <i class="fa fa-check text-info" aria-hidden="true"></i>
                     <span class="font-weight-bold ms-1">
@@ -311,291 +594,7 @@
             </div>
 
             {% comment %} here {% endcomment %}
-            {% comment %} <div class="card-body px-0 pb-2">
-              <div class="table-responsive">
-                <table class="table align-items-center mb-0">
-                  <thead>
-                      <tr>
-                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cow ID</th>
-                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Vaccination</th>
-                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">After Insemination</th>
-                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date of AI</th>
-                          <th class="text-secondary opacity-7"></th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {% if animal %}
-                          {% for a in animal %}
-                              <tr>
-                                  <td>{{ a.cow_id }}</td>
-                                  <td>{{ a.vaccination_date }}</td>
-                                  <td class="text-center">{{ a.after_insemination }}</td>
-                                  <td class="text-center">{{ a.date_of_ai }}</td>
-                              </tr>
-                          {% endfor %}
-                      {% else %}
-                          <tr>
-                              <td colspan="4" class="text-center">No cows found for this farm.</td>
-                          </tr>
-                      {% endif %}
-                  </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div> {% endcomment %}
-
-
-{% comment %} 
-                  <tbody>
-                    {% for a in animal %}
-                    <tr>
-                      <td>{{ a.cow_id }}</td>
-                      <td>{{ a.gyn_status }}</td>
-                      <td>{{ a.lactation_no }}</td>
-                      <td>{{ a.parity }}</td>
-                  </tr> {% endcomment %}
-                    {% comment %} {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center">No animals found for this farm ID</td>
-                    </tr> {% endcomment %}
-                    
-                  {% comment %} here {% endcomment %}
-                  {% comment %} <tbody>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{% static 'img/small-logos/logo-xd.svg' %}" class="avatar avatar-sm me-3" alt="xd">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Material XD Version</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img src="{% static 'img/team-1.jpg' %}" alt="team1">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img src="{% static 'img/team-2.jpg' %}" alt="team2">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">
-                            <img src="{% static 'img/team-3.jpg'%}" alt="team3">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img src="{% static 'img/team-4.jpg' %}" alt="team4">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $14,000 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">60%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{% static 'img/small-logos/logo-atlassian.svg' %}" class="avatar avatar-sm me-3" alt="atlassian">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Add Progress Track</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img src="{% static 'img/team-2.jpg' %}" alt="team5">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img src="{% static 'img/team-4.jpg' %}" alt="team6">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $3,000 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">10%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-10" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{% static 'img/small-logos/logo-slack.svg' %}" class="avatar avatar-sm me-3" alt="team7">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Fix Platform Errors</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img src="{% static 'img/team-3.jpg' %}" alt="team8">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img src="{% static 'img/team-1.jpg' %}" alt="team9">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> Not set </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">100%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-success w-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{% static 'img/small-logos/logo-spotify.svg' %}" class="avatar avatar-sm me-3" alt="spotify">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Launch our Mobile App</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img src="{% static 'img/team-4.jpg' %}" alt="user1">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">
-                            <img src=".{% static 'img/team-3.jpg' %}" alt="user2">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">
-                            <img src="{% static 'img/team-4.jpg' %}" alt="user3">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img src="{% static 'img/team-1.jpg' %}" alt="user4">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $20,500 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">100%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-success w-100" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{% static 'img/small-logos/logo-jira.svg' %}" class="avatar avatar-sm me-3" alt="jira">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Add the New Pricing Page</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img src="{% static 'img/team-4.jpg' %}" alt="user5">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $500 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">25%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-25" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="25"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div>
-                            <img src="{% static 'img/small-logos/logo-invision.svg' %}" class="avatar avatar-sm me-3" alt="invision">
-                          </div>
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">Redesign New Online Shop</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="avatar-group mt-2">
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                            <img src="{% static 'img/team-1.jpg' %}" alt="user6">
-                          </a>
-                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">
-                            <img src="{% static 'img/team-4.jpg' %}" alt="user7">
-                          </a>
-                        </div>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> $2,000 </span>
-                      </td>
-                      <td class="align-middle">
-                        <div class="progress-wrapper w-75 mx-auto">
-                          <div class="progress-info">
-                            <div class="progress-percentage">
-                              <span class="text-xs font-weight-bold">40%</span>
-                            </div>
-                          </div>
-                          <div class="progress">
-                            <div class="progress-bar bg-gradient-info w-40" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="40"></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody> {% endcomment %}
-
-                  {% comment %} here {% endcomment %}
+            
 
                 
               
