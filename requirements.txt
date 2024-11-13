@@ -1,0 +1,4 @@
+celery 
+redis
+pip install celery redis
+ensure celery -A farm_data worker --loglevel=info
