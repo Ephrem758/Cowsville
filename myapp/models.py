@@ -140,14 +140,15 @@ class Animal(models.Model):
     days_to_calving = models.IntegerField(null=True, blank=True)  # Days until calving if pregnant
     date_of_calving = models.DateField(null=True, blank=True)  # Date of calving (if applicable)
     lactation_no = models.IntegerField()  # Lactation number (1-7)
-    dim = models.IntegerField()  # Number of days in milk
-    dmy = models.FloatField()  # Average daily milk yield after calving
-    dalc = models.IntegerField()  # Days after last calving
+    no_days_in_milk = models.IntegerField()  # Number of days in milk
+    average_daily_milk = models.FloatField()  # Average daily milk yield after calving
+    days_after_calving = models.IntegerField()  # Days after last calving
+    insemination_number = models.IntegerField() # How many days
+    date_ai =  models.DateField(null=True, blank=True)                                                                               
 
     # Fertility and Heat Signs
+    last_heat_sign = models.DateField(null=True, blank=True)
     heat_signs = MultiSelectField(choices=HEAT_SIGN_CHOICES, max_length=200)  # Multi-select for heat signs
-    fertility_window_start = models.DateTimeField(null=True, blank=True)  # Fertility window start
-    fertility_window_end = models.DateTimeField(null=True, blank=True)  # Fertility window end
     conception_rate = models.CharField(max_length=20, choices=CONCEPTION_RATE_CHOICES, null=True, blank=True)
 
     # Health Information
