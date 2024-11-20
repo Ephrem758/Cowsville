@@ -88,21 +88,29 @@
 
       {% comment %} search button {% endcomment %}
 
-      <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
+      {% comment %} <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
         <input type="hidden" name="page" value="dashboard">
         <input class="form-control me-2" type="search" name="farm_id" placeholder="Farm ID" aria-label="search"
                style="border: 1px solid #ccc; text-align: center; color: black; 
                       background-color: white; border-radius: 5px; width: 200px; height: 38px;">
         <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
-    </form>
-
-      {% comment %} <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
-        <input class="form-control me-2" type="search" name="farm_id" placeholder="Farm ID" aria-label="search"
-               style="border: 1px solid #ccc; text-align: center; color: black; 
-                      background-color: white; border-radius: 5px; width: 200px; height: 38px;">
-        <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
     </form> {% endcomment %}
-    
+
+    <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
+      <input type="hidden" name="page" value="dashboard">
+      <select class="form-control me-2" name="farm_id" 
+              style="border: 1px solid #ccc; text-align: center; color: black; 
+                     background-color: white; border-radius: 5px; width: 200px; height: 38px;">
+          <option value="" disabled selected>Select Farm</option>
+          {% for farm in all_farms %}
+              <option value="{{ farm.farm_id }}" style="color: black;">{{ farm.owner_name }}</option>
+          {% endfor %}
+      </select>
+      <button class="btn btn-outline-primary" type="submit" style="height: 38px;">Search</button>
+  </form>
+  
+
+      
     <style>
       /* Add styles for the placeholder */
       input::placeholder {
@@ -114,12 +122,24 @@
     <!-- End Navbar -->
 
      {% comment %} search bar {% endcomment %}
+
+{% comment %} drop list farm search start {% endcomment %}
+
+
+
+
+{% comment %} drop list farm search end {% endcomment %}
+
+
+
+
     {% comment %} <form method="GET" action="{% url 'search' %}" class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ query }}">
       <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
   </form> {% endcomment %}
     {% comment %} search bar {% endcomment %}
-
+   
+  
     
     <div class="container-fluid py-4">
       <div class="row">
@@ -637,7 +657,7 @@
                   <div class="timeline-content">
                     <h6 class="text-dark text-sm font-weight-bold mb-0">
                       {% if animal %}
-                      DALC: {{ animal.dalc }} 
+                      DALC: {{ animal.days_after_calving }} 
                     {% else %}
                           DALC:  0
                     {% endif %}
@@ -654,7 +674,7 @@
                   <div class="timeline-content">
                     <h6 class="text-dark text-sm font-weight-bold mb-0">
                       {% if animal %}
-                      Date of AI: {{ animal.date_of_AI }} 
+                      Date of AI: {{ animal.date_ai }} 
                     {% else %}
                             Date of AI: 0
                     {% endif %}
@@ -707,7 +727,7 @@
                   <div class="timeline-content">
                     <h6 class="text-dark text-sm font-weight-bold mb-0">
                       {% if animal %}
-                      day count since last heat sign: {{animal.heat_sign_start_date}} 
+                      day count since last heat sign: {{animal.last_heat_sign}} 
                     {% else %}
                             day count since last heat sign: 0
                     {% endif %}

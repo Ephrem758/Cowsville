@@ -2,11 +2,22 @@ from celery import shared_task
 from django.utils import timezone
 from datetime import timedelta
 from .models import Animal
+from .gsm_utils import send_to_gsm_module
 
 @shared_task
+# def send_alert_message(recipient, message):
+#     # Replace this with your actual integration logic to send alerts
+#     print(f"Sending alert to {recipient}: {message}")
+
 def send_alert_message(recipient, message):
-    # Replace this with your actual integration logic to send alerts
-    print(f"Sending alert to {recipient}: {message}")
+    try:
+        # GSM-specific command
+        gsm_message = f"AT+CMGS=\"{recipient}\"\r{message}\x1A"
+        send_to_gsm_module(gsm_message)
+
+        print(f"Alert sent to {recipient}: {message}")
+    except Exception as e:
+        print(f"Error sending alert to {recipient}: {e}")
 
 
 @shared_task
