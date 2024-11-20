@@ -1,7 +1,9 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
+import requests
 from .models import Farm, Animal
-from datetime import timedelta
+from datetime import timedelta, timezone
 
 # farm_management/views.py
 from rest_framework.views import APIView
@@ -93,43 +95,64 @@ from .models import Farm
 
 
 
+# def search_farm(request):
+#     farm = None
+#     animal = []  # Use `animal` as the key to match other pages
+#     if 'farm_id' in request.GET:
+#         farm_id = request.GET['farm_id']
+#         try:
+#             farm = Farm.objects.get(farm_id=farm_id)
+#             # Fetch all animals related to this farm
+#             animal = list(Animal.objects.filter(farm_id=farm))
+#         except Farm.DoesNotExist:
+#             farm = None
+
+#     # Determine the page to render based on a query parameter (default to dashboard)
+#     page = request.GET.get('page', 'dashboard')
+#     template_name = 'tables.html' if page == 'tables' else 'dashboard.html'
+
+#     return render(request, template_name, {'farm': farm, 'animal': animal})
+
+
+
+# to fecth all farms
 def search_farm(request):
     farm = None
-    animal = []  # Use `animal` as the key to match other pages
-    if 'farm_id' in request.GET:
+    animal = []
+    all_farms = Farm.objects.all()  # Fetch all farms for the dropdown
+
+    if 'farm_id' in request.GET and request.GET['farm_id']:
         farm_id = request.GET['farm_id']
         try:
             farm = Farm.objects.get(farm_id=farm_id)
-            # Fetch all animals related to this farm
             animal = list(Animal.objects.filter(farm_id=farm))
         except Farm.DoesNotExist:
             farm = None
 
-    # Determine the page to render based on a query parameter (default to dashboard)
     page = request.GET.get('page', 'dashboard')
     template_name = 'tables.html' if page == 'tables' else 'dashboard.html'
 
-    return render(request, template_name, {'farm': farm, 'animal': animal})
+    return render(request, template_name, {'farm': farm, 'animal': animal, 'all_farms': all_farms})
 
 
 
 
 # itterable
-def search_animal(request):
-    animal = None
+# def search_animal(request):
+#     animal = None
     
-    # Check if a specific cow_id is provided
-    if 'cow_id' in request.GET and request.GET['cow_id']:
-        cow_id = request.GET['cow_id']
-        try:
-            animal = [Animal.objects.get(cow_id=cow_id)]  # Wrap in a list to make it iterable
-        except Animal.DoesNotExist:
-            animal = []  # Empty list if no matching animal is found
-    else:
-        # If no cow_id is provided, retrieve all animals
-        animal = list(Animal.objects.all())
+#     # Check if a specific cow_id is provided
+#     if 'cow_id' in request.GET and request.GET['cow_id']:
+#         cow_id = request.GET['cow_id']
+#         try:
+#             animal = [Animal.objects.get(cow_id=cow_id)]  # Wrap in a list to make it iterable
+#         except Animal.DoesNotExist:
+#             animal = []  # Empty list if no matching animal is found
+#     else:
+#         # If no cow_id is provided, retrieve all animals
+#         animal = list(Animal.objects.all())
     
-    return render(request, 'dashboard.html', {'animal': animal})
+#     return render(request, 'dashboard.html', {'animal': animal})
 
 
 
@@ -193,7 +216,7 @@ class ReportHeatSignView(APIView):
             return Response({"error": "No signs provided"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Trigger the insemination alert sequence
-        alert_insemination_sequence(animal, {"signs": farmer_message})
+        alert_insemination_sequence(animal, {"signs": farmer_message}) # type: ignore
 
         # Respond with a success message
         return Response({"status": "Alert sequence initiated for insemination."}, status=status.HTTP_200_OK)
