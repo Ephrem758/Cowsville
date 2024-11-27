@@ -119,7 +119,7 @@ from .models import Farm
 def search_farm(request):
     farm = None
     animal = []
-    all_farms = Farm.objects.all()  # Fetch all farms for the dropdown
+    all_farms = Farm.objects.all().order_by('owner_name')  # Sort farms alphabetically by owner_name
 
     if 'farm_id' in request.GET and request.GET['farm_id']:
         farm_id = request.GET['farm_id']
@@ -187,6 +187,42 @@ def search_animal(request):
         except Animal.DoesNotExist:
             animal = None
     return render(request, 'dashboard.html', {'animal': animal})
+
+
+
+# retrieve both animal and farm
+def dashboard(request):
+    farm = None
+    animal = None
+    all_farms = Farm.objects.all().order_by('owner_name')  # Retrieve all farms for dropdown
+
+    # Get query parameters
+    farm_id = request.GET.get('farm_id', None)
+    cow_id = request.GET.get('cow_id', None)
+
+    # Handle farm ID search
+    if farm_id:
+        try:
+            farm = Farm.objects.get(farm_id=farm_id)
+        except Farm.DoesNotExist:
+            farm = None
+
+    # Handle cow ID search
+    if cow_id:
+        try:
+            animal = Animal.objects.get(cow_id=cow_id)
+        except Animal.DoesNotExist:
+            animal = None
+
+    # Render the template with both farm and animal data
+    return render(request, 'dashboard.html', {
+        'farm': farm,
+        'animal': animal,
+        'all_farms': all_farms,
+        'farm_id': farm_id,
+        'cow_id': cow_id,
+    })
+
 
 
 
