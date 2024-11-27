@@ -10,7 +10,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', include('myapp.urls')),
     # path('',views.dashboard),
-    path('',views.sign_in),
+    path('',views.dashboard),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('tables/', views.tables, name='tables'),
     path('billing/', views.billing, name='billing'),

@@ -7,6 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+  
+{% comment %} select 2 end {% endcomment %}
+
   {% comment %} <title>
     Material Dashboard 2 by Creative Tim
   </title> {% endcomment %}
@@ -96,19 +99,49 @@
         <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
     </form> {% endcomment %}
 
-    <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
+
+
+
+    {% comment %} <form class="d-flex" method="GET" action="{% url 'search_farm' %}">
       <input type="hidden" name="page" value="dashboard">
       <select class="form-control me-2" name="farm_id" 
               style="border: 1px solid #ccc; text-align: center; color: black; 
                      background-color: white; border-radius: 5px; width: 200px; height: 38px;">
           <option value="" disabled selected>Select Farm</option>
           {% for farm in all_farms %}
-              <option value="{{ farm.farm_id }}" style="color: black;">{{ farm.owner_name }}</option>
+              <option value="{{ farm.farm_id }}">{{ farm.owner_name }}</option>
           {% endfor %}
       </select>
       <button class="btn btn-outline-primary" type="submit" style="height: 38px;">Search</button>
   </form>
+   {% endcomment %}
+
+
+
   
+   <form class="d-flex align-items-center" method="GET" action="{% url 'dashboard' %}" style="margin-bottom: 10px;">
+    {% if cow_id %}
+        <input type="hidden" name="cow_id" value="{{ cow_id }}">
+    {% endif %}
+    <select class="form-control me-2" name="farm_id" 
+            style="border: 1px solid #ccc; text-align: center; color: black; 
+                   background-color: white; border-radius: 5px; width: 200px; height: 38px;">
+        <option value="" disabled {% if not farm_id %}selected{% endif %}>Select Farm</option>
+        {% for farm_option in all_farms %}
+            <option value="{{ farm_option.farm_id }}" 
+                {% if farm_option.farm_id == farm_id %}selected{% endif %}>
+                {{ farm_option.owner_name }}
+            </option>
+        {% endfor %}
+    </select>
+    <button class="btn btn-outline-primary" type="submit" style="height: 38px; margin-left: 10px;">Search</button>
+</form>
+
+
+
+
+
+
 
       
     <style>
@@ -118,17 +151,41 @@
           font-weight: normal; /* Normal weight for placeholder */
       }
       </style>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdown = document.getElementById("farmDropdown");
+    
+            // Enable typing in the dropdown
+            dropdown.addEventListener("click", function () {
+                dropdown.size = dropdown.options.length; // Show all options
+            });
+    
+            dropdown.addEventListener("blur", function () {
+                dropdown.size = 0; // Collapse the dropdown on blur
+            });
+    
+            // Filter options based on user input
+            dropdown.addEventListener("keyup", function (event) {
+                const filter = event.target.value.toLowerCase(); // Get typed value
+                Array.from(dropdown.options).forEach((option) => {
+                    const text = option.textContent.toLowerCase();
+                    option.style.display = text.includes(filter) ? "block" : "none"; // Show/hide based on match
+                });
+            });
+        });
+    </script>
+    
+     
+      
+   
+
     </nav>
     <!-- End Navbar -->
 
      {% comment %} search bar {% endcomment %}
 
-{% comment %} drop list farm search start {% endcomment %}
 
-
-
-
-{% comment %} drop list farm search end {% endcomment %}
 
 
 
@@ -256,176 +313,31 @@
       <div class="row mt-4">
 
 
-        <form class="d-flex" method="GET" action="{% url 'search_animal' %}">
+        {% comment %} <form class="d-flex" method="GET" action="{% url 'search_animal' %}">
           <input class="form-control me-2" type="search" name = "cow_id" placeholder="Cow ID" aria-label="search" 
                  style="border: 1px solid #ccc; text-align: center; color: black; 
                         background-color: white; border-radius: 5px; width: 200px; height: 38px;">
           <button class="btn btn-outline-primary" type="submit" style="height: 38px;">search</button>
-        </form>
+        </form> {% endcomment %}
     
-      {% comment %} important graph {% endcomment %}
-        {% comment %} <div class="col-lg-4 col-md-6 mt-4 mb-4">
-          <div class="card z-index-2  ">
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-              <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                <div class="chart">
-                  <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">
-              <h6 class="mb-0 "> Fertility window </h6>
-              <p class="text-sm "> in the green zone </p>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm"> 2 hour left for the window </p>
-              </div>
-            </div>
-          </div>
-        </div> {% endcomment %}
+    
+        {% comment %} new cow ID searchbar {% endcomment %}
 
-        {% comment %} important graph END {% endcomment %}
+        <form class="d-flex align-items-center" method="GET" action="{% url 'dashboard' %}">
+          {% if farm_id %}
+              <input type="hidden" name="farm_id" value="{{ farm_id }}">
+          {% endif %}
+          <input class="form-control me-2" type="search" name="cow_id" placeholder="Cow ID" aria-label="search" 
+                 style="border: 1px solid #ccc; text-align: center; color: black; 
+                        background-color: white; border-radius: 5px; width: 200px; height: 38px;">
+          <button class="btn btn-outline-primary" type="submit" style="height: 38px; margin-left: 10px;">Search</button>
+      </form>
+      
+      
+      
+      
 
-
-
-
-        {% comment %} new graph start {% endcomment %}
-        
-        <!-- Fertility Window Graph -->
-{% comment %} <div style="width: 100%; max-width: 600px; height: 300px;">
-  <canvas id="fertility-chart"></canvas>
-</div>
-
-<!-- Load Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Load Chart.js Annotation Plugin -->
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0"></script>
-
-<script>
-  // Static heat sign time example (set as 1:00 PM)
-  const heatSignTime = new Date();
-  heatSignTime.setHours(13, 0, 0, 0); // H = 1:00 PM
-
-  // Calculate time labels for every 2 hours from heat sign time up to H + 18 hrs
-  const timeLabels = [];
-  for (let i = 0; i <= 18; i += 2) {
-    const labelTime = new Date(heatSignTime.getTime() + i * 60 * 60 * 1000);
-    timeLabels.push(labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-  }
-
-  // Define probability data for each 6-hour interval and colors
-  const probabilityData = [90, 60, 30];
-  const backgroundColors = [
-    "rgba(76, 175, 80, 0.8)",  // Green for 0-6 hrs
-    "rgba(255, 193, 7, 0.8)",  // Yellow for 6-12 hrs
-    "rgba(244, 67, 54, 0.8)"   // Red for 12-18 hrs
-  ];
-
-  // Calculate hours passed since heat sign to determine the pointer position
-  const currentTime = new Date();
-  const hoursPassed = Math.min(18, (currentTime - heatSignTime) / (60 * 60 * 1000)); // Cap at 18 hrs
-  const pointerPosition = hoursPassed / 2; // X-axis index for pointer (0 to 9 for 18 hours in 2-hour intervals)
-
-  // Initialize the chart
-  var ctx = document.getElementById("fertility-chart").getContext("2d");
-
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: timeLabels, // X-axis time labels
-      datasets: [{
-        label: "Probability of Pregnancy",
-        data: [90, 90, 90, 60, 60, 60, 30, 30, 30], // Repeating each probability level to match each 2-hour interval
-        backgroundColor: [
-          ...Array(3).fill("rgba(76, 175, 80, 0.8)"), // Green for 0-6 hrs
-          ...Array(3).fill("rgba(255, 193, 7, 0.8)"), // Yellow for 6-12 hrs
-          ...Array(3).fill("rgba(244, 67, 54, 0.8)")  // Red for 12-18 hrs
-        ],
-        barPercentage: 1.0,
-        categoryPercentage: 1.0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `Time: ${timeLabels[Math.floor(pointerPosition)]} (${Math.floor(hoursPassed)} hrs passed)`;
-            }
-          }
-        },
-        annotation: {
-          annotations: {
-            pointerDot: {
-              type: "point",
-              xValue: pointerPosition,
-              yValue: probabilityData[Math.floor(pointerPosition / 3)], // Determine the y-value from probabilityData
-              backgroundColor: "black",
-              radius: 6,
-              borderWidth: 2,
-              borderColor: "white",
-              label: {
-                enabled: true,
-                content: `Current Time: ${Math.floor(hoursPassed)} hrs`,
-                position: "top",
-                backgroundColor: "rgba(0,0,0,0.7)",
-                color: "white",
-                font: { size: 12 }
-              }
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          ticks: { color: "#333" },
-          grid: {
-            color: "rgba(0, 0, 0, 0.1)",
-            borderDash: [5, 5]
-          },
-          title: {
-            display: true,
-            text: "Probability (%)",
-            color: "#333",
-            font: { size: 14 }
-          }
-        },
-        x: {
-          ticks: { color: "#333" },
-          grid: { display: false },
-          title: {
-            display: true,
-            text: "Time (hours after heat sign)",
-            color: "#333",
-            font: { size: 14 }
-          }
-        }
-      }
-    }
-  });
-</script>
- {% endcomment %}
-
-
-
-
-        
-  {% comment %} new graph end        {% endcomment %}
-
-
-
-
-
-
-       
-  
-      {% comment %} final dynamic graph start {% endcomment %}
+        {% comment %} new cow ID searchbar end {% endcomment %}
 
 
 <!-- Fertility Window Graph or Message -->
