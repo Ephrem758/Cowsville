@@ -238,6 +238,47 @@ def dashboard(request):
 #
  #   return render(request, 'your_template.html', context)
 
+
+
+from django.shortcuts import render
+from .models import Animal
+
+def average_statistics(request):
+    # Collect all animals
+    animals = Animal.objects.all()
+
+    # Initialize variables to store sums and counts
+    stats = {
+        "insemination_after_calving": 0,
+        "calving_interval": 0,
+        "heat_after_calving": 0,
+        "cows_return_heat_60days": 0,
+        "inseminations_per_conception": 0,
+        "heifers_pregnant_after_01_service": 0,
+        "mature_cows_pregnant_after_01_service": 0,
+        "mature_cows_03_services": 0,
+        "dry_period_days": 0,
+        "cows_pregnancy_interval": 0,
+        "pregnancy_interval_days": 0,
+    }
+    counts = {key: 0 for key in stats.keys()}
+
+    # Process each animal to calculate totals
+    for animal in animals:
+        for key in stats.keys():
+            # Use getattr to get the attribute value or default to 0
+            value = getattr(animal, key, 0)
+            stats[key] += value
+            if value:  # Increment count only if the value is non-zero
+                counts[key] += 1
+
+    # Calculate averages
+    averages = {key: (stats[key] / counts[key] if counts[key] > 0 else 0) for key in stats.keys()}
+
+    context = {"averages": averages}
+    return render(request, "average_statistics.html", context)
+
+
 class ReportHeatSignView(APIView):
     def post(self, request, cow_id):
         # Retrieve the cow using the provided cow_id
