@@ -352,7 +352,11 @@
 
 
 <!-- Fertility Window Graph or Message -->
-<div style="width: 100%; max-width: 600px; height: 300px;">
+
+{% comment %} old graph start {% endcomment %}
+
+
+{% comment %} <div style="width: 100%; max-width: 600px; height: 300px;">
   {% if animal %}
     <canvas id="fertility-chart"></canvas>
   {% else %}
@@ -484,7 +488,7 @@
       });
     }
   {% endif %}
-</script>
+</script> {% endcomment %}
 
 
 
@@ -496,7 +500,155 @@
 
 
 
-       {% comment %} final dynamic graph end {% endcomment %}
+       {% comment %} old dynamic graph end {% endcomment %}
+
+
+
+
+       {% comment %} new graph start {% endcomment %}
+
+       <div style="width: 100%; max-width: 800px; height: 300px;">
+        {% if animal %}
+          <canvas id="fertility-chart"></canvas>
+        {% else %}
+          <p>No cow ID found</p>
+        {% endif %}
+      </div>
+      
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0"></script>
+      
+      <script>
+        {% if animal %}
+          let heatSignTime = "{{ animal.heat_sign_start_time|date:'Y-m-d H:i:s' }}" || "2024-12-14 02:00:00";
+          heatSignTime = new Date(heatSignTime);
+      
+          if (!isNaN(heatSignTime.getTime())) {
+            const currentTime = new Date();
+            const hoursPassed = (currentTime - heatSignTime) / (60 * 60 * 1000);
+      
+            // Clamp hoursPassed to graph range (H + 6 to H + 30)
+            const graphStart = 6;
+            const graphEnd = 30;
+            const clampedHours = Math.min(graphEnd, Math.max(graphStart, hoursPassed));
+      
+            // Generate X-axis labels (H + 6 to H + 30 in 2-hour increments)
+            const timeLabels = [];
+            for (let i = graphStart; i <= graphEnd; i += 2) {
+              const labelTime = new Date(heatSignTime.getTime() + i * 60 * 60 * 1000);
+              timeLabels.push(labelTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            }
+      
+            // Custom segmenting for visual clarity
+            const customColors = [];
+            for (let i = graphStart; i < graphEnd; i += 2) {
+              if (i < 9) {
+                customColors.push("rgba(255, 193, 7, 0.8)"); // Yellow: H + 6 to H + 9 (8:00 AM to 11:00 AM)
+              } else if (i < 24) {
+                customColors.push("rgba(76, 175, 80, 0.8)"); // Green: H + 9 to H + 24 (11:00 AM to 2:00 AM)
+              } else if (i < 28) {
+                customColors.push("rgba(255, 193, 7, 0.8)"); // Yellow: H + 24 to H + 28 (2:00 AM to 6:00 AM)
+              } else {
+                customColors.push("rgba(244, 67, 54, 0.8)"); // Red: H + 28 to H + 30 (6:00 AM to 8:00 AM)
+              }
+            }
+      
+            // Pointer position and y-value
+            const pointerPosition = (clampedHours - graphStart) / 2; // Map hours to 0-12 range
+            const pointerYValue =
+              clampedHours <= 9 ? 30 : // Yellow: H + 6 to H + 9
+              clampedHours <= 24 ? 90 : // Green: H + 9 to H + 24
+              clampedHours <= 28 ? 30 : // Yellow: H + 24 to H + 28
+              0; // Red: H + 28 to H + 30
+      
+            // Debugging logs
+            console.log("Heat Sign Time:", heatSignTime);
+            console.log("Current Time:", currentTime);
+            console.log("Hours Passed:", hoursPassed);
+            console.log("Clamped Hours:", clampedHours);
+            console.log("Pointer Position:", pointerPosition);
+      
+            // Chart setup
+            const ctx = document.getElementById("fertility-chart").getContext("2d");
+      
+            new Chart(ctx, {
+              type: "bar",
+              data: {
+                labels: timeLabels,
+                datasets: [{
+                  label: "Probability of Pregnancy",
+                  data: [
+                    ...Array(2).fill(30), // Yellow: H + 6 to H + 9
+                    ...Array(7).fill(90), // Green: H + 9 to H + 24
+                    ...Array(2).fill(30), // Yellow: H + 24 to H + 28
+                    ...Array(1).fill(20),  // Red: H + 28 to H + 30
+                  ],
+                  backgroundColor: customColors,
+                  barPercentage: 1.0,
+                  categoryPercentage: 1.0
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        return `Time: ${timeLabels[Math.floor(pointerPosition)]} (${Math.floor(clampedHours)} hrs passed)`;
+                      }
+                    }
+                  },
+                  annotation: {
+                    annotations: {
+                      pointerDot: {
+                        type: "point",
+                        xValue: pointerPosition,
+                        yValue: pointerYValue,
+                        backgroundColor: "black",
+                        radius: 6,
+                        borderWidth: 2,
+                        borderColor: "white",
+                        label: {
+                          enabled: true,
+                          content: `Current Time: ${Math.floor(clampedHours)} hrs`,
+                          position: "top",
+                          backgroundColor: "rgba(0,0,0,0.7)",
+                          color: "white",
+                          font: { size: 12 }
+                        }
+                      }
+                    }
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { color: "#333" },
+                    grid: { color: "rgba(0, 0, 0, 0.1)", borderDash: [5, 5] },
+                    title: { display: true, text: "Probability (%)", color: "#333", font: { size: 14 } }
+                  },
+                  x: {
+                    ticks: { color: "#333" },
+                    grid: { display: false },
+                    title: { display: true, text: "Time (hours after heat sign)", color: "#333", font: { size: 14 } }
+                  }
+                }
+              }
+            });
+          }
+        {% endif %}
+      </script>
+      
+      
+      
+      
+
+
+
+       {% comment %} new graph end {% endcomment %}
         
        
       </div> 
