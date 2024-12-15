@@ -140,7 +140,7 @@ class Animal(models.Model):
     days_to_calving = models.IntegerField(null=True, blank=True)  # Days until calving if pregnant
     date_of_calving = models.DateField(null=True, blank=True)  # Date of calving (if applicable)
     lactation_no = models.IntegerField()  # Lactation number (1-7)
-    no_days_in_milk = models.IntegerField()  # Number of days in milk
+    no_days_in_milk = models.IntegerField(default=0)  # Number of days in milk
     average_daily_milk = models.FloatField()  # Average daily milk yield after calving
     days_after_calving = models.IntegerField()  # Days after last calving
     insemination_number = models.IntegerField() # How many days

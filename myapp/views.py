@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404
 from .models import Farm, Animal
 from datetime import timedelta
+from django.utils import timezone
+
 
 # farm_management/views.py
 from rest_framework.views import APIView
@@ -240,17 +242,21 @@ def process_heat_sign_alerts_from_api():
 def check_heat_sign_alerts():
     today = timezone.now().date()
     animals = Animal.objects.filter(pd_status='non_pregnant')
+    print(animals)
 
     for animal in animals:
         if animal.last_heat_sign:
             days_since_last_heat = (today - animal.last_heat_sign).days
             if 19 <= days_since_last_heat <= 24:
                 # Send daily alert for 5 days within this range
+                print("hi")
                 send_alert_message.delay(animal.farm.telephone, f"Reminder: Check cow {animal.cow_id} for heat signs.")
+                print("hi")
+                # print(result.result)
         
         # Further logic to stop alert if the farmer sends a heat sign detected message (handled separately)
         # After checking alerts, process API-based alerts if a heat sign is detected
-        process_heat_sign_alerts_from_api()
+        # process_heat_sign_alerts_from_api()
 
 
 # Function to send vaccine reminder for pregnant cows at the 7th month
@@ -268,7 +274,8 @@ def check_vaccine_reminder_for_pregnant_cows():
 # Endpoint to trigger alerts manually (for testing)
 def trigger_alerts(request):
     check_heat_sign_alerts()
-    check_vaccine_reminder_for_pregnant_cows()
+    
+    # check_vaccine_reminder_for_pregnant_cows()
     return render(request, 'alerts_triggered.html')
 
 

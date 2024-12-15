@@ -24,6 +24,8 @@ urlpatterns = [
     path('api/report-heat-sign/<str:cow_id>/', ReportHeatSignView.as_view(), name='report-heat-sign'),
     path('search_farm/', views.search_farm, name='search_farm'),
     path('search_animal/', views.search_animal, name='search_animal'),
+    path('trigger/', views.trigger_alerts, name='triger'),
+
 
     # path('pages/sign-in/', views.sign_in, name='sign_in'),
     # path('pages/dashboard/', views.dashboard, name='dashboard'),
