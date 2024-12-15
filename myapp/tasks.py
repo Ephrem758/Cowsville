@@ -6,7 +6,15 @@ from .models import Animal
 @shared_task
 def send_alert_message(recipient, message):
     # Replace this with your actual integration logic to send alerts
-    print(f"Sending alert to {recipient}: {message}")
+    logger.info(f"Task started: Sending alert message: {message}")
+    try:
+        # Your actual task logic here
+        # Example:
+        print(f"Sending alert: {message}")
+        logger.info("Alert message sent successfully")
+    except Exception as e:
+        logger.error(f"Error in sending alert message: {e}")
+        raise
 
 
 @shared_task

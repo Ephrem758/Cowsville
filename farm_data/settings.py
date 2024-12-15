@@ -128,7 +128,7 @@ STATICFILES_DIRS = [BASE_DIR / 'farm_data/myapp/static',]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Use Redis as the broker
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Optional, to store results
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']  # Specify the content types allowed
+CELERY_TASK_SERIALIZER = 'json'  # Use JSON to serialize task data
+
