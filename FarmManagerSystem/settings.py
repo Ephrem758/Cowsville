@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-^nvczssod(!rcglw2)dhy)looo$0$ssiydr4_ok&1_82esqt7+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'enlargement-tariff-tennis-reconstruction.trycloudflare.com']
 
 
 # Application definition
