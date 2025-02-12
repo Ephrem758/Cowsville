@@ -42,7 +42,13 @@
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">dashboard</i>
             </div>
-            <span class="nav-link-text ms-1">Dashboard</span>
+            <span class="nav-link-text ms-1">
+                        {% if farm %}
+                            {{ farm.owner_name }}'s Farm
+                        {% else %}
+                            Dashboard
+                        {% endif %}
+            </span>
           </a>
         </li>
         <li class="nav-item">
@@ -232,9 +238,9 @@
               </div>
             </div>
             <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
+            {% comment %} <div class="card-footer p-3">
               <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than last month</p>
-            </div>
+            </div> {% endcomment %}
           </div>
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
@@ -258,9 +264,9 @@
               </div>
             </div>
             <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
+            {% comment %} <div class="card-footer p-3">
               <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+3% </span>than last month</p>
-            </div>
+            </div> {% endcomment %}
           </div>
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
@@ -520,7 +526,7 @@
       
       <script>
         {% if animal %}
-          let heatSignTime = "{{ animal.heat_sign_start_time|date:'Y-m-d H:i:s' }}" || "2024-12-14 02:00:00";
+          let heatSignTime = "{{ animal.heat_sign_start_time|date:'Y-m-d H:i:s' }}" || "2024-12-16 01:00:00";
           heatSignTime = new Date(heatSignTime);
       
           if (!isNaN(heatSignTime.getTime())) {
@@ -578,10 +584,10 @@
                 datasets: [{
                   label: "Probability of Pregnancy",
                   data: [
-                    ...Array(2).fill(30), // Yellow: H + 6 to H + 9
+                    ...Array(2).fill(50), // Yellow: H + 6 to H + 9
                     ...Array(7).fill(90), // Green: H + 9 to H + 24
-                    ...Array(2).fill(30), // Yellow: H + 24 to H + 28
-                    ...Array(1).fill(20),  // Red: H + 28 to H + 30
+                    ...Array(2).fill(50), // Yellow: H + 24 to H + 28
+                    ...Array(1).fill(40),  // Red: H + 28 to H + 30
                   ],
                   backgroundColor: customColors,
                   barPercentage: 1.0,
@@ -802,9 +808,9 @@
                   <div class="timeline-content">
                     <h6 class="text-dark text-sm font-weight-bold mb-0">
                       {% if animal %}
-                      day count since last heat sign: {{animal.last_heat_sign}} 
+                       last heat sign date: {{animal.last_heat_sign}} 
                     {% else %}
-                            day count since last heat sign: 0
+                        last heat sign date: 0
                     {% endif %}
                     </h6>
                     {% comment %} <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p> {% endcomment %}
