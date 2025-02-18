@@ -231,49 +231,6 @@ def trigger_alerts(request):
     return render(request, 'alerts_triggered.html')
 
 
-# Update when pregnant
-# Function to fetch and process pregnancy data from the API
-def process_pregnancy_check_from_api():
-    try:
-        # Fetch data from the API
-        response = requests.get(PREGNANCY_CHECK_API_URL)
-        response.raise_for_status()  # Raises an exception for bad responses (4xx or 5xx)
-        data = response.json()  # Assuming the response is in JSON format
-
-        for entry in data:  # Assuming each entry contains `cow_id`, `is_pregnant`, `delivered`, and `delivery_date`
-            cow_id = entry.get('cow_id')
-            is_pregnant = entry.get('is_pregnant')  # Indicates if the cow is currently pregnant
-            delivered = entry.get('delivered')  # Indicates if the cow has delivered
-            delivery_date = entry.get('delivery_date')  # Date when the cow delivered, if applicable
-
-            try:
-                # Retrieve the cow object
-                Cow = Cow.objects.get(cow_id=cow_id)
-
-                if delivered and delivery_date:
-                    # Update fields when the cow has delivered a calf
-                    delivery_date_parsed = timezone.datetime.strptime(delivery_date, '%Y-%m-%d').date()
-                    Cow.pd_status = 'non_pregnant'  # Set pregnancy status to non-pregnant
-                    Cow.days_after_calving = (timezone.now().date() - delivery_date_parsed).days  # Calculate days after calving
-
-                elif is_pregnant:
-                    # Update fields when the cow is pregnant
-                    Cow.pd_status = 'pregnant'
-                    # Set the expected calving date to now + 280 days if no specific date is provided
-                    Cow.date_of_calving = timezone.now().date() + timedelta(days=280)
-
-                else:
-                    # If the cow is not pregnant and has not delivered, ensure status is set correctly
-                    Cow.pd_status = 'non_pregnant'
-
-                Cow.save()  # Save changes to the database
-
-            except Cow.DoesNotExist:
-                print(f"Cow with ID {cow_id} not found.")
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching pregnancy data: {e}")
-
 
 @csrf_exempt
 def receive_data(request):

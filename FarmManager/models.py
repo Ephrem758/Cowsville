@@ -5,7 +5,11 @@ class Farm(models.Model):
     farm_id = models.AutoField(primary_key=True)
     owner_name = models.CharField(max_length=255)
     address = models.TextField()
-    telephone_number = models.CharField(max_length=15)
+    telephone_number = models.CharField(max_length=15,
+            validators=[RegexValidator(
+            regex=r'^\+?1?\d{9,15}$',  # Allows international and local formats
+            message="Enter a valid phone number (e.g. +251912345678 or 0912345678)."
+        )],)
     location_gps = models.CharField(max_length=255, null=True, blank=True)
     fertility_camp_no = models.IntegerField()
     total_number_of_cows = models.IntegerField()
@@ -67,6 +71,7 @@ class Cow(models.Model):
 
 # Health Model
 class Health(models.Model):
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
     cow = models.ForeignKey(Cow, on_delete=models.CASCADE)
     udder_health = models.CharField(max_length=50, choices=[
         ('4qt', '4 Quarters'),
@@ -93,6 +98,7 @@ class Health(models.Model):
 
 # Reproduction Model
 class Reproduction(models.Model):
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
     cow = models.ForeignKey(Cow, on_delete=models.CASCADE)
     is_cow_pregnant = models.BooleanField()
     heat_sign_start = models.DateTimeField()
