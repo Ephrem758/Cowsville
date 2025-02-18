@@ -101,64 +101,85 @@
                                 <th>Indicator</th>
                                 <th>Value</th>
                                 <th>Unit</th>
+                                <th>Goal</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Insemination after calving</td>
-                                <td>{{ averages.insemination_after_calving }}</td>
+                                <td>
+                                  {% if averages.insemination_after_calving %}
+                                    {{ averages.insemination_after_calving }}
+                                  {% else %}
+                                          50
+                                  {% endif %}
+                                </td>
                                 <td>Days</td>
+                                <td>60</td>
                             </tr>
                             <tr>
                                 <td>Average Calving interval</td>
-                                <td>{{ averages.calving_interval }}</td>
+                                <td>
+                                  {% if averages.calving_interval %}
+                                  {{ averages.calving_interval }}
+                                  {% else %}
+                                  14
+                                  {% endif %}
+                                </td>
                                 <td>Months</td>
+                                <td> < 12</td>
                             </tr>
                             <tr>
                                 <td>Heat after calving</td>
-                                <td>{{ averages.heat_after_calving }}</td>
+                                <td>{% if averages.averages.heat_after_calving %}
+                                  {{ averages.heat_after_calving }}
+                                  {% else %}
+                                  35
+                                  {% endif %}</td>
                                 <td>Days</td>
+                                <td> < 40</td>
                             </tr>
                             <tr>
                                 <td>Cows return to heat within 60 days</td>
-                                <td>{{ averages.cows_return_heat_60days }}</td>
+                                <td>{% if averages.cows_return_heat_60days %}
+                                  {{ averages.cows_return_heat_60days }}
+                                  {% else %}
+                                  50
+                                  {% endif %}</td>
                                 <td>%</td>
+                                <td>90</td>
                             </tr>
                             <tr>
                                 <td>No. of inseminations per conception</td>
-                                <td>{{ averages.inseminations_per_conception }}</td>
+                                <td>{% if  averages.inseminations_per_conception %}
+                                  {{ averages.inseminations_per_conception  }}
+                                  {% else %}
+                                  2.0
+                                  {% endif %}</td>
                                 <td>Number</td>
+                                <td> < 2.0</td>
                             </tr>
-                            <tr>
-                                <td>Rate of heifers pregnant after 01 service</td>
-                                <td>{{ averages.heifers_pregnant_after_01_service }}</td>
-                                <td>%</td>
-                            </tr>
-                            <tr>
-                                <td>Rate of mature cows pregnant after 01 service</td>
-                                <td>{{ averages.mature_cows_pregnant_after_01_service }}</td>
-                                <td>%</td>
-                            </tr>
-                            <tr>
+                            
                                 <td>Rate of mature cows doing 03 services</td>
-                                <td>{{ averages.mature_cows_03_services }}</td>
+                                <td>{% if averages.mature_cows_03_services %}
+                                  {{ averages.mature_cows_03_services }}
+                                  {% else %}
+                                  8
+                                  {% endif %}</td>
                                 <td>%</td>
-                            </tr>
-                            <tr>
-                                <td>Days of dry period</td>
-                                <td>{{ averages.dry_period_days }}</td>
-                                <td>Days</td>
+                                <td> < 10 </td>
                             </tr>
                             <tr>
                                 <td>Rate of cows with interval between calving and pregnancy</td>
-                                <td>{{ averages.cows_pregnancy_interval }}</td>
+                                <td>{% if averages.cows_pregnancy_interval %}
+                                  {{ averages.cows_pregnancy_interval }}
+                                  {% else %}
+                                  100
+                                  {% endif %}</td>
                                 <td>%</td>
+                                <td>85 - 110</td>
                             </tr>
-                            <tr>
-                                <td>Interval between calving and pregnancy</td>
-                                <td>{{ averages.pregnancy_interval_days }}</td>
-                                <td>Days</td>
-                            </tr>
+                          
                         </tbody>
                     </table>
                 </div>
