@@ -1,169 +1,102 @@
 from django.db import models
-from multiselectfield import MultiSelectField
 
-
+# Farm Model
 class Farm(models.Model):
-    # Basic Information
-    farm_id = models.CharField(max_length=50, unique=True, null=False, blank=True)
-    owner_name = models.CharField(max_length=100)
+    farm_id = models.AutoField(primary_key=True)
+    owner_name = models.CharField(max_length=255)
     address = models.TextField()
-    telephone = models.CharField(max_length=15)
-    gps_location = models.CharField(max_length=255, null=True, blank=True)
-    fcc_no = models.CharField(max_length=50, null=True, blank=True)  # Fertility control camp number
-    
-    # Animal Information
-    herd_size = models.IntegerField()
-    calves = models.IntegerField()
-    heifers = models.IntegerField()  # Number of young female cows above 12 months of age
-    milking_cows = models.IntegerField()
-    tdm = models.FloatField(help_text="Total Daily Milk produced by the farm in liters")
-
-    # Housing Information
-    HOUSING_CHOICES = [
-        ('free_stall', 'Free Stall'),
-        ('tie_stall', 'Tie Stall'),
+    telephone_number = models.CharField(max_length=15)
+    location_gps = models.CharField(max_length=255, null=True, blank=True)
+    fertility_camp_no = models.IntegerField()
+    total_number_of_cows = models.IntegerField()
+    number_of_calves = models.IntegerField()
+    number_of_calf = models.IntegerField()
+    number_of_milking_cow = models.IntegerField()
+    total_daily_milk = models.IntegerField()
+    type_of_housing = models.CharField(max_length=50, choices=[
+        ('free stall', 'Free Stall'),
+        ('tie stall', 'Tie Stall'),
         ('traditional', 'Traditional')
-    ]
-    housing_type = models.CharField(max_length=20, choices=HOUSING_CHOICES)
-
-    # Floor Information
-    FLOOR_CHOICES = [
+    ])
+    type_of_floor = models.CharField(max_length=50, choices=[
         ('concrete', 'Concrete'),
         ('stone', 'Stone'),
         ('soil', 'Soil'),
-        ('mat_bedding', 'Mat or Other Bedding')
-    ]
-    floor_type = models.CharField(max_length=20, choices=FLOOR_CHOICES)
+        ('mat', 'Mat')
+    ])
+    main_feed = models.TextField()
+    rate_of_cow_feeding = models.CharField(max_length=50, choices=[
+        ('once', 'Once'),
+        ('twice', 'Twice'),
+        ('three times', 'Three Times')
+    ])
+    source_of_water = models.CharField(max_length=50, choices=[
+        ('tap', 'Tap'),
+        ('wells', 'Wells')
+    ])
+    rate_of_water_giving = models.CharField(max_length=50, choices=[
+        ('once', 'Once'),
+        ('twice', 'Twice'),
+        ('three times', 'Three Times')
+    ])
+    farm_hygiene_score = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4')])
 
-    # Feed/Feeding Information
-    feed_given = models.TextField(help_text="Main feed given to the cows")
-    feeding_frequency = models.CharField(max_length=50, help_text="e.g. Once/day, twice/day, three times/day")
-
-    # Watering Information
-    watering_frequency = models.CharField(max_length=50, help_text="e.g. Once/day, twice/day, three times/day")
-    
-    # Hygiene Information
-    farm_hygiene_score = models.IntegerField(help_text="Farm hygiene score from 1 to 4")
-
-    def __str__(self):
-        return f"Farm of {self.owner_name}"
-
-class Animal(models.Model):
-    # Farm to which the cow belongs
+# Cow Model
+class Cow(models.Model):
     farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
+    cow_id = models.AutoField(primary_key=True)
+    breed = models.CharField(max_length=100)
+    age_in_days = models.IntegerField()
+    sex = models.CharField(max_length=50, default='milking_cow')
+    parity = models.IntegerField()
+    body_weight = models.FloatField()
+    bcs = models.FloatField(choices=[(1, '1'), (1.5, '1.5'), (2, '2'), (2.5, '2.5'), (3, '3'), (3.5, '3.5'), (4, '4'), (4.5, '4.5'), (5, '5')])
+    gynecological_status = models.CharField(max_length=50, choices=[
+        ('Estrus', 'Estrus'),
+        ('AI', 'AI'),
+        ('Pregna', 'Pregna')
+    ])
+    lactation_number = models.IntegerField()
+    days_in_milk = models.IntegerField()
+    average_daily_milk = models.FloatField()
+    cow_inseminated_before = models.BooleanField()
+    last_date_insemination = models.DateField()
+    number_of_inseminations = models.IntegerField()
+    id_or_breed_bull_used = models.IntegerField()
+    last_calving_date = models.DateField()
 
-    # Predefined Choices for Fields
-    SEX_CHOICES = [
-        ('milking', 'Milking Cow'),
-        ('bull', 'Bull'),
-    ]
-
-    BREED_CHOICES = [
-        ('hf', 'HF'),
-        ('zebu', 'Zebu'),
-        ('hf_zebu', 'HF*Zebu Cross'),
-        ('other', 'Other'),
-    ]
-
-    PD_STATUS_CHOICES = [
-        ('pregnant', 'Pregnant'),
-        ('non_pregnant', 'Non-pregnant'),
-        ('unknown', 'Unknown'),
-    ]
-
-    BCS_CHOICES = [
-        (1.0, '1.0'), (1.5, '1.5'), (2.0, '2.0'), (2.5, '2.5'),
-        (3.0, '3.0'), (3.5, '3.5'), (4.0, '4.0'), (4.5, '4.5'),
-        (5.0, '5.0')
-    ]
-
-    GYN_STATUS_CHOICES = [
-        ('estrus', 'Estrus'),
-        ('ai', 'AI'),
-        ('pregnant', 'Pregnant'),
-        ('abortion', 'Abortion'),
-        ('fresh', 'Fresh'),
-    ]
-
-    HEAT_SIGN_CHOICES = [
-        ('bellowing', 'Bellowing'),
-        ('restlessness', 'Restlessness'),
-        ('off_feed', 'Off Feed'),
-        ('vaginal_discharge', 'Vaginal Discharge'),
-        ('mounting_other_cows', 'Mounting Other Cows'),
-        ('standing_to_be_mounted', 'Standing to be Mounted'),
-        ('head_butting_others', 'Head Butting Others'),
-        ('chin_resting', 'Chin Resting'),
-    ]
-
-    METABOLIC_DISEASE_CHOICES = [
-        ('hypocalcemia', 'Hypocalcemia'),
-        ('vit_a_deficiency', 'Vitamin A Deficiency'),
-        ('mg_deficiency', 'Magnesium Deficiency'),
-        ('ketosis', 'Ketosis'),
-        ('acidosis', 'Acidosis'),
-    ]
-
-    MASTITIS_CHOICES = [
+# Health Model
+class Health(models.Model):
+    cow = models.ForeignKey(Cow, on_delete=models.CASCADE)
+    udder_health = models.CharField(max_length=50, choices=[
+        ('4qt', '4 Quarters'),
+        ('3qt', '3 Quarters'),
+        ('2qt', '2 Quarters'),
+        ('1qt', '1 Quarter')
+    ])
+    mastitis = models.CharField(max_length=50, choices=[
         ('negative', 'Negative'),
-        ('clinical_mastitis', 'Clinical Mastitis'),
-        ('cmt_positive', 'CMT +'),
-        ('cmt_double_positive', 'CMT ++'),
-        ('cmt_triple_positive', 'CMT +++')
-    ]
+        ('clinical mastitis', 'Clinical Mastitis')
+    ])
+    general_health = models.CharField(max_length=50, choices=[
+        ('normal', 'Normal'),
+        ('sick', 'Sick')
+    ])
+    reproductive_health = models.TextField()
+    metabolic_health = models.TextField()
+    is_cow_vaccinated = models.BooleanField()
+    vaccination_date = models.DateField(null=True, blank=True)
+    vaccination_type = models.TextField()
+    has_cow_taken_deworming = models.BooleanField()
+    deworming_date = models.DateField(null=True, blank=True)
+    deworming_type = models.TextField()
 
-    UDDER_HEALTH_CHOICES = [
-        ('4qt_normal', '4qt normal'),
-        ('3qt_normal', '3qt normal'),
-        ('2qt_normal', '2qt normal'),
-        ('1qt_normal', '1qt normal'),
-    ]
-
-    CONCEPTION_RATE_CHOICES = [
-        ('low', 'Low'),
-        ('moderate', 'Moderate'),
-        ('high', 'High'),
-    ]
-
-    # Animal Information
-    cow_id = models.CharField(max_length=50, unique=True, null=False)  # ID or number for the cow
-    breed = models.CharField(max_length=50, choices=BREED_CHOICES)  # Breed information
-    age_months = models.IntegerField()  # Age in months
-    sex = models.CharField(max_length=20, choices=SEX_CHOICES)  # Male/Female
-    parity = models.IntegerField()  # Number of pregnancies (0-8)
-    body_weight = models.FloatField()  # Body weight in kg
-    bcs = models.FloatField(choices=BCS_CHOICES)  # Body Condition Score (1 to 5 scale)
-    gyn_status = models.CharField(max_length=20, choices=GYN_STATUS_CHOICES)  # Gynecological status
-    
-    # Pregnancy and Reproductive Information
-    pd_status = models.CharField(max_length=20, choices=PD_STATUS_CHOICES)  # Pregnancy status
-    days_to_calving = models.IntegerField(null=True, blank=True)  # Days until calving if pregnant
-    date_of_calving = models.DateField(null=True, blank=True)  # Date of calving (if applicable)
-    lactation_no = models.IntegerField()  # Lactation number (1-7)
-    no_days_in_milk = models.IntegerField(default=0)  # Number of days in milk
-    average_daily_milk = models.FloatField()  # Average daily milk yield after calving
-    days_after_calving = models.IntegerField()  # Days after last calving
-    insemination_number = models.IntegerField() # How many days
-    date_ai =  models.DateField(null=True, blank=True)                                                                               
-
-    # Fertility and Heat Signs
-    last_heat_sign = models.DateField(null=True, blank=True)
-    heat_signs = MultiSelectField(choices=HEAT_SIGN_CHOICES, max_length=200)  # Multi-select for heat signs
-    conception_rate = models.CharField(max_length=20, choices=CONCEPTION_RATE_CHOICES, null=True, blank=True)
-
-    # Health Information
-    udder_health = models.CharField(max_length=255, choices=UDDER_HEALTH_CHOICES)  # Udder health choices
-    mastitis = models.CharField(max_length=255, choices=MASTITIS_CHOICES)  # Mastitis status
-    general_health = models.CharField(max_length=255)  # General health (Normal, Sick, etc.)
-    reproductive_health = models.CharField(max_length=255, choices=GYN_STATUS_CHOICES, null=True, blank=True)  # Reproductive health choices
-    reproductive_health_other = models.TextField(null=True, blank=True)  # Custom text if not in choices
-    metabolic_disease = models.CharField(max_length=255, choices=METABOLIC_DISEASE_CHOICES, null=True, blank=True)  # Metabolic disease choices
-    metabolic_disease_other = models.TextField(null=True, blank=True)  # Custom text if not in choices
-    
-    # Vaccination and Deworming
-    vaccination_date = models.DateField(null=True, blank=True)  # Date and type of vaccination given
-    deworming_date = models.DateField(null=True, blank=True)  # Date of deworming
-
-    def __str__(self):
-        return f"Animal {self.cow_id} - {self.breed} at {self.farm}"
-
+# Reproduction Model
+class Reproduction(models.Model):
+    cow = models.ForeignKey(Cow, on_delete=models.CASCADE)
+    is_cow_pregnant = models.BooleanField()
+    heat_sign_start = models.DateTimeField()
+    heat_sign_end = models.DateTimeField(null=True, blank=True)
+    heat_signs_seen = models.TextField()
+    pregnancy_date = models.DateField()
+    calving_date = models.DateField()
