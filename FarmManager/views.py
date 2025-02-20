@@ -17,6 +17,10 @@ from django.shortcuts import render, get_object_or_404
 from .models import Farm
 from django.shortcuts import render
 
+from rest_framework import viewsets, status
+from rest_framework.decorators import api_view, action
+from .serializers import FarmSerializer, CowSerializer  # You'll need to create these
+
 def index(request):
     return render(request, 'index.html')
 
@@ -98,10 +102,7 @@ def dashboard(request):
 
 
 def average_statistics(request):
-    # Collect all Cows
-    Cows = Cow.objects.all()
-
-    # Initialize variables to store sums and counts
+    cows = Cow.objects.all()
     stats = {
         "insemination_after_calving": 0,
         "calving_interval": 0,
@@ -117,20 +118,15 @@ def average_statistics(request):
     }
     counts = {key: 0 for key in stats.keys()}
 
-    # Process each Cow to calculate totals
-    for Cow in Cows:
+    for cow in cows:
         for key in stats.keys():
-            # Use getattr to get the attribute value or default to 0
-            value = getattr(Cow, key, 0)
+            value = getattr(cow, key, 0)
             stats[key] += value
-            if value:  # Increment count only if the value is non-zero
+            if value:
                 counts[key] += 1
 
-    # Calculate averages
     averages = {key: (stats[key] / counts[key] if counts[key] > 0 else 0) for key in stats.keys()}
-
-    context = {"averages": averages}
-    return render(request, "average_statistics.html", context)
+    return Response({"averages": averages})
 
 
 class ReportHeatSignView(APIView):
@@ -243,3 +239,39 @@ def receive_data(request):
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+class FarmViewSet(viewsets.ModelViewSet):
+    queryset = Farm.objects.all().order_by('owner_name')
+    serializer_class = FarmSerializer
+
+    @action(detail=False, methods=['GET'])
+    def search(self, request):
+        farm_id = request.query_params.get('farm_id')
+        if farm_id:
+            try:
+                farm = Farm.objects.get(farm_id=farm_id)
+                cows = Cow.objects.filter(farm=farm)
+                farm_data = self.get_serializer(farm).data
+                cow_data = CowSerializer(cows, many=True).data
+                return Response({
+                    'farm': farm_data,
+                    'cows': cow_data
+                })
+            except Farm.DoesNotExist:
+                return Response({'error': 'Farm not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'No farm_id provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+class CowViewSet(viewsets.ModelViewSet):
+    queryset = Cow.objects.all()
+    serializer_class = CowSerializer
+
+    @action(detail=False, methods=['GET'])
+    def search(self, request):
+        cow_id = request.query_params.get('cow_id')
+        if cow_id:
+            try:
+                cow = Cow.objects.get(cow_id=cow_id)
+                return Response(self.get_serializer(cow).data)
+            except Cow.DoesNotExist:
+                return Response({'error': 'Cow not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'No cow_id provided'}, status=status.HTTP_400_BAD_REQUEST)
