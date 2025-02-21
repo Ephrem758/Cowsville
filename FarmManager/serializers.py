@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Farm, Cow
+from .models import Farm, Cow, Message, Inseminator
 
 class FarmSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,4 +9,14 @@ class FarmSerializer(serializers.ModelSerializer):
 class CowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cow
+        fields = '__all__'
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'
+
+class InseminatorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inseminator
         fields = '__all__' 
