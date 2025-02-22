@@ -4,7 +4,7 @@ from .models import (
     HousingType, FloorType, FeedingFrequency, WaterSource,
     BreedType, GynecologicalStatus, UdderHealthStatus,
     MastitisStatus, GeneralHealthStatus, Message,
-    Inseminator
+    Inseminator, Doctor
 )
 
 # Register all models
@@ -35,3 +35,9 @@ class InseminatorAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('name', 'phone_number', 'address')
+
+@admin.register(Doctor)
+class DoctorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'license_number', 'phone_number', 'is_active')
+    list_filter = ('is_active', 'specialization')
+    search_fields = ('name', 'phone_number', 'license_number')

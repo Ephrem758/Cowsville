@@ -1,0 +1,515 @@
+{
+  "info": {
+    "name": "Farm Manager API",
+    "description": "Complete API documentation for Farm Management System. Includes endpoints for farm management, cow tracking, medical assessments, and more.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Farms",
+      "description": "Endpoints for managing farms and their details",
+      "item": [
+        {
+          "name": "List Farms",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/farms/",
+            "description": "Get all registered farms. Can be filtered by farm_id, owner_name, or address. Returns basic farm information including assigned doctor and inseminator."
+          }
+        },
+        {
+          "name": "Create Farm",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/farms/",
+            "description": "Register a new farm in the system. Requires farm identification, owner details, and farm infrastructure information. Optional: can assign doctor and inseminator during creation.",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "FARM001",
+                "owner_name": "John Doe",
+                "address": "Addis Ababa",
+                "telephone_number": "+251912345678",
+                "type_of_housing": 1,
+                "type_of_floor": 1,
+                "source_of_water": 1,
+                "feeding_frequency": 1,
+                "inseminator": 1,
+                "doctor": 1
+              }
+            }
+          }
+        },
+        {
+          "name": "Change Farm's Doctor",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/farms/{farm_id}/change_doctor/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "doctor_id": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cows",
+      "item": [
+        {
+          "name": "List Cows",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/cows/",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "FARM001"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create Cow",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/cows/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm": "FARM001",
+                "cow_id": "COW001",
+                "breed": 1,
+                "age_in_days": 730,
+                "sex": "F",
+                "body_weight": 450.5,
+                "bcs": 3.5,
+                "gynecological_status": 1,
+                "lactation_number": 2,
+                "average_daily_milk": 25.5
+              }
+            }
+          }
+        },
+        {
+          "name": "Record Heat Sign",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/cows/record_heat_sign/",
+            "description": "Record heat signs for a cow and notify relevant parties",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "FARM001",
+                "cow_id": "COW001",
+                "heat_signs": "Mounting behavior, Restlessness"
+              }
+            }
+          }
+        },
+        {
+          "name": "Monitor Pregnancy",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/cows/monitor_pregnancy/",
+            "description": "Record or update pregnancy monitoring information",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "FARM001",
+                "cow_id": "COW001",
+                "is_pregnant": true,
+                "lactation_number": 2
+              }
+            }
+          },
+          "response": [
+            {
+              "status": "200 OK",
+              "body": {
+                "message": "Pregnancy monitoring record updated successfully",
+                "cow_id": "COW001",
+                "farm_id": "FARM001",
+                "is_pregnant": true,
+                "lactation_number": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Doctors",
+      "item": [
+        {
+          "name": "List Doctors",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/doctors/"
+          }
+        },
+        {
+          "name": "Create Doctor",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/doctors/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "name": "Dr. John Smith",
+                "phone_number": "+251912345678",
+                "address": "Addis Ababa",
+                "is_active": true,
+                "specialization": "Veterinary Medicine",
+                "license_number": "VET123"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inseminators",
+      "item": [
+        {
+          "name": "List Inseminators",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/inseminators/"
+          }
+        },
+        {
+          "name": "Create Inseminator",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/inseminators/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "name": "John Doe",
+                "phone_number": "+251912345678",
+                "address": "Addis Ababa",
+                "is_active": true,
+                "license_number": "INS123"
+              }
+            }
+          }
+        },
+        {
+          "name": "Replace Inseminator",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/inseminators/{inseminator_id}/replace_inseminator/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "name": "New Name",
+                "phone_number": "+251912345678",
+                "address": "New Address"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Choice Models",
+      "item": [
+        {
+          "name": "List Breed Types",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/breedtypes/"
+          }
+        },
+        {
+          "name": "List Housing Types",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/housingtypes/"
+          }
+        },
+        {
+          "name": "List Floor Types",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/floortypes/"
+          }
+        },
+        {
+          "name": "List Water Sources",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/watersources/"
+          }
+        },
+        {
+          "name": "List Feeding Frequencies",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/feedingfrequencies/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "List Messages",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/messages/",
+            "description": "Get all messages. Can be filtered by farm_id and cow_id.",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "FARM001",
+                "description": "Filter messages by farm ID"
+              },
+              {
+                "key": "cow_id",
+                "value": "COW001",
+                "description": "Filter messages by cow ID (requires farm_id)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Records",
+      "item": [
+        {
+          "name": "List Health Records",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/health/",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "FARM001"
+              },
+              {
+                "key": "cow_id",
+                "value": "COW001"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create Health Record",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/health/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "cow": "COW001",
+                "farm": "FARM001",
+                "general_health": 1,
+                "udder_health": 1,
+                "mastitis": 1,
+                "is_cow_vaccinated": true,
+                "assessed_by": 1,
+                "diagnosis": "Healthy",
+                "treatment": "None required",
+                "next_assessment_date": "2024-04-21"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reproduction Records",
+      "item": [
+        {
+          "name": "List Reproduction Records",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/reproduction/",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "FARM001"
+              },
+              {
+                "key": "is_pregnant",
+                "value": "true"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Create Reproduction Record",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/reproduction/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "cow": "COW001",
+                "farm": "FARM001",
+                "is_cow_pregnant": true,
+                "heat_sign_start": "2024-03-21T10:00:00Z",
+                "pregnancy_date": "2024-03-21",
+                "calving_date": "2024-12-21"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medical Assessments",
+      "description": "Endpoints for managing medical assessments by doctors and farmers",
+      "item": [
+        {
+          "name": "Doctor's Medical Assessment",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/medical-assessments/doctor_assessment/",
+            "description": "Submit a comprehensive medical assessment by a veterinary doctor. Includes detailed health status, vaccination records, and treatment plans. Automatically notifies the farmer of the assessment results.",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "1",
+                "cow_id": "8620",
+                "doctor_id": 1,
+                "is_cow_sick": true,
+                "sickness_type": "infectious",
+                "general_health": 1,
+                "udder_health": 1,
+                "mastitis": 1,
+                "body_condition_score": 3,
+                "reproductive_health": "Normal cycling",
+                "metabolic_disease": "None observed",
+                "is_cow_vaccinated": true,
+                "vaccination_date": "2024-03-21",
+                "vaccination_type": "FMD Vaccine",
+                "has_deworming": true,
+                "deworming_date": "2024-03-21",
+                "deworming_type": "Albendazole",
+                "diagnosis": "Mild infection",
+                "treatment": "Antibiotics prescribed",
+                "prescription": "Medication details",
+                "next_assessment_date": "2024-04-21",
+                "notes": "Follow up required"
+              }
+            }
+          }
+        },
+        {
+          "name": "Farmer's Medical Report",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/cows/farmer_medical_assessment/",
+            "description": "Submit a medical report by a farmer",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "1",
+                "cow_id": "8620",
+                "sickness_description": "የወተት ነጭ ራሽ ባክቴሪያ ይታያል"
+              }
+            }
+          }
+        },
+        {
+          "name": "List Medical Assessments",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/medical-assessments/",
+            "description": "Get all medical assessments",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "1"
+              },
+              {
+                "key": "cow_id",
+                "value": "8620"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Heat Sign Monitoring",
+      "description": "Endpoints for tracking heat signs and insemination records",
+      "item": [
+        {
+          "name": "Monitor Heat Sign",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/cows/monitor_heat_sign/",
+            "description": "Record heat sign monitoring by inseminator. Tracks insemination details, updates reproduction records, and sends notifications to relevant parties. Important for breeding management.",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "1",
+                "cow_id": "8620",
+                "is_inseminated": true,
+                "insemination_time": "14:30",
+                "insemination_count": 2,
+                "lactation_number": 3
+              }
+            }
+          }
+        },
+        {
+          "name": "List Insemination Records",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/insemination-records/",
+            "description": "Get all insemination records",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "1"
+              },
+              {
+                "key": "cow_id",
+                "value": "8620"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "List Messages",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/messages/",
+            "description": "Get all messages",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "1"
+              },
+              {
+                "key": "message_type",
+                "value": "health_alert"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+}

@@ -88,6 +88,13 @@ class Farm(models.Model):
         blank=True,
         related_name='assigned_farms'
     )
+    doctor = models.ForeignKey(
+        'Doctor',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_farms'
+    )
 
     def __str__(self):
         return f"Farm {self.farm_id} - {self.owner_name}"
@@ -190,39 +197,6 @@ class GeneralHealthStatus(models.Model):
     def __str__(self):
         return self.display_name
 
-# Health Model
-class Health(models.Model):
-    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='health_records')
-    cow = models.ForeignKey(Cow, on_delete=models.CASCADE, related_name='health_records')
-    udder_health = models.ForeignKey(
-        UdderHealthStatus,
-        on_delete=models.PROTECT,
-        related_name='health_records'
-    )
-    mastitis = models.ForeignKey(
-        MastitisStatus,
-        on_delete=models.PROTECT,
-        related_name='health_records'
-    )
-    general_health = models.ForeignKey(
-        GeneralHealthStatus,
-        on_delete=models.PROTECT,
-        related_name='health_records'
-    )
-    reproductive_health = models.TextField(blank=True)
-    metabolic_health = models.TextField(blank=True)
-    is_cow_vaccinated = models.BooleanField(default=False)
-    vaccination_date = models.DateField(null=True, blank=True)
-    vaccination_type = models.TextField(blank=True)
-    has_cow_taken_deworming = models.BooleanField(default=False)
-    deworming_date = models.DateField(null=True, blank=True)
-    deworming_type = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"Health Record - Cow {self.cow.cow_id}"
-
-    class Meta:
-        verbose_name_plural = "Health Records"
 
 # Reproduction Model
 class Reproduction(models.Model):
@@ -243,13 +217,26 @@ class Reproduction(models.Model):
 
 class Message(models.Model):
     farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='messages')
-    cow = models.ForeignKey(Cow, on_delete=models.CASCADE, related_name='messages')
+    cow = models.ForeignKey(
+        Cow, 
+        on_delete=models.CASCADE, 
+        related_name='messages',
+        null=True,
+        blank=True
+    )
     message_text = models.TextField()
     sent_date = models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(max_length=50, choices=[
         ('heat_alert', 'Heat Alert'),
         ('health_alert', 'Health Alert'),
         ('vaccination_alert', 'Vaccination Alert'),
+        ('pregnancy_update', 'Pregnancy Update'),
+        ('inseminator_alert', 'Inseminator Alert'),
+        ('farmer_alert', 'Farmer Alert'),
+        ('doctor_alert', 'Doctor Alert'),
+        ('doctor_assignment', 'Doctor Assignment'),
+        ('inseminator_assignment', 'Inseminator Assignment'),
+        ('pregnancy_confirmation', 'Pregnancy Confirmation'),
         ('other', 'Other')
     ])
     is_sent = models.BooleanField(default=False)
@@ -277,3 +264,103 @@ class Inseminator(models.Model):
 
     class Meta:
         ordering = ['name']
+
+class Doctor(models.Model):
+    name = models.CharField(max_length=255)
+    phone_number = models.CharField(
+        max_length=15,
+        validators=[RegexValidator(
+            regex=r'^\+?1?\d{9,15}$',
+            message="Enter a valid phone number (e.g. +251912345678 or 0912345678)."
+        )]
+    )
+    address = models.TextField()
+    is_active = models.BooleanField(default=True)
+    specialization = models.CharField(max_length=255, blank=True)
+    license_number = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return f"Dr. {self.name} - {self.license_number}"
+
+    class Meta:
+        ordering = ['name']
+
+class FarmerMedicalReport(models.Model):
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='farmer_medical_reports')
+    cow = models.ForeignKey(Cow, on_delete=models.CASCADE, related_name='farmer_medical_reports')
+    sickness_description = models.TextField()
+    reported_date = models.DateTimeField(auto_now_add=True)
+    is_reviewed = models.BooleanField(default=False)
+    reviewed_by = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, blank=True)
+    review_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Medical Report - Farm {self.farm.farm_id} - Cow {self.cow.cow_id}"
+
+    class Meta:
+        ordering = ['-reported_date']
+
+class MedicalAssessment(models.Model):
+    SICKNESS_TYPE_CHOICES = [
+        ('infectious', 'Infectious Disease'),
+        ('non_infectious', 'Non-Infectious Disease')
+    ]
+
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='medical_assessments')
+    cow = models.ForeignKey(Cow, on_delete=models.CASCADE, related_name='medical_assessments')
+    assessed_by = models.ForeignKey(Doctor, on_delete=models.PROTECT, related_name='assessments')
+    assessment_date = models.DateTimeField(auto_now_add=True)
+    
+    # Health Status
+    is_cow_sick = models.BooleanField(default=False)
+    sickness_type = models.CharField(
+        max_length=20, 
+        choices=SICKNESS_TYPE_CHOICES,
+        null=True, 
+        blank=True
+    )
+    general_health = models.ForeignKey(GeneralHealthStatus, on_delete=models.PROTECT)
+    udder_health = models.ForeignKey(UdderHealthStatus, on_delete=models.PROTECT)
+    mastitis = models.ForeignKey(MastitisStatus, on_delete=models.PROTECT)
+    body_condition_score = models.IntegerField()
+    reproductive_health = models.TextField()
+    metabolic_disease = models.TextField(blank=True)
+    
+    # Vaccination
+    is_cow_vaccinated = models.BooleanField(default=False)
+    vaccination_date = models.DateField(null=True, blank=True)
+    vaccination_type = models.CharField(max_length=255, blank=True)
+    
+    # Deworming
+    has_deworming = models.BooleanField(default=False)
+    deworming_date = models.DateField(null=True, blank=True)
+    deworming_type = models.CharField(max_length=255, blank=True)
+    
+    # Assessment Details
+    diagnosis = models.TextField(blank=True)
+    treatment = models.TextField(blank=True)
+    prescription = models.TextField(blank=True)
+    next_assessment_date = models.DateField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Medical Assessment - Farm {self.farm.farm_id} - Cow {self.cow.cow_id}"
+
+    class Meta:
+        ordering = ['-assessment_date']
+
+class InseminationRecord(models.Model):
+    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='insemination_records')
+    cow = models.ForeignKey(Cow, on_delete=models.CASCADE, related_name='insemination_records')
+    inseminator = models.ForeignKey(Inseminator, on_delete=models.PROTECT, related_name='insemination_records')
+    is_inseminated = models.BooleanField(default=False)
+    insemination_time = models.TimeField(null=True, blank=True)
+    insemination_count = models.IntegerField(default=0)
+    lactation_number = models.IntegerField()
+    recorded_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Insemination Record - Farm {self.farm.farm_id} - Cow {self.cow.cow_id}"
+
+    class Meta:
+        ordering = ['-recorded_date']
