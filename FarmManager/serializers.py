@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import Farm, Cow, Message, Inseminator, Health, Reproduction, BreedType, HousingType, FloorType, FeedingFrequency, WaterSource, GynecologicalStatus, UdderHealthStatus, MastitisStatus, GeneralHealthStatus
+from .models import (
+    Farm, Cow, Doctor, Inseminator, Message,
+    BreedType, HousingType, FloorType, FeedingFrequency,
+    WaterSource, GynecologicalStatus, UdderHealthStatus,
+    MastitisStatus, GeneralHealthStatus, MedicalAssessment,
+    InseminationRecord, FarmerMedicalReport
+)
 
 class FarmSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,9 +17,9 @@ class CowSerializer(serializers.ModelSerializer):
         model = Cow
         fields = '__all__'
 
-class MessageSerializer(serializers.ModelSerializer):
+class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Message
+        model = Doctor
         fields = '__all__'
 
 class InseminatorSerializer(serializers.ModelSerializer):
@@ -21,58 +27,68 @@ class InseminatorSerializer(serializers.ModelSerializer):
         model = Inseminator
         fields = '__all__'
 
-class HealthSerializer(serializers.ModelSerializer):
+class MessageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Health
+        model = Message
         fields = '__all__'
 
-class ReproductionSerializer(serializers.ModelSerializer):
+class MedicalAssessmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Reproduction
+        model = MedicalAssessment
         fields = '__all__'
 
-# Choice Model Serializers
+class InseminationRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InseminationRecord
+        fields = '__all__'
+
+class FarmerMedicalReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FarmerMedicalReport
+        fields = '__all__'
+
+# Choice model serializers
 class BreedTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = BreedType
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class HousingTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = HousingType
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class FloorTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FloorType
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class FeedingFrequencySerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedingFrequency
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class WaterSourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = WaterSource
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class GynecologicalStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = GynecologicalStatus
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class UdderHealthStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = UdderHealthStatus
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class MastitisStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = MastitisStatus
-        fields = ['id', 'name', 'display_name']
+        fields = '__all__'
 
 class GeneralHealthStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeneralHealthStatus
-        fields = ['id', 'name', 'display_name'] 
+        fields = '__all__' 

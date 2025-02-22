@@ -249,6 +249,68 @@ Currently using Django's default authentication system.
 - **Method:** `GET`
 - **Description:** Get all available feeding frequencies
 
+### 8. Farmer Medical Reports
+
+#### List Farmer Reports
+
+- **URL:** `/farmer-medical-reports/`
+- **Method:** `GET`
+- **Description:** Get all farmer-submitted medical reports
+- **Query Parameters:**
+  - `farm_id`: Filter by farm ID
+  - `cow_id`: Filter by cow ID
+  - `is_reviewed`: Filter by review status (true/false)
+- **Success Response:** `200 OK`
+
+#### Get Single Farmer Report
+
+- **URL:** `/farmer-medical-reports/{id}/`
+- **Method:** `GET`
+- **Description:** Get details of a specific farmer medical report
+- **Success Response:** `200 OK`
+
+### 9. Medical Assessments
+
+#### List Medical Assessments
+
+- **URL:** `/medical-assessments/`
+- **Method:** `GET`
+- **Description:** Get all doctor medical assessments
+- **Query Parameters:**
+  - `farm_id`: Filter by farm ID
+  - `cow_id`: Filter by cow ID
+  - `doctor_id`: Filter by doctor ID
+  - `is_cow_sick`: Filter by health status (true/false)
+- **Success Response:** `200 OK`
+
+#### Get Single Assessment
+
+- **URL:** `/medical-assessments/{id}/`
+- **Method:** `GET`
+- **Description:** Get details of a specific medical assessment
+- **Success Response:** `200 OK`
+
+### 10. Insemination Records
+
+#### List Insemination Records
+
+- **URL:** `/insemination-records/`
+- **Method:** `GET`
+- **Description:** Get all insemination records
+- **Query Parameters:**
+  - `farm_id`: Filter by farm ID
+  - `cow_id`: Filter by cow ID
+  - `inseminator_id`: Filter by inseminator ID
+  - `is_inseminated`: Filter by insemination status (true/false)
+- **Success Response:** `200 OK`
+
+#### Get Single Record
+
+- **URL:** `/insemination-records/{id}/`
+- **Method:** `GET`
+- **Description:** Get details of a specific insemination record
+- **Success Response:** `200 OK`
+
 ## Message Types
 
 - `heat_alert`: Heat detection alerts

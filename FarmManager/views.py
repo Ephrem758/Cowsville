@@ -7,8 +7,15 @@ from django.db.models import Q
 from django.utils.timezone import now, timezone
 
 from AlertSystem.sendMesage import send_alert
-from .models import Cow, Farm, Message, Reproduction, Inseminator, Doctor, Health, BreedType, HousingType, FloorType, FeedingFrequency, WaterSource, GynecologicalStatus, UdderHealthStatus, MastitisStatus, GeneralHealthStatus, FarmerMedicalReport, MedicalAssessment, InseminationRecord
-from .serializers import FarmSerializer, CowSerializer, MessageSerializer, InseminatorSerializer, HealthSerializer, ReproductionSerializer, BreedTypeSerializer, HousingTypeSerializer, FloorTypeSerializer, FeedingFrequencySerializer, WaterSourceSerializer, GynecologicalStatusSerializer, UdderHealthStatusSerializer, MastitisStatusSerializer, GeneralHealthStatusSerializer
+from .models import (
+    Cow, Farm, Message, Reproduction, Inseminator, Doctor, 
+    MedicalAssessment,  # Changed from Health
+    BreedType, HousingType, FloorType, FeedingFrequency, 
+    WaterSource, GynecologicalStatus, UdderHealthStatus, 
+    MastitisStatus, GeneralHealthStatus, FarmerMedicalReport, 
+    InseminationRecord
+)
+from .serializers import FarmSerializer, CowSerializer, MessageSerializer, InseminatorSerializer, ReproductionSerializer, BreedTypeSerializer, HousingTypeSerializer, FloorTypeSerializer, FeedingFrequencySerializer, WaterSourceSerializer, GynecologicalStatusSerializer, UdderHealthStatusSerializer, MastitisStatusSerializer, GeneralHealthStatusSerializer, FarmerMedicalReportSerializer, MedicalAssessmentSerializer, InseminationRecordSerializer
 
 
 class FarmViewSet(viewsets.ModelViewSet):
@@ -769,24 +776,6 @@ class InseminatorViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-class HealthViewSet(viewsets.ModelViewSet):
-    queryset = Health.objects.all()
-    serializer_class = HealthSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['cow__cow_id', 'farm__farm_id']
-
-    def get_queryset(self):
-        queryset = Health.objects.all()
-        farm_id = self.request.query_params.get('farm_id', None)
-        cow_id = self.request.query_params.get('cow_id', None)
-        
-        if farm_id:
-            queryset = queryset.filter(farm__farm_id=farm_id)
-        if cow_id and farm_id:
-            queryset = queryset.filter(cow__cow_id=cow_id)
-            
-        return queryset
-
 class ReproductionViewSet(viewsets.ModelViewSet):
     queryset = Reproduction.objects.all()
     serializer_class = ReproductionSerializer
@@ -854,4 +843,67 @@ class GeneralHealthStatusViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = GeneralHealthStatus.objects.all()
     serializer_class = GeneralHealthStatusSerializer
     search_fields = ['name', 'display_name']
+
+class FarmerMedicalReportViewSet(viewsets.ModelViewSet):
+    queryset = FarmerMedicalReport.objects.all()
+    serializer_class = FarmerMedicalReportSerializer
+
+    def get_queryset(self):
+        queryset = FarmerMedicalReport.objects.all()
+        farm_id = self.request.query_params.get('farm_id', None)
+        cow_id = self.request.query_params.get('cow_id', None)
+        is_reviewed = self.request.query_params.get('is_reviewed', None)
+
+        if farm_id:
+            queryset = queryset.filter(farm__farm_id=farm_id)
+        if cow_id:
+            queryset = queryset.filter(cow__cow_id=cow_id)
+        if is_reviewed is not None:
+            queryset = queryset.filter(is_reviewed=is_reviewed)
+
+        return queryset
+
+class MedicalAssessmentViewSet(viewsets.ModelViewSet):
+    queryset = MedicalAssessment.objects.all()
+    serializer_class = MedicalAssessmentSerializer
+
+    def get_queryset(self):
+        queryset = MedicalAssessment.objects.all()
+        farm_id = self.request.query_params.get('farm_id', None)
+        cow_id = self.request.query_params.get('cow_id', None)
+        doctor_id = self.request.query_params.get('doctor_id', None)
+        is_cow_sick = self.request.query_params.get('is_cow_sick', None)
+
+        if farm_id:
+            queryset = queryset.filter(farm__farm_id=farm_id)
+        if cow_id:
+            queryset = queryset.filter(cow__cow_id=cow_id)
+        if doctor_id:
+            queryset = queryset.filter(assessed_by_id=doctor_id)
+        if is_cow_sick is not None:
+            queryset = queryset.filter(is_cow_sick=is_cow_sick)
+
+        return queryset
+
+class InseminationRecordViewSet(viewsets.ModelViewSet):
+    queryset = InseminationRecord.objects.all()
+    serializer_class = InseminationRecordSerializer
+
+    def get_queryset(self):
+        queryset = InseminationRecord.objects.all()
+        farm_id = self.request.query_params.get('farm_id', None)
+        cow_id = self.request.query_params.get('cow_id', None)
+        inseminator_id = self.request.query_params.get('inseminator_id', None)
+        is_inseminated = self.request.query_params.get('is_inseminated', None)
+
+        if farm_id:
+            queryset = queryset.filter(farm__farm_id=farm_id)
+        if cow_id:
+            queryset = queryset.filter(cow__cow_id=cow_id)
+        if inseminator_id:
+            queryset = queryset.filter(inseminator_id=inseminator_id)
+        if is_inseminated is not None:
+            queryset = queryset.filter(is_inseminated=is_inseminated)
+
+        return queryset
 

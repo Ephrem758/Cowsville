@@ -7,7 +7,10 @@ from .views import (
     BreedTypeViewSet, HousingTypeViewSet, FloorTypeViewSet,
     FeedingFrequencyViewSet, WaterSourceViewSet,
     GynecologicalStatusViewSet, UdderHealthStatusViewSet,
-    MastitisStatusViewSet, GeneralHealthStatusViewSet
+    MastitisStatusViewSet, GeneralHealthStatusViewSet,
+    FarmerMedicalReportViewSet,
+    MedicalAssessmentViewSet,
+    InseminationRecordViewSet
 )
 
 router = DefaultRouter()
@@ -31,6 +34,10 @@ router.register(r'gynecologicalstatuses', GynecologicalStatusViewSet)
 router.register(r'udderhealthstatuses', UdderHealthStatusViewSet)
 router.register(r'mastitisstatuses', MastitisStatusViewSet)
 router.register(r'generalhealthstatuses', GeneralHealthStatusViewSet)
+
+router.register(r'farmer-medical-reports', FarmerMedicalReportViewSet)
+router.register(r'medical-assessments', MedicalAssessmentViewSet)
+router.register(r'insemination-records', InseminationRecordViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

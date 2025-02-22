@@ -503,6 +503,122 @@
           }
         }
       ]
+    },
+    {
+      "name": "Farmer Medical Reports",
+      "description": "Endpoints for managing farmer-submitted medical reports",
+      "item": [
+        {
+          "name": "List Farmer Reports",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/farmer-medical-reports/",
+            "description": "Get all farmer medical reports. Can be filtered by farm_id, cow_id, and review status.",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "FARM001"
+              },
+              {
+                "key": "cow_id",
+                "value": "COW001"
+              },
+              {
+                "key": "is_reviewed",
+                "value": "false"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Single Farmer Report",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/farmer-medical-reports/{id}/",
+            "description": "Get details of a specific farmer medical report"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medical Assessments",
+      "description": "Endpoints for managing doctor medical assessments",
+      "item": [
+        {
+          "name": "List Medical Assessments",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/medical-assessments/",
+            "description": "Get all medical assessments. Can be filtered by farm_id, cow_id, doctor_id, and health status.",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "FARM001"
+              },
+              {
+                "key": "cow_id",
+                "value": "COW001"
+              },
+              {
+                "key": "doctor_id",
+                "value": "1"
+              },
+              {
+                "key": "is_cow_sick",
+                "value": "true"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Single Assessment",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/medical-assessments/{id}/",
+            "description": "Get details of a specific medical assessment"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Insemination Records",
+      "description": "Endpoints for managing insemination records",
+      "item": [
+        {
+          "name": "List Insemination Records",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/insemination-records/",
+            "description": "Get all insemination records. Can be filtered by farm_id, cow_id, and inseminator_id.",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "FARM001"
+              },
+              {
+                "key": "cow_id",
+                "value": "COW001"
+              },
+              {
+                "key": "inseminator_id",
+                "value": "1"
+              },
+              {
+                "key": "is_inseminated",
+                "value": "true"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Get Single Record",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/insemination-records/{id}/",
+            "description": "Get details of a specific insemination record"
+          }
+        }
+      ]
     }
   ],
   "variable": [
