@@ -4,7 +4,7 @@ from .models import (
     BreedType, HousingType, FloorType, FeedingFrequency,
     WaterSource, GynecologicalStatus, UdderHealthStatus,
     MastitisStatus, GeneralHealthStatus, MedicalAssessment,
-    InseminationRecord, FarmerMedicalReport
+    InseminationRecord, FarmerMedicalReport, Reproduction
 )
 
 class FarmSerializer(serializers.ModelSerializer):
@@ -91,4 +91,9 @@ class MastitisStatusSerializer(serializers.ModelSerializer):
 class GeneralHealthStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeneralHealthStatus
+        fields = '__all__'
+
+class ReproductionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reproduction
         fields = '__all__' 

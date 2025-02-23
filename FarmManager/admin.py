@@ -29,8 +29,8 @@ class DoctorAdmin(admin.ModelAdmin):
 
 @admin.register(Inseminator)
 class InseminatorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone_number', 'is_active', 'license_number')
-    search_fields = ('name', 'phone_number', 'license_number')
+    list_display = ('name', 'phone_number', 'is_active')
+    search_fields = ('name', 'phone_number')
     list_filter = ('is_active',)
 
 @admin.register(Message)

@@ -1,0 +1,156 @@
+@startuml Farm Management System
+
+' Base Models
+class Farm {
+    + farm_id: CharField
+    + owner_name: CharField
+    + address: TextField
+    + telephone_number: CharField
+    + type_of_housing: ForeignKey(HousingType)
+    + type_of_floor: ForeignKey(FloorType)
+    + source_of_water: ForeignKey(WaterSource)
+    + feeding_frequency: ForeignKey(FeedingFrequency)
+    + inseminator: ForeignKey(Inseminator)
+    + doctor: ForeignKey(Doctor)
+}
+
+class Cow {
+    + farm: ForeignKey(Farm)
+    + cow_id: CharField
+    + breed: ForeignKey(BreedType)
+    + age_in_days: IntegerField
+    + sex: CharField
+    + body_weight: DecimalField
+    + bcs: DecimalField
+    + gynecological_status: ForeignKey(GynecologicalStatus)
+    + lactation_number: IntegerField
+    + average_daily_milk: DecimalField
+}
+
+class Doctor {
+    + name: CharField
+    + phone_number: CharField
+    + address: TextField
+    + is_active: BooleanField
+    + specialization: CharField
+}
+
+class Inseminator {
+    + name: CharField
+    + phone_number: CharField
+    + address: TextField
+    + is_active: BooleanField
+}
+
+' Medical Records
+class MedicalAssessment {
+    + farm: ForeignKey(Farm)
+    + cow: ForeignKey(Cow)
+    + assessed_by: ForeignKey(Doctor)
+    + assessment_date: DateTimeField
+    + is_cow_sick: BooleanField
+    + sickness_type: CharField
+    + general_health: ForeignKey(GeneralHealthStatus)
+    + udder_health: ForeignKey(UdderHealthStatus)
+    + mastitis: ForeignKey(MastitisStatus)
+    + body_condition_score: IntegerField
+    + reproductive_health: TextField
+    + metabolic_disease: TextField
+    + is_cow_vaccinated: BooleanField
+    + vaccination_date: DateField
+    + vaccination_type: CharField
+    + has_deworming: BooleanField
+    + deworming_date: DateField
+    + deworming_type: CharField
+    + diagnosis: TextField
+    + treatment: TextField
+    + prescription: TextField
+    + next_assessment_date: DateField
+    + notes: TextField
+}
+
+class FarmerMedicalReport {
+    + farm: ForeignKey(Farm)
+    + cow: ForeignKey(Cow)
+    + sickness_description: TextField
+    + reported_date: DateTimeField
+    + is_reviewed: BooleanField
+    + reviewed_by: ForeignKey(Doctor)
+    + review_date: DateTimeField
+}
+
+class InseminationRecord {
+    + farm: ForeignKey(Farm)
+    + cow: ForeignKey(Cow)
+    + inseminator: ForeignKey(Inseminator)
+    + is_inseminated: BooleanField
+    + insemination_time: TimeField
+    + insemination_count: IntegerField
+    + lactation_number: IntegerField
+    + recorded_date: DateTimeField
+}
+
+' Choice Models
+class BreedType {
+    + name: CharField
+    + description: TextField
+}
+
+class HousingType {
+    + name: CharField
+    + description: TextField
+}
+
+class FloorType {
+    + name: CharField
+    + description: TextField
+}
+
+class WaterSource {
+    + name: CharField
+    + description: TextField
+}
+
+class FeedingFrequency {
+    + name: CharField
+    + description: TextField
+}
+
+class GynecologicalStatus {
+    + name: CharField
+    + description: TextField
+}
+
+class UdderHealthStatus {
+    + name: CharField
+    + description: TextField
+}
+
+class MastitisStatus {
+    + name: CharField
+    + description: TextField
+}
+
+class GeneralHealthStatus {
+    + name: CharField
+    + description: TextField
+}
+
+' Relationships
+Farm "1" -- "*" Cow
+Farm "1" -- "*" MedicalAssessment
+Farm "1" -- "*" FarmerMedicalReport
+Farm "1" -- "*" InseminationRecord
+Farm "*" -- "1" Doctor
+Farm "*" -- "1" Inseminator
+
+Cow "1" -- "*" MedicalAssessment
+Cow "1" -- "*" FarmerMedicalReport
+Cow "1" -- "*" InseminationRecord
+
+Doctor "1" -- "*" MedicalAssessment
+Doctor "1" -- "*" FarmerMedicalReport
+
+Inseminator "1" -- "*" InseminationRecord
+
+@enduml
