@@ -1,5 +1,19 @@
 from django.db import models
+from django.db.models import Q
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+
+
+# manager for soft delete
+class SoftDeleteManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+    
+    def all_with_deleted(self):
+        return super().get_queryset()
+    
+    def deleted(self):
+        return super().get_queryset().filter(is_deleted=True)
+
 
 # Choice Models
 class HousingType(models.Model):
@@ -95,6 +109,16 @@ class Farm(models.Model):
         blank=True,
         related_name='assigned_farms'
     )
+    # soft delete
+    is_deleted = models.BooleanField(default=False)
+    objects = SoftDeleteManager()
+    
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()
+        
+    def hard_delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"Farm {self.farm_id} - {self.owner_name}"
@@ -163,6 +187,16 @@ class Cow(models.Model):
     number_of_inseminations = models.PositiveIntegerField(default=0)
     id_or_breed_bull_used = models.CharField(max_length=100, blank=True)
     last_calving_date = models.DateField(null=True, blank=True)
+    
+    is_deleted = models.BooleanField(default=False)
+    objects = SoftDeleteManager()
+    
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()
+        
+    def hard_delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"Farm {self.farm.farm_id} - Cow {self.cow_id}"
