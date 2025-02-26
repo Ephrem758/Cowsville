@@ -1,3 +1,5 @@
+import logging
+import transaction
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, status, filters
@@ -15,172 +17,166 @@ from .models import (
     MastitisStatus, GeneralHealthStatus, FarmerMedicalReport, 
     InseminationRecord
 )
-from .serializers import FarmSerializer, CowSerializer, MessageSerializer, InseminatorSerializer, ReproductionSerializer, BreedTypeSerializer, HousingTypeSerializer, FloorTypeSerializer, FeedingFrequencySerializer, WaterSourceSerializer, GynecologicalStatusSerializer, UdderHealthStatusSerializer, MastitisStatusSerializer, GeneralHealthStatusSerializer, FarmerMedicalReportSerializer, MedicalAssessmentSerializer, InseminationRecordSerializer
+from .serializers import FarmSerializer, CowSerializer, MessageSerializer, InseminatorSerializer, ReproductionSerializer, BreedTypeSerializer, HousingTypeSerializer, FloorTypeSerializer, FeedingFrequencySerializer, WaterSourceSerializer, GynecologicalStatusSerializer, UdderHealthStatusSerializer, MastitisStatusSerializer, GeneralHealthStatusSerializer, FarmerMedicalReportSerializer, MedicalAssessmentSerializer, InseminationRecordSerializer, InseminatorAssignmentSerializer, DoctorAssignmentSerializer
+
+#initiating the logger
+logger = logging.getLogger(__name__)
 
 
 class FarmViewSet(viewsets.ModelViewSet):
     queryset = Farm.objects.all()
     serializer_class = FarmSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['farm_id', 'owner_name', 'address']
-
-    def get_queryset(self):
-        queryset = Farm.objects.all()
-        search_query = self.request.query_params.get('search', None)
-        if search_query:
-            queryset = queryset.filter(
-                Q(farm_id__icontains=search_query) |
-                Q(owner_name__icontains=search_query) |
-                Q(address__icontains=search_query)
-            )
-        return queryset
-
+    search_fields = ['farm_id', 'owner_name', "address"]
+    
     @action(detail=True, methods=['post'])
     def change_inseminator(self, request, pk=None):
-        try:
-            farm = self.get_object()
-            inseminator_id = request.data.get('inseminator_id')
-            
-            if not inseminator_id:
-                return Response(
-                    {'error': 'inseminator_id is required'}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+        farm = self.get_object()
+        logger.info(f"Request to change inseminator for farm {farm.farm_id}")
+        
+        serializer = InseminatorAssignmentSerializer(data=request.data)
+        if not serializer.is_valid():
+            logger.warning(f"Invalid data for inseminator change: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            try:
-                new_inseminator = Inseminator.objects.get(id=inseminator_id)
-            except Inseminator.DoesNotExist:
-                return Response(
-                    {'error': 'Inseminator not found'}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-
-            # Store old inseminator for message
-            old_inseminator = farm.inseminator
-
-            # Update farm's inseminator
-            farm.inseminator = new_inseminator
-            farm.save()
-
-            # Send notifications
-            if old_inseminator:
-                # Notify old inseminator
-                old_message = (
-                    f"Notice: You have been unassigned from farm: {farm.farm_id} "
-                    f"({farm.owner_name})"
-                )
-                send_alert(old_inseminator.phone_number, old_message)
-
-            # Notify new inseminator
-            new_message = (
-                f"Notice: You have been assigned to a new farm:\n"
-                f"Farm ID: {farm.farm_id}\n"
-                f"Owner: {farm.owner_name}\n"
-                f"Address: {farm.address}\n"
-                f"Phone: {farm.telephone_number}"
-            )
-            send_alert(new_inseminator.phone_number, new_message)
-
-            # Similar update needed for inseminator assignment
-            Message.objects.create(
-                farm=farm,
-                cow=None,  # Yes, cow field is nullable based on the model definition
-                message_text=new_message,
-                message_type='inseminator_assignment',
-                is_sent=True
-            )
-
-            return Response({
-                'message': 'Inseminator changed successfully',
-                'farm_id': farm.farm_id,
-                'new_inseminator': new_inseminator.name
-            })
-
-        except Exception as e:
-            return Response(
-                {'error': str(e)}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
+        logger.info(f"Validated inseminator change request for farm {farm.farm_id}")
+        return self._change_staff(
+                                  request, 
+                                  'inseminator', 
+                                  serializer.validated_data['inseminator_id'], 
+                                  'inseminator_assignment', 
+                                  )
+        
+        
     @action(detail=True, methods=['post'])
     def change_doctor(self, request, pk=None):
+        farm = self.get_object()
+        logger.info(f"Request to change doctor for farm {farm.farm_id}")
+        
+        serializer = DoctorAssignmentSerializer(data=request.data)
+        if not serializer.is_valid():
+            logger.warning(f"Invalid data for doctor change: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        logger.info(f"Validated doctor change request for farm {farm.farm_id}")
+        return self._change_staff(
+                                  request, 
+                                  'doctor', 
+                                  serializer.validated_data['doctor_id'], 
+                                  'doctor_assignment'
+                                  )
+        
+        
+    def _change_staff(self, request, staff_type, staff_id, message_type):
+        farm = self.get_object()
+        logger.info(f"Attempting to change {staff_type} for farm {farm.farm_id} to staff ID {staff_id}")
+        
         try:
-            farm = self.get_object()
-            doctor_id = request.data.get('doctor_id')
-            
-            if not doctor_id:
-                return Response(
-                    {'error': 'doctor_id is required'}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            try:
-                new_doctor = Doctor.objects.get(id=doctor_id)
-            except Doctor.DoesNotExist:
-                return Response(
-                    {'error': 'Doctor not found'}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-
-            if not new_doctor.is_active:
-                return Response(
-                    {'error': 'Selected doctor is not active'}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            # Store old doctor for message
-            old_doctor = farm.doctor
-
-            # Update farm's doctor
-            farm.doctor = new_doctor
-            farm.save()
-
-            # Send notifications
-            if old_doctor:
-                # Notify old doctor
-                old_message = (
-                    f"Notice: You have been unassigned from farm: {farm.farm_id} "
+            with transaction.atomic():
+                if staff_type == 'inseminator':
+                    StaffModel = Inseminator
+                    old_staff = farm.inseminator
+                    new_staff = StaffModel.objects.get(id=staff_id)
+                    title = ''
+                else:
+                    StaffModel = Doctor
+                    old_staff = farm.doctor
+                    new_staff = StaffModel.objects.get(id=staff_id)
+                    title = 'Dr.'
+                    
+                logger.info(f"Found new {staff_type} : {new_staff.name} (ID: {new_staff.id})")
+                
+                if old_staff:
+                    logger.info(f"Replacing {staff_type} : {old_staff.name} (ID: {old_staff.id}) with {new_staff.name} (ID: {new_staff.id})")
+                    old_staff.is_active = False
+                else:
+                    logger.info(f"No existing {staff_type} to replace")
+                    
+                setattr(farm, staff_type, new_staff) 
+                farm.save(update_fields=[staff_type])
+                
+                logger.info(f"Successfully updated farm {farm.farm_id} with new {staff_type}")
+                
+                # send message to old staff
+                if old_staff:
+                    old_message = (
+                        f"Notice: You have been unassigned from farm: {farm.farm_id} "
                     f"({farm.owner_name})"
+                    )
+                    try:
+                        send_alert(old_staff.phone_number, old_message)
+                        logger.info(f"Notification sent to previous {staff_type} : {old_staff.name}")
+                    except Exception as e:
+                        logger.warning(f"Failed to send notification to previous {staff_type} : {old_staff.name}. Error: {e}")
+                        
+                # send message to new staff
+                new_message = (
+                    f"Notice: You have been assigned to a new farm:\n"
+                    f"Farm ID: {farm.farm_id}\n"
+                    f"Owner: {farm.owner_name}\n"
+                    f"Address: {farm.address}\n"
+                    f"Phone: {farm.telephone_number}"
                 )
-                send_alert(old_doctor.phone_number, old_message)
-
-            # Notify new doctor
-            new_message = (
-                f"Notice: You have been assigned to a new farm:\n"
-                f"Farm ID: {farm.farm_id}\n"
-                f"Owner: {farm.owner_name}\n"
-                f"Address: {farm.address}\n"
-                f"Phone: {farm.telephone_number}"
-            )
-            send_alert(new_doctor.phone_number, new_message)
-
-            # Notify farmer
-            farmer_message = (
-                f"Notice: Your farm's doctor has been changed to Dr. {new_doctor.name}. "
-                f"Contact number: {new_doctor.phone_number}"
-            )
-            send_alert(farm.telephone_number, farmer_message)
-
-            # Create message record
-            Message.objects.create(
-                farm=farm,
-                cow=None,
-                message_text=old_message,
-                message_type='doctor_assignment',
-                is_sent=True
-            )
-
-            return Response({
-                'message': 'Doctor changed successfully',
-                'farm_id': farm.farm_id,
-                'new_doctor': new_doctor.name
-            })
-
-        except Exception as e:
+                try:
+                    send_alert(new_staff.phone_number, new_message)
+                    logger.info(f"Notification sent to new {staff_type} : {new_staff.name}")
+                except Exception as e:
+                    logger.warning(f"Failed to send notification to new {staff_type} : {new_staff.name}. Error: {e}")
+                    
+                
+                # Notify the farmer about the doctor change
+                if staff_type == "doctor":
+                    farmer_message = (
+                    f"Notice: Your farm's doctor has been changed to {title}{new_staff.name}. "
+                    f"Contact number: {new_staff.phone_number}"
+                    )
+                    try:
+                        send_alert(farm.telephone_number, farmer_message)
+                        logger.info(f"Notification sent to farmer about doctor change")
+                    except Exception as e:
+                        logger.warning(f"Failed to send notification to farmer about doctor change. Error: {str(e)}")
+                        
+                # Creating message record 
+                try:
+                    Message.objects.create(
+                        farm=farm,
+                        cow=None,
+                        message_text=new_message,
+                        message_type=message_type,
+                        is_sent=True
+                    )   
+                    logger.info(f"Message record created for {staff_type} change")
+                except Exception as e:
+                    logger.warning(f"Failed to create message record for {staff_type} change. Error: {str(e)}")
+                    raise
+                
+                logger.info(f"Successfully compeleted the {staff_type} change process for farm {farm.farm_id}")  
+                
+                return Response({
+                    'message': f"{staff_type} changed successfully",
+                    'farm_id': farm.farm_id,
+                    'new_staff_id': new_staff.id,
+                    'old_staff_id': old_staff.id if old_staff else None
+                })  
+                
+        except StaffModel.DoesNotExist:
+            err_msg = f'{staff_type.capitalize()} with ID {staff_id} not found'
+            logger.error(err_msg)
+            
             return Response(
-                {'error': str(e)}, 
+                {'error': err_msg},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        except Exception as e:
+            logger.error(f"An error occurred while changing {staff_type} for farm {farm.farm_id}: {str(e)}")
+            
+            return Response(
+                {'error': f'Failed to change {staff_type} for farm {farm.farm_id}: Unexpected error'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+                                      
+         
 
 class CowViewSet(viewsets.ModelViewSet):
     queryset = Cow.objects.all()

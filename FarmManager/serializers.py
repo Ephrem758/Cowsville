@@ -97,3 +97,39 @@ class ReproductionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reproduction
         fields = '__all__' 
+        
+
+class StaffAssignmentSerializer(serializers.ModelSerializer):
+    staff_id = serializers.IntegerField(required=True)
+    
+    class Meta:
+        abstract = True
+        
+    def validate(self, attrs):
+        return NotImplementedError("child classes must implement this method")
+
+
+class InseminatorAssignmentSerializer(StaffAssignmentSerializer):
+    staff_id = serializers.IntegerField(required=True, source='inseminator_id')
+
+    def validate_staff_id(self, value):
+        try:
+            inseminator = Inseminator.objects.get(id=value)
+            if not inseminator.is_active:
+                raise serializers.ValidationError("Inseminator is not active")
+            return value
+        except Inseminator.DoesNotExist:
+            raise serializers.ValidationError("Inseminator Not Found")
+
+
+class DoctorAssignmentSerializer(StaffAssignmentSerializer):
+    staff_id = serializers.IntegerField(required=True, source='doctor_id')
+
+    def validate_staff_id(self, value):
+        try:
+            doctor = Doctor.objects.get(id=value)
+            if not doctor.is_active:
+                raise serializers.ValidationError("Doctor is not active")
+            return value
+        except Doctor.DoesNotExist:
+            raise serializers.ValidationError("Doctor Not Found")
