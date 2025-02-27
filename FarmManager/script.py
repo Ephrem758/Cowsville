@@ -5,7 +5,9 @@ import os
 import django
 
 # Set the settings module
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'FarmManagerSystem.settings')  # Replace 'myproject' with your project name
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", "FarmManagerSystem.settings"
+)  # Replace 'myproject' with your project name
 
 # Setup Django
 django.setup()

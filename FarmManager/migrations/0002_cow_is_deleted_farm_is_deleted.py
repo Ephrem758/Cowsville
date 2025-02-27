@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('FarmManager', '0001_initial'),
+        ("FarmManager", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cow',
-            name='is_deleted',
+            model_name="cow",
+            name="is_deleted",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='farm',
-            name='is_deleted',
+            model_name="farm",
+            name="is_deleted",
             field=models.BooleanField(default=False),
         ),
     ]
