@@ -8,6 +8,7 @@ from .sendMesage import send_alert
 
 logging.basicConfig(level=logging.INFO)
 
+
 def check_heat_sign_alerts():
     """Checks cows for heat sign alerts and sends notifications if necessary"""
     today = now().date()
@@ -21,33 +22,38 @@ def check_heat_sign_alerts():
             days_since_last_heat = (today - cow.heat_sign_start.date()).days
             if days_since_last_heat >= threshold_days:
                 message_text = f"Heat Sign Alert: Cow {cow.cow.id} has not shown heat signs for {days_since_last_heat} days. Please check!"
-                
+
                 # Send alert first
                 alert_response = send_alert(cow.farm.telephone_number, message_text)
-                
+
                 # Create message record only if alert was sent successfully
-                if alert_response.get('status') == 'success':
+                if alert_response.get("status") == "success":
                     Message.objects.create(
                         farm=cow.farm,
                         cow=cow.cow,
                         message_text=message_text,
-                        message_type='heat_alert',
-                        is_sent=True
+                        message_type="heat_alert",
+                        is_sent=True,
                     )
-                    logging.info(f"✅ Heat Sign Alert sent and recorded for Cow {cow.cow.id}")
+                    logging.info(
+                        f"✅ Heat Sign Alert sent and recorded for Cow {cow.cow.id}"
+                    )
                 else:
-                    logging.error(f"❌ Failed to send alert for Cow {cow.cow.id}: {alert_response.get('message')}")
+                    logging.error(
+                        f"❌ Failed to send alert for Cow {cow.cow.id}: {alert_response.get('message')}"
+                    )
 
     return f"Checked {len(cows)} cows for heat sign alerts"
 
+
 def start():
     """Start APScheduler for heat sign alerts every 24 hours"""
-    jobstores = {'default': MemoryJobStore()}
-    executors = {'default': ThreadPoolExecutor(2)}
+    jobstores = {"default": MemoryJobStore()}
+    executors = {"default": ThreadPoolExecutor(2)}
     scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors)
 
     # Schedule the task to run every 24 hours
-    scheduler.add_job(check_heat_sign_alerts, 'interval', hours=24)
+    scheduler.add_job(check_heat_sign_alerts, "interval", hours=24)
 
     logging.info("✅ APScheduler started for heat sign alerts (every 24 hours)")
     scheduler.start()

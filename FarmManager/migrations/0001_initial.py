@@ -9,256 +9,703 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='BreedType',
+            name="BreedType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='Doctor',
+            name="Doctor",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('phone_number', models.CharField(max_length=15, validators=[django.core.validators.RegexValidator(message='Enter a valid phone number (e.g. +251912345678 or 0912345678).', regex='^\\+?1?\\d{9,15}$')])),
-                ('address', models.TextField()),
-                ('is_active', models.BooleanField(default=True)),
-                ('specialization', models.CharField(blank=True, max_length=255)),
-                ('license_number', models.CharField(max_length=50, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "phone_number",
+                    models.CharField(
+                        max_length=15,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Enter a valid phone number (e.g. +251912345678 or 0912345678).",
+                                regex="^\\+?1?\\d{9,15}$",
+                            )
+                        ],
+                    ),
+                ),
+                ("address", models.TextField()),
+                ("is_active", models.BooleanField(default=True)),
+                ("specialization", models.CharField(blank=True, max_length=255)),
+                ("license_number", models.CharField(max_length=50, unique=True)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='FeedingFrequency',
+            name="FeedingFrequency",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='FloorType',
+            name="FloorType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='GeneralHealthStatus',
+            name="GeneralHealthStatus",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='GynecologicalStatus',
+            name="GynecologicalStatus",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='HousingType',
+            name="HousingType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='Inseminator',
+            name="Inseminator",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('phone_number', models.CharField(max_length=15, validators=[django.core.validators.RegexValidator(message='Enter a valid phone number (e.g. +251912345678 or 0912345678).', regex='^\\+?1?\\d{9,15}$')])),
-                ('address', models.TextField()),
-                ('is_active', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "phone_number",
+                    models.CharField(
+                        max_length=15,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Enter a valid phone number (e.g. +251912345678 or 0912345678).",
+                                regex="^\\+?1?\\d{9,15}$",
+                            )
+                        ],
+                    ),
+                ),
+                ("address", models.TextField()),
+                ("is_active", models.BooleanField(default=True)),
             ],
             options={
-                'ordering': ['name'],
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='MastitisStatus',
+            name="MastitisStatus",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='UdderHealthStatus',
+            name="UdderHealthStatus",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='WaterSource',
+            name="WaterSource",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('display_name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                ("display_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='Farm',
+            name="Farm",
             fields=[
-                ('farm_id', models.CharField(max_length=50, primary_key=True, serialize=False)),
-                ('owner_name', models.CharField(max_length=255)),
-                ('address', models.TextField()),
-                ('telephone_number', models.CharField(max_length=15, validators=[django.core.validators.RegexValidator(message='Enter a valid phone number (e.g. +251912345678 or 0912345678).', regex='^\\+?1?\\d{9,15}$')])),
-                ('location_gps', models.CharField(blank=True, max_length=255, null=True)),
-                ('fertility_camp_no', models.PositiveIntegerField(help_text='Number of fertility camps')),
-                ('total_number_of_cows', models.PositiveIntegerField()),
-                ('number_of_calves', models.PositiveIntegerField()),
-                ('number_of_milking_cow', models.PositiveIntegerField()),
-                ('total_daily_milk', models.PositiveIntegerField(help_text='Total daily milk production in liters')),
-                ('main_feed', models.TextField()),
-                ('farm_hygiene_score', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(4)])),
-                ('doctor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assigned_farms', to='FarmManager.doctor')),
-                ('rate_of_cow_feeding', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='farms_feeding', to='FarmManager.feedingfrequency')),
-                ('rate_of_water_giving', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='farms_watering', to='FarmManager.feedingfrequency')),
-                ('type_of_floor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='farms', to='FarmManager.floortype')),
-                ('type_of_housing', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='farms', to='FarmManager.housingtype')),
-                ('inseminator', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assigned_farms', to='FarmManager.inseminator')),
-                ('source_of_water', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='farms', to='FarmManager.watersource')),
+                (
+                    "farm_id",
+                    models.CharField(max_length=50, primary_key=True, serialize=False),
+                ),
+                ("owner_name", models.CharField(max_length=255)),
+                ("address", models.TextField()),
+                (
+                    "telephone_number",
+                    models.CharField(
+                        max_length=15,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Enter a valid phone number (e.g. +251912345678 or 0912345678).",
+                                regex="^\\+?1?\\d{9,15}$",
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "location_gps",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                (
+                    "fertility_camp_no",
+                    models.PositiveIntegerField(help_text="Number of fertility camps"),
+                ),
+                ("total_number_of_cows", models.PositiveIntegerField()),
+                ("number_of_calves", models.PositiveIntegerField()),
+                ("number_of_milking_cow", models.PositiveIntegerField()),
+                (
+                    "total_daily_milk",
+                    models.PositiveIntegerField(
+                        help_text="Total daily milk production in liters"
+                    ),
+                ),
+                ("main_feed", models.TextField()),
+                (
+                    "farm_hygiene_score",
+                    models.PositiveIntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(4),
+                        ]
+                    ),
+                ),
+                (
+                    "doctor",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="assigned_farms",
+                        to="FarmManager.doctor",
+                    ),
+                ),
+                (
+                    "rate_of_cow_feeding",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="farms_feeding",
+                        to="FarmManager.feedingfrequency",
+                    ),
+                ),
+                (
+                    "rate_of_water_giving",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="farms_watering",
+                        to="FarmManager.feedingfrequency",
+                    ),
+                ),
+                (
+                    "type_of_floor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="farms",
+                        to="FarmManager.floortype",
+                    ),
+                ),
+                (
+                    "type_of_housing",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="farms",
+                        to="FarmManager.housingtype",
+                    ),
+                ),
+                (
+                    "inseminator",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="assigned_farms",
+                        to="FarmManager.inseminator",
+                    ),
+                ),
+                (
+                    "source_of_water",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="farms",
+                        to="FarmManager.watersource",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Cow',
+            name="Cow",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('cow_id', models.CharField(max_length=50)),
-                ('age_in_days', models.PositiveIntegerField()),
-                ('sex', models.CharField(choices=[('F', 'Female'), ('M', 'Male')], max_length=1)),
-                ('parity', models.PositiveIntegerField(default=0, help_text='Number of times the cow has given birth')),
-                ('body_weight', models.DecimalField(decimal_places=2, max_digits=6, validators=[django.core.validators.MinValueValidator(0)])),
-                ('bcs', models.DecimalField(choices=[(1, '1'), (1.5, '1.5'), (2, '2'), (2.5, '2.5'), (3, '3'), (3.5, '3.5'), (4, '4'), (4.5, '4.5'), (5, '5')], decimal_places=1, max_digits=2, verbose_name='Body Condition Score')),
-                ('lactation_number', models.PositiveIntegerField(default=0)),
-                ('days_in_milk', models.PositiveIntegerField(default=0)),
-                ('average_daily_milk', models.DecimalField(decimal_places=2, max_digits=6, validators=[django.core.validators.MinValueValidator(0)])),
-                ('cow_inseminated_before', models.BooleanField(default=False)),
-                ('last_date_insemination', models.DateField(blank=True, null=True)),
-                ('number_of_inseminations', models.PositiveIntegerField(default=0)),
-                ('id_or_breed_bull_used', models.CharField(blank=True, max_length=100)),
-                ('last_calving_date', models.DateField(blank=True, null=True)),
-                ('breed', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cows', to='FarmManager.breedtype')),
-                ('farm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cows', to='FarmManager.farm')),
-                ('gynecological_status', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='cows', to='FarmManager.gynecologicalstatus')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("cow_id", models.CharField(max_length=50)),
+                ("age_in_days", models.PositiveIntegerField()),
+                (
+                    "sex",
+                    models.CharField(
+                        choices=[("F", "Female"), ("M", "Male")], max_length=1
+                    ),
+                ),
+                (
+                    "parity",
+                    models.PositiveIntegerField(
+                        default=0, help_text="Number of times the cow has given birth"
+                    ),
+                ),
+                (
+                    "body_weight",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=6,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                (
+                    "bcs",
+                    models.DecimalField(
+                        choices=[
+                            (1, "1"),
+                            (1.5, "1.5"),
+                            (2, "2"),
+                            (2.5, "2.5"),
+                            (3, "3"),
+                            (3.5, "3.5"),
+                            (4, "4"),
+                            (4.5, "4.5"),
+                            (5, "5"),
+                        ],
+                        decimal_places=1,
+                        max_digits=2,
+                        verbose_name="Body Condition Score",
+                    ),
+                ),
+                ("lactation_number", models.PositiveIntegerField(default=0)),
+                ("days_in_milk", models.PositiveIntegerField(default=0)),
+                (
+                    "average_daily_milk",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=6,
+                        validators=[django.core.validators.MinValueValidator(0)],
+                    ),
+                ),
+                ("cow_inseminated_before", models.BooleanField(default=False)),
+                ("last_date_insemination", models.DateField(blank=True, null=True)),
+                ("number_of_inseminations", models.PositiveIntegerField(default=0)),
+                ("id_or_breed_bull_used", models.CharField(blank=True, max_length=100)),
+                ("last_calving_date", models.DateField(blank=True, null=True)),
+                (
+                    "breed",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="cows",
+                        to="FarmManager.breedtype",
+                    ),
+                ),
+                (
+                    "farm",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="cows",
+                        to="FarmManager.farm",
+                    ),
+                ),
+                (
+                    "gynecological_status",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="cows",
+                        to="FarmManager.gynecologicalstatus",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['farm', 'cow_id'],
-                'unique_together': {('farm', 'cow_id')},
+                "ordering": ["farm", "cow_id"],
+                "unique_together": {("farm", "cow_id")},
             },
         ),
         migrations.CreateModel(
-            name='FarmerMedicalReport',
+            name="FarmerMedicalReport",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sickness_description', models.TextField()),
-                ('reported_date', models.DateTimeField(auto_now_add=True)),
-                ('is_reviewed', models.BooleanField(default=False)),
-                ('review_date', models.DateTimeField(blank=True, null=True)),
-                ('cow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='farmer_medical_reports', to='FarmManager.cow')),
-                ('farm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='farmer_medical_reports', to='FarmManager.farm')),
-                ('reviewed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='FarmManager.doctor')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sickness_description", models.TextField()),
+                ("reported_date", models.DateTimeField(auto_now_add=True)),
+                ("is_reviewed", models.BooleanField(default=False)),
+                ("review_date", models.DateTimeField(blank=True, null=True)),
+                (
+                    "cow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="farmer_medical_reports",
+                        to="FarmManager.cow",
+                    ),
+                ),
+                (
+                    "farm",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="farmer_medical_reports",
+                        to="FarmManager.farm",
+                    ),
+                ),
+                (
+                    "reviewed_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="FarmManager.doctor",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-reported_date'],
+                "ordering": ["-reported_date"],
             },
         ),
         migrations.CreateModel(
-            name='InseminationRecord',
+            name="InseminationRecord",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_inseminated', models.BooleanField(default=False)),
-                ('insemination_time', models.TimeField(blank=True, null=True)),
-                ('insemination_count', models.IntegerField(default=0)),
-                ('lactation_number', models.IntegerField()),
-                ('recorded_date', models.DateTimeField(auto_now_add=True)),
-                ('cow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='insemination_records', to='FarmManager.cow')),
-                ('farm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='insemination_records', to='FarmManager.farm')),
-                ('inseminator', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='insemination_records', to='FarmManager.inseminator')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_inseminated", models.BooleanField(default=False)),
+                ("insemination_time", models.TimeField(blank=True, null=True)),
+                ("insemination_count", models.IntegerField(default=0)),
+                ("lactation_number", models.IntegerField()),
+                ("recorded_date", models.DateTimeField(auto_now_add=True)),
+                (
+                    "cow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="insemination_records",
+                        to="FarmManager.cow",
+                    ),
+                ),
+                (
+                    "farm",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="insemination_records",
+                        to="FarmManager.farm",
+                    ),
+                ),
+                (
+                    "inseminator",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="insemination_records",
+                        to="FarmManager.inseminator",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-recorded_date'],
+                "ordering": ["-recorded_date"],
             },
         ),
         migrations.CreateModel(
-            name='Message',
+            name="Message",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('message_text', models.TextField()),
-                ('sent_date', models.DateTimeField(auto_now_add=True)),
-                ('message_type', models.CharField(choices=[('heat_alert', 'Heat Alert'), ('health_alert', 'Health Alert'), ('vaccination_alert', 'Vaccination Alert'), ('pregnancy_update', 'Pregnancy Update'), ('inseminator_alert', 'Inseminator Alert'), ('farmer_alert', 'Farmer Alert'), ('doctor_alert', 'Doctor Alert'), ('doctor_assignment', 'Doctor Assignment'), ('inseminator_assignment', 'Inseminator Assignment'), ('pregnancy_confirmation', 'Pregnancy Confirmation'), ('other', 'Other')], max_length=50)),
-                ('is_sent', models.BooleanField(default=False)),
-                ('cow', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='FarmManager.cow')),
-                ('farm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='FarmManager.farm')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("message_text", models.TextField()),
+                ("sent_date", models.DateTimeField(auto_now_add=True)),
+                (
+                    "message_type",
+                    models.CharField(
+                        choices=[
+                            ("heat_alert", "Heat Alert"),
+                            ("health_alert", "Health Alert"),
+                            ("vaccination_alert", "Vaccination Alert"),
+                            ("pregnancy_update", "Pregnancy Update"),
+                            ("inseminator_alert", "Inseminator Alert"),
+                            ("farmer_alert", "Farmer Alert"),
+                            ("doctor_alert", "Doctor Alert"),
+                            ("doctor_assignment", "Doctor Assignment"),
+                            ("inseminator_assignment", "Inseminator Assignment"),
+                            ("pregnancy_confirmation", "Pregnancy Confirmation"),
+                            ("other", "Other"),
+                        ],
+                        max_length=50,
+                    ),
+                ),
+                ("is_sent", models.BooleanField(default=False)),
+                (
+                    "cow",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="messages",
+                        to="FarmManager.cow",
+                    ),
+                ),
+                (
+                    "farm",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="messages",
+                        to="FarmManager.farm",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-sent_date'],
+                "ordering": ["-sent_date"],
             },
         ),
         migrations.CreateModel(
-            name='Reproduction',
+            name="Reproduction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_cow_pregnant', models.BooleanField(default=False)),
-                ('heat_sign_start', models.DateTimeField()),
-                ('heat_sign_end', models.DateTimeField(blank=True, null=True)),
-                ('heat_signs_seen', models.TextField(blank=True)),
-                ('pregnancy_date', models.DateField(blank=True, null=True)),
-                ('calving_date', models.DateField(blank=True, null=True)),
-                ('cow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reproduction_records', to='FarmManager.cow')),
-                ('farm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reproduction_records', to='FarmManager.farm')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_cow_pregnant", models.BooleanField(default=False)),
+                ("heat_sign_start", models.DateTimeField()),
+                ("heat_sign_end", models.DateTimeField(blank=True, null=True)),
+                ("heat_signs_seen", models.TextField(blank=True)),
+                ("pregnancy_date", models.DateField(blank=True, null=True)),
+                ("calving_date", models.DateField(blank=True, null=True)),
+                (
+                    "cow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reproduction_records",
+                        to="FarmManager.cow",
+                    ),
+                ),
+                (
+                    "farm",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reproduction_records",
+                        to="FarmManager.farm",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Reproduction Records',
+                "verbose_name_plural": "Reproduction Records",
             },
         ),
         migrations.CreateModel(
-            name='MedicalAssessment',
+            name="MedicalAssessment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('assessment_date', models.DateTimeField(auto_now_add=True)),
-                ('is_cow_sick', models.BooleanField(default=False)),
-                ('sickness_type', models.CharField(blank=True, choices=[('infectious', 'Infectious Disease'), ('non_infectious', 'Non-Infectious Disease')], max_length=20, null=True)),
-                ('body_condition_score', models.IntegerField()),
-                ('reproductive_health', models.TextField()),
-                ('metabolic_disease', models.TextField(blank=True)),
-                ('is_cow_vaccinated', models.BooleanField(default=False)),
-                ('vaccination_date', models.DateField(blank=True, null=True)),
-                ('vaccination_type', models.CharField(blank=True, max_length=255)),
-                ('has_deworming', models.BooleanField(default=False)),
-                ('deworming_date', models.DateField(blank=True, null=True)),
-                ('deworming_type', models.CharField(blank=True, max_length=255)),
-                ('diagnosis', models.TextField(blank=True)),
-                ('treatment', models.TextField(blank=True)),
-                ('prescription', models.TextField(blank=True)),
-                ('next_assessment_date', models.DateField(blank=True, null=True)),
-                ('notes', models.TextField(blank=True)),
-                ('assessed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='assessments', to='FarmManager.doctor')),
-                ('cow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='medical_assessments', to='FarmManager.cow')),
-                ('farm', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='medical_assessments', to='FarmManager.farm')),
-                ('general_health', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='FarmManager.generalhealthstatus')),
-                ('mastitis', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='FarmManager.mastitisstatus')),
-                ('udder_health', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='FarmManager.udderhealthstatus')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("assessment_date", models.DateTimeField(auto_now_add=True)),
+                ("is_cow_sick", models.BooleanField(default=False)),
+                (
+                    "sickness_type",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("infectious", "Infectious Disease"),
+                            ("non_infectious", "Non-Infectious Disease"),
+                        ],
+                        max_length=20,
+                        null=True,
+                    ),
+                ),
+                ("body_condition_score", models.IntegerField()),
+                ("reproductive_health", models.TextField()),
+                ("metabolic_disease", models.TextField(blank=True)),
+                ("is_cow_vaccinated", models.BooleanField(default=False)),
+                ("vaccination_date", models.DateField(blank=True, null=True)),
+                ("vaccination_type", models.CharField(blank=True, max_length=255)),
+                ("has_deworming", models.BooleanField(default=False)),
+                ("deworming_date", models.DateField(blank=True, null=True)),
+                ("deworming_type", models.CharField(blank=True, max_length=255)),
+                ("diagnosis", models.TextField(blank=True)),
+                ("treatment", models.TextField(blank=True)),
+                ("prescription", models.TextField(blank=True)),
+                ("next_assessment_date", models.DateField(blank=True, null=True)),
+                ("notes", models.TextField(blank=True)),
+                (
+                    "assessed_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="assessments",
+                        to="FarmManager.doctor",
+                    ),
+                ),
+                (
+                    "cow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="medical_assessments",
+                        to="FarmManager.cow",
+                    ),
+                ),
+                (
+                    "farm",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="medical_assessments",
+                        to="FarmManager.farm",
+                    ),
+                ),
+                (
+                    "general_health",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="FarmManager.generalhealthstatus",
+                    ),
+                ),
+                (
+                    "mastitis",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="FarmManager.mastitisstatus",
+                    ),
+                ),
+                (
+                    "udder_health",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="FarmManager.udderhealthstatus",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-assessment_date'],
+                "ordering": ["-assessment_date"],
             },
         ),
     ]
