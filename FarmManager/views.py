@@ -593,7 +593,7 @@ class CowViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post']) # inseminator
     def monitor_heat_sign(self, request):
         try:
             # Get required data from request
