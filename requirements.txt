@@ -1,8 +1,0 @@
-Django>=4.1.3
-celery 
-redis
-# pip install celery redis
-# ensure celery -A farm_data worker --loglevel=info
-# apscheduler
-# pip install celery redis
-# ensure celery -A farm_data worker --loglevel=info
