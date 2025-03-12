@@ -179,6 +179,30 @@ Currently using Django's default authentication system.
   }
   ```
 
+#### Record Heat Sign
+
+- **URL:** `/cows/record_heat_sign/`
+- **Method:** `POST`
+- **Description:** Record heat signs for a cow and notify relevant parties
+- **Request Body:**
+  ```json
+  {
+    "farm_id": "FARM001",
+    "cow_id": "01",
+    "heat_signs": "Mounting behavior, Restlessness"
+  }
+  ```
+- **Success Response:**
+  ```json
+  {
+    "message": "Heat sign recorded and alert sent successfully",
+    "cow_id": "01",
+    "farm_id": "FARM001",
+    "heat_sign_time": "2024-03-21T10:30:00Z",
+    "alert_sent": true
+  }
+  ```
+
 ### 3. Medical Assessments
 
 #### List Medical Assessments
