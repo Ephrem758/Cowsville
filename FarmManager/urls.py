@@ -12,6 +12,7 @@ from .views import (
     FloorTypeViewSet,
     FeedingFrequencyViewSet,
     WaterSourceViewSet,
+    DoctorViewSet,
     GynecologicalStatusViewSet,
     UdderHealthStatusViewSet,
     MastitisStatusViewSet,
@@ -29,7 +30,7 @@ router.register(r"cows", CowViewSet)
 router.register(r"reproduction", ReproductionViewSet)
 router.register(r"inseminators", InseminatorViewSet)
 router.register(r"messages", MessageViewSet)
-
+router.register(r"doctors", DoctorViewSet)
 # Choice model endpoints
 router.register(r"breedtypes", BreedTypeViewSet)
 router.register(r"housingtypes", HousingTypeViewSet)

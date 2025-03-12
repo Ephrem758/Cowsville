@@ -1,0 +1,28 @@
+WARNING 2025-03-11 09:23:22,748 views Invalid farmer medical assessment data: {'cow_id': [ErrorDetail(string='This field is required.', code='required')], 'sickness_description': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-03-11 09:23:58,875 views Invalid farmer medical assessment data: {'non_field_errors': [ErrorDetail(string='Cow not found', code='invalid')]}
+INFO 2025-03-11 10:01:12,990 views Created new doctor: Dr. John Smith (ID: 1)
+WARNING 2025-03-12 10:58:20,727 views Invalid heat sign monitoring data: {'is_inseminated': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-03-12 11:36:16,841 views Received heat sign recording request
+INFO 2025-03-12 11:36:16,845 views Recording heat sign for cow 1 from farm 1
+INFO 2025-03-12 11:36:16,845 views Creating or updating reproduction record for cow 1 from farm 1
+ERROR 2025-03-12 11:36:16,846 views An error occurred while recording heat sign for cow 1 from farm 1: Invalid field name(s) for model Reproduction: 'heat_sign_seen', 'heat_sign_time'.
+INFO 2025-03-12 11:40:01,892 views Received heat sign recording request
+INFO 2025-03-12 11:40:01,895 views Recording heat sign for cow 1 from farm 1
+INFO 2025-03-12 11:40:01,896 views Creating or updating reproduction record for cow 1 from farm 1
+ERROR 2025-03-12 11:40:01,896 views An error occurred while recording heat sign for cow 1 from farm 1: Invalid field name(s) for model Reproduction: 'heat_sign_seen', 'heat_sign_time'.
+INFO 2025-03-12 11:43:31,712 views Received heat sign recording request
+INFO 2025-03-12 11:43:31,716 views Recording heat sign for cow 1 from farm 1
+INFO 2025-03-12 11:43:31,716 views Creating or updating reproduction record for cow 1 from farm 1
+INFO 2025-03-12 11:43:31,732 views Successfully created or updated reproduction record for cow 1 from farm 1
+INFO 2025-03-12 11:43:32,899 views Successfully sent insemination alert to inseminator
+INFO 2025-03-12 11:43:33,348 views Successfully sent insemination alert to farmer
+INFO 2025-03-12 11:43:33,362 views Successfully recorded heat sign for cow 1 from farm 1
+ERROR 2025-03-12 13:18:54,156 views Error in farmer medical assessment: module 'transaction' has no attribute 'atomic'
+INFO 2025-03-12 13:23:36,094 views Successfully created medical report for cow 1
+INFO 2025-03-12 13:26:20,604 views Successfully created medical report for cow 1
+WARNING 2025-03-12 13:49:02,392 views Invalid heat sign monitoring data: {'is_inseminated': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-03-12 13:51:37,614 views Invalid heat sign monitoring data: {'is_inseminated': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-03-12 13:52:57,015 views Invalid heat sign monitoring data: {'is_inseminated': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-03-12 13:54:17,244 views Invalid heat sign monitoring data: {'is_inseminated': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-03-12 13:57:45,637 views Invalid heat sign monitoring data: {'non_field_errors': [ErrorDetail(string='Insemination time is required when cow is inseminated', code='invalid')]}
+INFO 2025-03-12 13:59:05,039 views Successfully recorded heat sign monitoring for cow 1
