@@ -203,6 +203,57 @@ Currently using Django's default authentication system.
   }
   ```
 
+#### Get Cows by Farm
+
+- **URL:** `/cows/by_farm/`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `farm_id`: (Required) The ID of the farm to filter cows
+- **Description:** Get all cows belonging to a specific farm
+- **Success Response:**
+  ```json
+  {
+    "farm_id": "FARM001",
+    "total_cows": 5,
+    "cows": [
+      {
+        "cow_id": "01",
+        "breed": 1,
+        "age_in_days": 730,
+        "sex": "F",
+        "parity": 2,
+        "body_weight": "450.50",
+        "bcs": "3.5",
+        "gynecological_status": 1,
+        "lactation_number": 2,
+        "days_in_milk": 100,
+        "average_daily_milk": "25.50",
+        "cow_inseminated_before": true,
+        "last_date_insemination": "2025-03-11",
+        "number_of_inseminations": 2,
+        "id_or_breed_bull_used": "HF-BULL-001",
+        "last_calving_date": "2025-03-11"
+      }
+      // ... more cows
+    ]
+  }
+  ```
+- **Error Response:**
+  ```json
+  {
+    "error": "farm_id query parameter is required"
+  }
+  ```
+  Status: 400 Bad Request
+
+#### Alternative Method (Using Filter)
+
+You can also filter cows using the main cows endpoint:
+
+- **URL:** `/cows/?farm__farm_id=FARM001`
+- **Method:** `GET`
+- **Description:** Filter cows by farm ID using query parameter
+
 ### 3. Medical Assessments
 
 #### List Medical Assessments

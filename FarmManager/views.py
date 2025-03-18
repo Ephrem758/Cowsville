@@ -7,6 +7,8 @@ from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.db.models import Q
 from django.utils.timezone import now, timezone
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 from AlertSystem.sendMesage import send_alert
 from .models import (
@@ -244,6 +246,27 @@ class CowViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["cow_id", "breed__name"]
     logger = logging.getLogger(__name__)
+    filterset_fields = ['farm_id']  # Add this line
+
+    @action(detail=False, methods=['GET'])
+    
+    def by_farm(self, request):
+        """Get all cows for a specific farm"""
+        farm_id = request.query_params.get('farm_id')
+        if not farm_id:
+            return Response(
+                {"error": "farm_id query parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cows = self.get_queryset().filter(farm__farm_id=farm_id)
+        serializer = self.get_serializer(cows, many=True)
+        
+        return Response({
+            "farm_id": farm_id,
+            "total_cows": len(serializer.data),
+            "cows": serializer.data
+        })
 
     def perform_create(self, serializer):
         """Override perform_create to automatically create reproduction record"""
