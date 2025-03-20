@@ -26,3 +26,17 @@ WARNING 2025-03-12 13:52:57,015 views Invalid heat sign monitoring data: {'is_in
 WARNING 2025-03-12 13:54:17,244 views Invalid heat sign monitoring data: {'is_inseminated': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
 WARNING 2025-03-12 13:57:45,637 views Invalid heat sign monitoring data: {'non_field_errors': [ErrorDetail(string='Insemination time is required when cow is inseminated', code='invalid')]}
 INFO 2025-03-12 13:59:05,039 views Successfully recorded heat sign monitoring for cow 1
+INFO 2025-03-20 22:59:52,219 views Created new cow: 2 for farm FARM001
+ERROR 2025-03-20 22:59:52,221 views Error creating cow with reproduction record: NOT NULL constraint failed: FarmManager_reproduction.heat_sign_start
+INFO 2025-03-20 23:00:13,465 views Created new cow: 2 for farm FARM001
+ERROR 2025-03-20 23:00:13,467 views Error creating cow with reproduction record: NOT NULL constraint failed: FarmManager_reproduction.heat_sign_start
+INFO 2025-03-20 23:02:03,872 views Created new cow: 2 for farm FARM001
+ERROR 2025-03-20 23:02:03,874 views Error creating cow with reproduction record: NOT NULL constraint failed: FarmManager_reproduction.heat_sign_start
+INFO 2025-03-20 23:03:05,475 views Created new cow: 12 for farm FARM001
+ERROR 2025-03-20 23:03:05,477 views Error creating cow with reproduction record: NOT NULL constraint failed: FarmManager_reproduction.heat_sign_start
+INFO 2025-03-20 23:04:07,132 views Created new cow: 12 for farm FARM001
+ERROR 2025-03-20 23:04:07,134 views Error creating cow with reproduction record: NOT NULL constraint failed: FarmManager_reproduction.heat_signs_seen
+INFO 2025-03-20 23:04:35,921 views Created new cow: 12 for farm FARM001
+ERROR 2025-03-20 23:04:35,922 views Error creating cow with reproduction record: NOT NULL constraint failed: FarmManager_reproduction.heat_signs_seen
+INFO 2025-03-20 23:06:24,088 views Created new cow: 2 for farm FARM001
+INFO 2025-03-20 23:06:24,090 views Created default reproduction record for cow 2

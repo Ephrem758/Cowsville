@@ -230,9 +230,9 @@ class Reproduction(SoftDeleteModel):
     )
 
     # Heat Detection
-    heat_sign_start = models.DateTimeField()
+    heat_sign_start = models.DateTimeField(null=True, blank=True)
     heat_sign_end = models.DateTimeField(null=True, blank=True)
-    heat_signs_seen = models.TextField(blank=True)
+    heat_signs_seen = models.BooleanField(null=True, blank=True)
 
     # Pregnancy Tracking
     is_cow_pregnant = models.BooleanField(default=False)
