@@ -22,7 +22,7 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
 // Billing page components
-import Invoice from "layouts/billing/components/Invoice";
+import Invoice from "layouts/AverageStatistics/components/Invoice";
 
 function Invoices() {
   return (

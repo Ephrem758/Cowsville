@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /**
 =========================================================
 * Material Dashboard 2 React - v2.2.0
@@ -31,8 +32,26 @@ import DataTable from "examples/Tables/DataTable";
 // Data
 import data from "layouts/dashboard/components/Projects/data";
 
-function Projects() {
-  const { columns, rows } = data();
+function Projects({ cows, farm }) {
+  const { columns } = data();
+  // Generate rows dynamically
+  const rows = (cows || []).map((cow) => ({
+    cow_id: cow.cow_id || "N/A",
+    gynecological_status: cow.gynecological_status || "N/A",
+    lactation_number: cow.lactation_number !== undefined ? cow.lactation_number : "N/A", // Check for undefined
+    last_date_insemination: cow.last_date_insemination || "N/A",
+  }));
+
+  // Add default row if no cows exist but farm is selected
+  if (rows.length === 0 && farm?.farm_id) {
+    rows.push({
+      cow_id: "N/A",
+      gynecological_status: "N/A",
+      lactation_number: "N/A",
+      last_date_insemination: "N/A",
+    });
+  }
+
   const [menu, setMenu] = useState(null);
 
   const openMenu = ({ currentTarget }) => setMenu(currentTarget);
@@ -64,7 +83,7 @@ function Projects() {
       <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
         <MDBox>
           <MDTypography variant="h6" gutterBottom>
-            Projects
+            {farm?.owner_name || "No Selected"} Farm
           </MDTypography>
           <MDBox display="flex" alignItems="center" lineHeight={0}>
             <Icon
@@ -77,7 +96,7 @@ function Projects() {
               done
             </Icon>
             <MDTypography variant="button" fontWeight="regular" color="text">
-              &nbsp;<strong>30 done</strong> this month
+              &nbsp;<strong>{farm?.total_number_of_cows || "N/A"}</strong> total cows
             </MDTypography>
           </MDBox>
         </MDBox>

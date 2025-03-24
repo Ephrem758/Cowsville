@@ -22,6 +22,9 @@ import { useLocation, Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
 // @material-ui core components
+// import { useSearch } from "context/SearchContext";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -33,6 +36,7 @@ import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 
 // Material Dashboard 2 React example components
+import farms from "layouts/dashboard";
 import Breadcrumbs from "examples/Breadcrumbs";
 import NotificationItem from "examples/Items/NotificationItem";
 
@@ -53,12 +57,30 @@ import {
   setOpenConfigurator,
 } from "context";
 
-function DashboardNavbar({ absolute, light, isMini }) {
+function DashboardNavbar({ absolute, light, isMini, searchValue, onInputChange, onSearch }) {
+  // const { setSearchQuery } = useSearch();
+  // const [searchQuery, setSearchQuery] = useState(""); // Add state for search
+  const [selectedFarm, setSelectedFarm] = useState(null);
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+
+  // Handle input changes (typing)
+  // const handleInputChange = (event, newInputValue) => {
+  //   setSearchQuery(newInputValue);
+  //   setSelectedFarm(null); // Reset selection if input changes
+  // };
+
+  // // Handle selection from the dropdown
+  // const handleSelect = (event, newValue) => {
+  //   if (newValue) {
+  //     setSearchQuery(newValue.id || newValue.ownerName);
+  //     onSearchChange(newValue.id || newValue.ownerName);
+  //     setSelectedFarm(newValue);
+  //   }
+  // };
 
   useEffect(() => {
     // Setting the navbar type
@@ -136,15 +158,62 @@ function DashboardNavbar({ absolute, light, isMini }) {
         {isMini ? null : (
           <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
             <MDBox pr={1}>
-              <MDInput label="Search here" />
+              <MDInput
+                label="Search"
+                value={searchValue}
+                onChange={(e) => onInputChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onSearch?.(e.target.value); // Trigger on Enter
+                  }
+                }}
+              />
+              {/* <Autocomplete
+                freeSolo // Allows free text input
+                id="search-autocomplete"
+                options={farms}
+                getOptionLabel={(option) => `${option.id} - ${option.ownerName}`}
+                inputValue={searchQuery}
+                onInputChange={handleInputChange}
+                onChange={handleSelect}
+                filterOptions={(options, params) => {
+                  const filtered = Autocomplete.filterOptions(options, params);
+                  return filtered.sort((a, b) => {
+                    // Prioritize exact matches
+                    const matchesA =
+                      a.id.toLowerCase().startsWith(params.inputValue.toLowerCase()) ||
+                      a.ownerName.toLowerCase().startsWith(params.inputValue.toLowerCase());
+                    const matchesB =
+                      b.id.toLowerCase().startsWith(params.inputValue.toLowerCase()) ||
+                      b.ownerName.toLowerCase().startsWith(params.inputValue.toLowerCase());
+                    return matchesA ? -1 : 1;
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search"
+                    variant="standard"
+                    InputProps={{
+                      ...params.InputProps,
+                      onKeyDown: (e) => {
+                        if (e.key === "Enter") {
+                          onSearchChange(searchQuery); // Trigger search on Enter
+                        }
+                      },
+                    }}
+                  />
+                )}
+                style={{ width: 300 }} // Adjust width as needed
+              /> */}
             </MDBox>
             <MDBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in/basic">
+              {/* <Link to="/authentication/sign-in/basic">
                 <IconButton sx={navbarIconButton} size="small" disableRipple>
                   <Icon sx={iconsStyle}>account_circle</Icon>
                 </IconButton>
-              </Link>
-              <IconButton
+              </Link> */}
+              {/* <IconButton
                 size="small"
                 disableRipple
                 color="inherit"
@@ -154,7 +223,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 <Icon sx={iconsStyle} fontSize="medium">
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
-              </IconButton>
+              </IconButton> */}
               <IconButton
                 size="small"
                 disableRipple
@@ -164,7 +233,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon sx={iconsStyle}>settings</Icon>
               </IconButton>
-              <IconButton
+              {/* <IconButton
                 size="small"
                 disableRipple
                 color="inherit"
@@ -175,7 +244,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 onClick={handleOpenMenu}
               >
                 <Icon sx={iconsStyle}>notifications</Icon>
-              </IconButton>
+              </IconButton> */}
               {renderMenu()}
             </MDBox>
           </MDBox>
@@ -197,6 +266,11 @@ DashboardNavbar.propTypes = {
   absolute: PropTypes.bool,
   light: PropTypes.bool,
   isMini: PropTypes.bool,
+  // onSearchChange: PropTypes.func, // Optional prop
+  searchValue: PropTypes.string.isRequired, // Required prop
+  onSearchChange: PropTypes.func.isRequired, // Required prop
+  onInputChange: PropTypes.func.isRequired, // New prop
+  onSearch: PropTypes.func.isRequired, // New prop
 };
 
 export default DashboardNavbar;

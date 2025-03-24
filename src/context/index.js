@@ -134,3 +134,4 @@ export {
   setLayout,
   setDarkMode,
 };
+export { SearchProvider, useSearch } from ".//SearchContext";

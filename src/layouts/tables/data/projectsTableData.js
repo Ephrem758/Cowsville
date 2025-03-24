@@ -55,27 +55,27 @@ export default function data() {
 
   return {
     columns: [
-      { Header: "project", accessor: "project", width: "30%", align: "left" },
-      { Header: "budget", accessor: "budget", align: "left" },
-      { Header: "status", accessor: "status", align: "center" },
-      { Header: "completion", accessor: "completion", align: "center" },
+      { Header: "Indicator", accessor: "indicator", width: "30%", align: "left" },
+      { Header: "Value", accessor: "value", align: "left" },
+      { Header: "Unit", accessor: "unit", align: "center" },
+      { Header: "Goal", accessor: "goal", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
 
     rows: [
       {
-        project: <Project image={LogoAsana} name="Asana" />,
-        budget: (
+        indicator: <Project image={LogoAsana} name="Insemination after calving" />,
+        value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            $2,500
+            50
           </MDTypography>
         ),
-        status: (
+        unit: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            working
+            Days
           </MDTypography>
         ),
-        completion: <Progress color="info" value={60} />,
+        goal: <Progress color="info" value={60} />,
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -83,18 +83,18 @@ export default function data() {
         ),
       },
       {
-        project: <Project image={logoGithub} name="Github" />,
-        budget: (
+        indicator: <Project image={LogoAsana} name="Average Calving interval" />,
+        value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            $5,000
+            14
           </MDTypography>
         ),
-        status: (
+        unit: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            done
+            Months
           </MDTypography>
         ),
-        completion: <Progress color="success" value={100} />,
+        goal: <Progress color="success" value={100} />,
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -102,18 +102,18 @@ export default function data() {
         ),
       },
       {
-        project: <Project image={logoAtlassian} name="Atlassian" />,
-        budget: (
+        indicator: <Project image={LogoAsana} name="Heat after calving" />,
+        value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            $3,400
+            35
           </MDTypography>
         ),
-        status: (
+        unit: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            canceled
+            Days
           </MDTypography>
         ),
-        completion: <Progress color="error" value={30} />,
+        goal: <Progress color="error" value={30} />,
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -121,18 +121,18 @@ export default function data() {
         ),
       },
       {
-        project: <Project image={logoSpotify} name="Spotify" />,
-        budget: (
+        indicator: <Project image={LogoAsana} name="Cows return to heat within 60 days" />,
+        value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            $14,000
+            50
           </MDTypography>
         ),
-        status: (
+        unit: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            working
+            %
           </MDTypography>
         ),
-        completion: <Progress color="info" value={80} />,
+        goal: <Progress color="info" value={80} />,
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -140,18 +140,18 @@ export default function data() {
         ),
       },
       {
-        project: <Project image={logoSlack} name="Slack" />,
-        budget: (
+        indicator: <Project image={LogoAsana} name="No. of inseminations per conception" />,
+        value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            $1,000
+            2.0
           </MDTypography>
         ),
-        status: (
+        unit: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            canceled
+            Number
           </MDTypography>
         ),
-        completion: <Progress color="error" value={0} />,
+        goal: <Progress color="error" value={0} />,
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -159,18 +159,42 @@ export default function data() {
         ),
       },
       {
-        project: <Project image={logoInvesion} name="Invesion" />,
-        budget: (
+        indicator: <Project image={LogoAsana} name="Rate of mature cows doing 03 services" />,
+        value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            $2,300
+            8
           </MDTypography>
         ),
-        status: (
+        unit: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            done
+            %
           </MDTypography>
         ),
-        completion: <Progress color="success" value={100} />,
+        goal: <Progress color="success" value={100} />,
+        action: (
+          <MDTypography component="a" href="#" color="text">
+            <Icon>more_vert</Icon>
+          </MDTypography>
+        ),
+      },
+      {
+        indicator: (
+          <Project
+            image={LogoAsana}
+            name="Rate of cows with interval between calving and pregnancy"
+          />
+        ),
+        value: (
+          <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
+            100
+          </MDTypography>
+        ),
+        unit: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            %
+          </MDTypography>
+        ),
+        goal: <Progress color="success" value={100} />,
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>

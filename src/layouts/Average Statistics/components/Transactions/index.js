@@ -24,7 +24,7 @@ import MDTypography from "components/MDTypography";
 // import MDButton from "components/MDButton";
 
 // Billing page components
-import Transaction from "layouts/billing/components/Transaction";
+import Transaction from "layouts/AverageStatistics/components/Transaction";
 
 function Transactions() {
   return (
