@@ -29,15 +29,15 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
 // Data
-import { getFarms } from "api/farmsService";
+import { getCows, getFarms, getDoctorAssessments } from "api/farmsService";
 import authorsTableData from "layouts/tables/data/authorsTableData";
 import projectsTableData from "layouts/tables/data/projectsTableData";
-import { getDoctorAssessments } from "api/farmsService";
 
 function Tables() {
   // const { searchQuery, setSearchQuery } = useSearch();
   const [tableSearchInput, setTableSearchInput] = useState(""); // Current input
   const [tableSearchQuery, setTableSearchQuery] = useState(""); // Query for filtering
+  const [cows, setCows] = useState([]);
   const [assessments, setAssessments] = useState([]); // Store real data
   const [farms, setFarms] = useState([]); // Store farms for ownerName lookup
   const [loading, setLoading] = useState(false);
@@ -50,11 +50,58 @@ function Tables() {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Fetch cows (filtered by farm ID if provided)
+        const cowsResponse = await getCows(tableSearchQuery);
+        const cowsData = Array.isArray(cowsResponse) ? cowsResponse : cowsResponse.cows || [];
+
+        // Fetch doctor assessments
         const assessmentsData = await getDoctorAssessments();
+
+        // Fetch farms
         const farmsData = await getFarms();
-        console.log("All assessments:", assessmentsData); // Check if assessments exist
-        console.log("All farms:", farmsData); // Check if farms exist
-        setAssessments(assessmentsData);
+
+        // Merge cow data with doctor assessments
+        const mergedCows = cowsData.map((cow) => {
+          const assessment = assessmentsData.find((a) => a.cow_id === cow.cow_id);
+          return {
+            ...cow,
+            vaccination_date: assessment?.vaccination_date || "N/A",
+            udder_health: assessment?.udder_health || "N/A",
+            body_condition_score: assessment?.body_condition_score || "N/A",
+            deworming_date: assessment?.deworming_date || "N/A",
+          };
+        });
+
+        // Add mock cows
+        const mockCows = [
+          {
+            cow_id: "COW123",
+            farm_id: "MOCK",
+            vaccination_date: "2024-03-20",
+            udder_health: "Healthy",
+            body_condition_score: "3.5",
+            deworming_date: "2024-03-15",
+          },
+          {
+            cow_id: "COW456",
+            farm_id: "MOCK",
+            vaccination_date: "2024-02-10",
+            udder_health: "Mastitis",
+            body_condition_score: "2.8",
+            deworming_date: "2024-02-05",
+          },
+        ];
+
+        // Conditionally include mock cows
+        if (tableSearchQuery?.toLowerCase() === "mock") {
+          if (mergedCows.length === 0) {
+            setCows(mockCows); // Use mock cows only if no real data
+          } else {
+            setCows(mergedCows); // Use real MOCK farm data if available
+          }
+        } else {
+          setCows(mergedCows); // Use real data for other farms
+        }
         setFarms(farmsData);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -65,68 +112,20 @@ function Tables() {
     };
 
     fetchData();
-  }, []);
+  }, [tableSearchQuery]);
 
-  // Filter assessments based on search query
-  const filteredAssessments = assessments.filter((assessment) => {
-    const farm = farms.find((farm) => farm.id === assessment.farm_id);
-    return (
-      assessment.farm_id?.toLowerCase().includes(tableSearchQuery.toLowerCase()) ||
-      (farm?.owner_name || "").toLowerCase().includes(tableSearchQuery.toLowerCase()) ||
-      tableSearchQuery.trim() === "" // Always include all assessments when no search
-    );
-  });
-
-  // Generate rows with fallbacks
-  let rows = filteredAssessments.map((assessment) => ({
-    cow_id: assessment.cow_id || "N/A",
-    vaccination_date: assessment.vaccination_date || "N/A",
-    udder_health: assessment.udder_health || "N/A",
-    body_condition_score: assessment.body_condition_score || "N/A",
-    deworming_date: assessment.deworming_date || "N/A",
-    owner_name: farms.find((farm) => farm.id === assessment.farm_id)?.owner_name || "N/A",
-  }));
-
-  // Add default row if no filtered assessments but data exists
-  if (rows.length === 0 && assessments.length > 0) {
-    rows = [
-      {
-        cow_id: "N/A",
-        vaccination_date: "N/A",
-        udder_health: "N/A",
-        body_condition_score: "N/A",
-        deworming_date: "N/A",
-        owner_name: "N/A",
-      },
-    ];
-  }
-
-  // Add default rows if no assessments or farms exist
-  if (assessments.length === 0 || farms.length === 0) {
-    rows = [
-      {
-        cow_id: "N/A",
-        vaccination_date: "N/A",
-        udder_health: "N/A",
-        body_condition_score: "N/A",
-        deworming_date: "N/A",
-        owner_name: "N/A",
-      },
-    ];
-  }
-
-  // Handle empty search query
-  // if (tableSearchQuery.trim() === "") {
-  //   // Show all assessments if no search
-  //   rows = assessments.map((assessment) => ({
-  //     cow_id: assessment.cow_id || "N/A",
-  //     vaccination_date: assessment.vaccination_date || "N/A",
-  //     udder_health: assessment.udder_health || "N/A",
-  //     body_condition_score: assessment.body_condition_score || "N/A",
-  //     deworming_date: assessment.deworming_date || "N/A",
-  //     owner_name: farms.find((farm) => farm.id === assessment.farm_id)?.owner_name || "N/A",
-  //   }));
-  // }
+  // Generate rows **only if cows is defined**
+  const rows =
+    cows.length > 0
+      ? cows.map((cow) => ({
+          cow_id: cow.cow_id || "N/A",
+          vaccination_date: cow.vaccination_date || "N/A",
+          udder_health: cow.udder_health || "N/A",
+          body_condition_score: cow.body_condition_score || "N/A",
+          deworming_date: cow.deworming_date || "N/A",
+          owner_name: farms.find((farm) => farm.farm_id === cow.farm_id)?.owner_name || "N/A",
+        }))
+      : [];
 
   return (
     <DashboardLayout>
@@ -150,7 +149,7 @@ function Tables() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Farm Data
+                  Cow Health and Farm Data
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -161,7 +160,15 @@ function Tables() {
                       rows.length > 0
                         ? rows
                         : [
-                            /* default row */
+                            {
+                              // Default row
+                              cow_id: "N/A",
+                              vaccination_date: "N/A",
+                              udder_health: "N/A",
+                              body_condition_score: "N/A",
+                              deworming_date: "N/A",
+                              owner_name: "N/A",
+                            },
                           ],
                   }}
                   isSorted={false}

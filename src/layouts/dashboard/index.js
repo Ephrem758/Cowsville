@@ -96,17 +96,22 @@ function Dashboard() {
     setSelectedFarm(firstFarm);
   }, [firstFarm]);
 
+  // Fetch cows when a farm is selected
   // useEffect(() => {
   //   const fetchCows = async () => {
+  //     if (!selectedFarm) return;
+
   //     try {
-  //       const farmId = selectedFarm?.farm_id; // Use selectedFarm
+  //       const farmId = selectedFarm?.farm_id;
   //       const apiCows = await getCows(farmId);
+
+  //       // Add mock cows for testing
   //       const mockCows = [
   //         {
   //           cow_id: "COW123",
-  //           heat_sign_time: "2024-03-21T06:00:00Z", // Simple time format
-  //           farm_id: "MOCK", // Unique ID for mock cows
-  //           heat_signs: "Bellowing, Restlessness, Off-Feed", // Add these fields
+  //           heat_sign_time: "2024-03-21T06:00:00Z",
+  //           farm_id: "MOCK",
+  //           heat_signs: "Bellowing, Restlessness, Off-Feed",
   //           dalc: "5 days",
   //           date_of_ai: "21 DEC 9:34 PM",
   //           insemination_number: "3",
@@ -114,7 +119,7 @@ function Dashboard() {
   //         },
   //         {
   //           cow_id: "COW456",
-  //           heat_sign_time: "2024-03-21T08:00:00Z", // Simple time format
+  //           heat_sign_time: "2024-03-21T08:00:00Z",
   //           farm_id: "MOCK",
   //           heat_signs: "Mounting, Mucus Discharge",
   //           dalc: "7 days",
@@ -129,45 +134,52 @@ function Dashboard() {
   //       setCows([]);
   //     }
   //   };
-  //   if (selectedFarm) fetchCows();
-  // }, [selectedFarm]); // Re-run when selectedFarm changes
+  //   fetchCows();
+  // }, [selectedFarm]);
 
-  // Fetch cows when a farm is selected
   useEffect(() => {
     const fetchCows = async () => {
-      if (!selectedFarm) return;
-
-      try {
-        const farmId = selectedFarm?.farm_id;
-        const apiCows = await getCows(farmId);
-
-        // Add mock cows for testing
-        const mockCows = [
-          {
-            cow_id: "COW123",
-            heat_sign_time: "2024-03-21T06:00:00Z",
-            farm_id: "MOCK",
-            heat_signs: "Bellowing, Restlessness, Off-Feed",
-            dalc: "5 days",
-            date_of_ai: "21 DEC 9:34 PM",
-            insemination_number: "3",
-            breed: "Zebu",
-          },
-          {
-            cow_id: "COW456",
-            heat_sign_time: "2024-03-21T08:00:00Z",
-            farm_id: "MOCK",
-            heat_signs: "Mounting, Mucus Discharge",
-            dalc: "7 days",
-            date_of_ai: "15 MAR 2:15 PM",
-            insemination_number: "2",
-            breed: "Holstein",
-          },
-        ];
-        setCows([...apiCows, ...mockCows]);
-      } catch (err) {
-        console.error("Failed to fetch cows:", err);
-        setCows([]);
+      if (!selectedFarm) {
+        // If no farm is selected, fetch all cows and add mock data
+        try {
+          const allCows = await getCows();
+          const mockCows = [
+            {
+              cow_id: "COW123",
+              heat_sign_time: "2024-03-21T06:00:00Z",
+              farm_id: "MOCK",
+              heat_signs: "Bellowing, Restlessness, Off-Feed",
+              dalc: "5 days",
+              date_of_ai: "21 DEC 9:34 PM",
+              insemination_number: "3",
+              breed: "Zebu",
+            },
+            {
+              cow_id: "COW456",
+              heat_sign_time: "2024-03-21T08:00:00Z",
+              farm_id: "MOCK",
+              heat_signs: "Mounting, Mucus Discharge",
+              dalc: "7 days",
+              date_of_ai: "15 MAR 2:15 PM",
+              insemination_number: "2",
+              breed: "Holstein",
+            },
+          ];
+          setCows([...allCows, ...mockCows]);
+        } catch (err) {
+          console.error("Failed to fetch cows:", err);
+          setCows([]);
+        }
+      } else {
+        // If a real farm is selected, fetch only its cows (no mocks)
+        try {
+          const farmId = selectedFarm.farm_id;
+          const apiCows = await getCows(farmId);
+          setCows(apiCows); // Only real cows for the selected farm
+        } catch (err) {
+          console.error("Failed to fetch cows:", err);
+          setCows([]);
+        }
       }
     };
     fetchCows();
@@ -320,11 +332,15 @@ function Dashboard() {
                   } else {
                     // Fetch heat_sign_time from API for real cows
                     const heatSignTime = await getCowHeatSign(foundCow.farm_id, foundCow.cow_id);
-                    const updatedCow = {
+                    setSelectedCow({
                       ...foundCow,
                       heat_sign_time: heatSignTime || "06:00",
-                    };
-                    setSelectedCow(updatedCow);
+                    });
+                    // const updatedCow = {
+                    //   ...foundCow,
+                    //   heat_sign_time: heatSignTime || "06:00",
+                    // };
+                    // setSelectedCow(updatedCow);
                   }
                 } else {
                   setSelectedCow(null);
@@ -355,13 +371,6 @@ function Dashboard() {
                 ) : (
                   <MDBox>No cow selected</MDBox>
                 )}
-                {/* <ReportsLineChart
-                  color="success"
-                  title="Fertility Window"
-                  description="Fertility Window"
-                  date="updated 4 min ago"
-                  chart={sales} // Pass the 'sales' data
-                /> */}
               </MDBox>
             </Grid>
           </Grid>
@@ -370,7 +379,12 @@ function Dashboard() {
         <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
-              <Projects cows={cows || []} farm={firstFarm} />
+              <Projects
+                cows={
+                  selectedFarm ? cows.filter((cow) => cow.farm_id === selectedFarm.farm_id) : []
+                }
+                farm={firstFarm}
+              />
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <OrdersOverview cow={selectedCow} />
