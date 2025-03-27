@@ -23,6 +23,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDAvatar from "components/MDAvatar";
 import MDProgress from "components/MDProgress";
+import { calculateDaysDifference } from "utils/helpers";
 
 // Images
 import LogoAsana from "assets/images/small-logos/logo-asana.svg";
@@ -32,7 +33,7 @@ import logoSlack from "assets/images/small-logos/logo-slack.svg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 import logoInvesion from "assets/images/small-logos/logo-invision.svg";
 
-export default function data() {
+export default function data(searchedFarmId = null, mockCows = []) {
   const Project = ({ image, name }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDAvatar src={image} name={name} size="sm" variant="rounded" />
@@ -53,6 +54,111 @@ export default function data() {
     </MDBox>
   );
 
+  // Filter cows by searched farm ID
+  const filteredCows = searchedFarmId
+    ? mockCows.filter((cow) => cow.farm_id === searchedFarmId)
+    : [];
+
+  // Calculate average insemination after calving
+  const calculateAverageInseminationAfterCalving = (cows) => {
+    if (!Array.isArray(cows) || cows.length === 0) return 0;
+
+    const totalDays = cows.reduce((sum, cow) => {
+      const days = calculateDaysDifference(cow.calving_date, cow.recent_insemination_date);
+      return sum + days;
+    }, 0);
+    return totalDays / cows.length;
+  };
+
+  const averageInseminationAfterCalving = calculateAverageInseminationAfterCalving(filteredCows);
+
+  // Average Calving Interval
+  const calculateAverageCalvingInterval = (cows) => {
+    if (!Array.isArray(cows) || cows.length === 0) return 0;
+
+    const totalMonths = cows.reduce((sum, cow) => {
+      const months = calculateDaysDifference(cow.last_calving_date, cow.calving_date) / 30; // Approximate months
+      return sum + months;
+    }, 0);
+
+    return totalMonths / cows.length;
+  };
+
+  const averageCalvingInterval = calculateAverageCalvingInterval(filteredCows);
+
+  // Heat after calving
+  const calculateAverageHeatAfterCalving = (cows) => {
+    if (!Array.isArray(cows) || cows.length === 0) return 0;
+
+    const totalDays = cows.reduce((sum, cow) => {
+      const days = calculateDaysDifference(cow.calving_date, cow.heat_sign_date);
+      return sum + days;
+    }, 0);
+
+    return totalDays / cows.length;
+  };
+
+  const averageHeatAfterCalving = calculateAverageHeatAfterCalving(filteredCows);
+
+  // Cows return to heat within 60 days
+  const calculateCowsReturnToHeatWithin60Days = (cows) => {
+    if (!Array.isArray(cows) || cows.length === 0) return 0;
+
+    const eligibleCows = cows.filter((cow) => {
+      const days = calculateDaysDifference(cow.calving_date, cow.heat_sign_date);
+      return days <= 60;
+    });
+
+    return (eligibleCows.length / cows.length) * 100 || 0;
+  };
+
+  const cowsReturnToHeatWithin60Days = calculateCowsReturnToHeatWithin60Days(filteredCows);
+
+  // No. of services per conception
+  const calculateAverageServicesPerConception = (cows) => {
+    if (!Array.isArray(cows) || cows.length === 0) return 0;
+
+    const totalServices = cows.reduce((sum, cow) => sum + cow.insemination_count, 0);
+
+    return totalServices / cows.length;
+  };
+
+  const averageServicesPerConception = calculateAverageServicesPerConception(filteredCows);
+
+  // Rate of mature cows doing 03 services
+  const calculateRateOfMatureCowsDoing3Services = (cows) => {
+    if (!Array.isArray(cows) || cows.length === 0) return 0;
+
+    const matureCows = cows.filter((cow) => cow.insemination_count > 3);
+
+    return (matureCows.length / cows.length) * 100 || 0;
+  };
+
+  const rateOfMatureCowsDoing3Services = calculateRateOfMatureCowsDoing3Services(filteredCows);
+
+  // Rate of cows with interval between calving and pregnancy
+  const calculateRateOfCowsWithIntervalBetweenCalvingAndPregnancy = (cows) => {
+    if (!Array.isArray(cows) || cows.length === 0) return 0;
+
+    const eligibleCows = cows.filter((cow) => {
+      if (!cow.pregnancy_status) {
+        // For not pregnant cows: Check time since calving
+        const monthsSinceCalving = calculateDaysDifference(cow.calving_date, new Date()) / 30; // Approximate months
+        return monthsSinceCalving >= 3;
+      } else {
+        // For pregnant cows: Check time between calving and pregnancy
+        const monthsSinceCalving =
+          calculateDaysDifference(cow.calving_date, cow.pregnancy_date) / 30; // Approximate months
+        return monthsSinceCalving >= 3;
+      }
+    });
+
+    return (eligibleCows.length / cows.length) * 100 || 0;
+  };
+
+  const rateOfCowsWithIntervalBetweenCalvingAndPregnancy =
+    calculateRateOfCowsWithIntervalBetweenCalvingAndPregnancy(filteredCows);
+
   return {
     columns: [
       { Header: "Indicator", accessor: "indicator", width: "30%", align: "left" },
@@ -67,7 +173,7 @@ export default function data() {
         indicator: <Project image={LogoAsana} name="Insemination after calving" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            50
+            {averageInseminationAfterCalving.toFixed(2)}
           </MDTypography>
         ),
         unit: (
@@ -86,7 +192,7 @@ export default function data() {
         indicator: <Project image={LogoAsana} name="Average Calving interval" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            14
+            {averageCalvingInterval.toFixed(2)}
           </MDTypography>
         ),
         unit: (
@@ -105,7 +211,7 @@ export default function data() {
         indicator: <Project image={LogoAsana} name="Heat after calving" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            35
+            {averageHeatAfterCalving.toFixed(2)}
           </MDTypography>
         ),
         unit: (
@@ -124,7 +230,7 @@ export default function data() {
         indicator: <Project image={LogoAsana} name="Cows return to heat within 60 days" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            50
+            {cowsReturnToHeatWithin60Days.toFixed(2)}
           </MDTypography>
         ),
         unit: (
@@ -143,7 +249,7 @@ export default function data() {
         indicator: <Project image={LogoAsana} name="No. of inseminations per conception" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            2.0
+            {averageServicesPerConception.toFixed(2)}
           </MDTypography>
         ),
         unit: (
@@ -162,7 +268,7 @@ export default function data() {
         indicator: <Project image={LogoAsana} name="Rate of mature cows doing 03 services" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            8
+            {rateOfMatureCowsDoing3Services.toFixed(2)}
           </MDTypography>
         ),
         unit: (
@@ -186,7 +292,7 @@ export default function data() {
         ),
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            100
+            {rateOfCowsWithIntervalBetweenCalvingAndPregnancy.toFixed(2)}
           </MDTypography>
         ),
         unit: (
