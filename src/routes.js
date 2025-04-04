@@ -44,6 +44,7 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import FarmCards from "layouts/farm-cards";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -88,6 +89,14 @@ const routes = [
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/notifications",
     component: <Notifications />,
+  },
+  {
+    type: "collapse",
+    name: "Farm Cards",
+    key: "farm-cards",
+    icon: <Icon fontSize="small">view_module</Icon>,
+    route: "/farm-cards",
+    component: <FarmCards />,
   },
   // {
   //   type: "collapse",

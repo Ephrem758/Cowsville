@@ -111,20 +111,127 @@ import Card from "@mui/material/Card";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import LogoAsana from "assets/images/small-logos/logo-asana.svg";
+import MDAvatar from "components/MDAvatar";
+import MDProgress from "components/MDProgress";
+import Icon from "@mui/material/Icon";
+import PropTypes from "prop-types";
+import React, { useState, useEffect } from "react";
 
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
+import averageStatisticsData from "layouts/Average Statistics/averageStatisticsData";
+import mockCows from "layouts/Average Statistics/mockData";
+import {
+  getCows,
+  getMonitorBirthData,
+  getHeatSignData,
+  getInseminationCountData,
+  getMonitorPregnancyData,
+} from "api/farmsService";
 
 // Data
 import authorsTableData from "layouts/tables/data/authorsTableData";
 import projectsTableData from "layouts/tables/data/projectsTableData";
 
+// function AverageStatistics() {
+//   const { columns, rows } = authorsTableData();
+//   const { columns: pColumns, rows: pRows } = projectsTableData();
+
+//   return (
+//     <DashboardLayout>
+//       <DashboardNavbar />
+//       <MDBox pt={6} pb={3}>
+//         <Grid container spacing={6}>
+//           <Grid item xs={12}>
+//             <Card>
+//               <MDBox
+//                 mx={2}
+//                 mt={-3}
+//                 py={3}
+//                 px={2}
+//                 variant="gradient"
+//                 bgColor="info"
+//                 borderRadius="lg"
+//                 coloredShadow="info"
+//               >
+//                 <MDTypography variant="h6" color="white">
+//                   Average Statistics for all farms
+//                 </MDTypography>
+//               </MDBox>
+//               <MDBox pt={3}>
+//                 <DataTable
+//                   table={{ columns: pColumns, rows: pRows }}
+//                   isSorted={false}
+//                   entriesPerPage={false}
+//                   showTotalEntries={false}
+//                   noEndBorder
+//                 />
+//               </MDBox>
+//             </Card>
+//           </Grid>
+//         </Grid>
+//       </MDBox>
+//       <Footer />
+//     </DashboardLayout>
+//   );
+// }
+
+// export default AverageStatistics;
+import { calculateDaysDifference } from "utils/helpers";
+
 function AverageStatistics() {
-  const { columns, rows } = authorsTableData();
-  const { columns: pColumns, rows: pRows } = projectsTableData();
+  const [cows, setCows] = useState([]); // State to store all cows
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(null); // Error state
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetch all cows
+        const allCows = await getCows();
+
+        // Fetch additional data for all cows
+        const [monitorBirth, heatSign, inseminationCount, pregnancyData] = await Promise.all([
+          getMonitorBirthData("ALL"), // Fetch all calving data
+          getHeatSignData("ALL"), // Fetch all heat sign data
+          getInseminationCountData("ALL"), // Fetch all insemination data
+          getMonitorPregnancyData("ALL"), // Fetch all pregnancy data
+        ]);
+
+        // Merge all data into a unified structure
+        const mergedCows = allCows.map((cow) => ({
+          ...cow,
+          calving_date: monitorBirth.find((b) => b.cow_id === cow.cow_id)?.calving_date || "N/A",
+          last_calving_date:
+            monitorBirth.find((b) => b.cow_id === cow.cow_id)?.last_calving_date || "N/A",
+          heat_sign_date: heatSign.find((h) => h.cow_id === cow.cow_id)?.heat_sign_time || "N/A",
+          recent_insemination_date:
+            inseminationCount.find((i) => i.cow_id === cow.cow_id)?.insemination_time || "N/A", // Added this line
+          insemination_count:
+            inseminationCount.find((i) => i.cow_id === cow.cow_id)?.insemination_count || 0,
+          pregnancy_date:
+            pregnancyData.find((p) => p.cow_id === cow.cow_id)?.pregnancy_date || "N/A",
+          is_pregnant: pregnancyData.find((p) => p.cow_id === cow.cow_id)?.is_pregnant || false,
+        }));
+
+        setCows(mergedCows);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Pass all cows to the averageStatisticsData function
+  const { columns, rows } = averageStatisticsData(cows);
 
   return (
     <DashboardLayout>
@@ -149,7 +256,7 @@ function AverageStatistics() {
               </MDBox>
               <MDBox pt={3}>
                 <DataTable
-                  table={{ columns: pColumns, rows: pRows }}
+                  table={{ columns, rows }} // Pass columns and rows to DataTable
                   isSorted={false}
                   entriesPerPage={false}
                   showTotalEntries={false}

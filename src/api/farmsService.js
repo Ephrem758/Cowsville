@@ -92,3 +92,55 @@ export const getDateOfAI = async (cowId) => {
     return "N/A";
   }
 };
+
+// Fetch calving data (monitor_birth)
+export const getMonitorBirthData = async (farmId = null) => {
+  try {
+    const params = {};
+    if (farmId && farmId !== "ALL") params.farm_id = farmId;
+    const response = await axios.get(`${COW_API_URL}monitor_birth/`, { params });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching calving data:", error);
+    return [];
+  }
+};
+
+export const getHeatSignData = async (farmId = null) => {
+  try {
+    const response = await axios.post(`${COW_API_URL}record_heat_sign/`, {
+      farm_id: farmId || "ALL", // Use "ALL" for bulk data
+      cow_id: "ALL",
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching heat sign data:", error);
+    return [];
+  }
+};
+
+export const getInseminationCountData = async (farmId = null) => {
+  try {
+    const response = await axios.post(`${COW_API_URL}monitor_heat_sign/`, {
+      farm_id: farmId || "ALL", // Use "ALL" for bulk data
+      cow_id: "ALL",
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching insemination count data:", error);
+    return [];
+  }
+};
+
+export const getMonitorPregnancyData = async (farmId = null) => {
+  try {
+    const response = await axios.post(`${COW_API_URL}monitor_pregnancy/`, {
+      farm_id: farmId || "ALL", // Use "ALL" for bulk data
+      cow_id: "ALL",
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pregnancy data:", error);
+    return [];
+  }
+};
