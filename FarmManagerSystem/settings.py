@@ -179,3 +179,5 @@ LOGGING = {
         "level": "WARNING",
     },
 }
+
+# APScheduler settings have been removed since we're using MemoryJobStore

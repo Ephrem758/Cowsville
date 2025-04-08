@@ -33,6 +33,32 @@ class CowSerializer(serializers.ModelSerializer):
     body_weight = serializers.DecimalField(max_digits=6, decimal_places=2)
     bcs = serializers.DecimalField(max_digits=2, decimal_places=1)
     average_daily_milk = serializers.DecimalField(max_digits=6, decimal_places=2)
+    
+    # Additional fields for reproduction
+    is_pregnant = serializers.BooleanField(write_only=True, required=False)
+    until_calving = serializers.IntegerField(write_only=True, required=False)
+    heat_shown = serializers.BooleanField(write_only=True, required=False)
+    heat_start_date = serializers.DateField(write_only=True, required=False)
+    heat_end_date = serializers.DateField(write_only=True, required=False)
+    heat_signs = serializers.CharField(write_only=True, required=False)
+    service_per_conception = serializers.IntegerField(write_only=True, required=False)
+    
+    # Additional fields for medical assessment
+    reproductive_health = serializers.CharField(write_only=True, required=False)
+    metabolic_disease = serializers.CharField(write_only=True, required=False)
+    udder_health = serializers.CharField(write_only=True, required=False)
+    mastitis = serializers.CharField(write_only=True, required=False)
+    general_health = serializers.CharField(write_only=True, required=False)
+    
+    # Vaccination fields
+    is_vaccinated = serializers.BooleanField(write_only=True, required=False)
+    vaccination_date = serializers.DateField(write_only=True, required=False)
+    vaccination_type = serializers.CharField(write_only=True, required=False)
+    
+    # Deworming fields
+    deworming = serializers.BooleanField(write_only=True, required=False)
+    deworming_date = serializers.DateField(write_only=True, required=False)
+    deworming_type = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Cow
@@ -53,27 +79,64 @@ class CowSerializer(serializers.ModelSerializer):
             'last_date_insemination',
             'number_of_inseminations',
             'id_or_breed_bull_used',
-            'last_calving_date'
+            'last_calving_date',
+            # Additional fields
+            'is_pregnant',
+            'until_calving',
+            'heat_shown',
+            'heat_start_date',
+            'heat_end_date',
+            'heat_signs',
+            'service_per_conception',
+            'reproductive_health',
+            'metabolic_disease',
+            'udder_health',
+            'mastitis',
+            'general_health',
+            'is_vaccinated',
+            'vaccination_date',
+            'vaccination_type',
+            'deworming',
+            'deworming_date',
+            'deworming_type'
         ]
         swagger_schema_fields = {
             "example": {
-                "farm_id": "FARM001",
-                "cow_id": "COW001",
-                "breed": 1,
-                "age_in_days": 730,
+                "farm_id": "12",
+                "cow_id": "34",
+                "breed": "HF",
+                "age_in_days": 34,
                 "sex": "F",
-                "parity": 2,
-                "body_weight": "450.00",
-                "bcs": "3.5",
-                "gynecological_status": 1,
-                "lactation_number": 1,
-                "days_in_milk": 150,
-                "average_daily_milk": "40.00",
-                "cow_inseminated_before": False,
-                "last_date_insemination": None,
-                "number_of_inseminations": 0,
-                "id_or_breed_bull_used": "",
-                "last_calving_date": None
+                "parity": 6,
+                "body_weight": "350.0",
+                "bcs": "3",
+                "gynecological_status": "AI",
+                "lactation_number": 6,
+                "days_in_milk": 2,
+                "average_daily_milk": "10.0",
+                "cow_inseminated_before": True,
+                "last_date_insemination": "2024-11-21",
+                "number_of_inseminations": 2,
+                "id_or_breed_bull_used": "345",
+                "last_calving_date": None,
+                "is_pregnant": True,
+                "until_calving": 6,
+                "heat_shown": False,
+                "heat_start_date": None,
+                "heat_end_date": None,
+                "heat_signs": None,
+                "service_per_conception": 3,
+                "reproductive_health": "Abortion",
+                "metabolic_disease": "Hypocalcemia",
+                "udder_health": "4qt normal",
+                "mastitis": "Clinical mastitis",
+                "general_health": "Normal",
+                "is_vaccinated": True,
+                "vaccination_date": "2024-11-05",
+                "vaccination_type": "LSD",
+                "deworming": True,
+                "deworming_date": "2024-11-10",
+                "deworming_type": "Albendazole"
             }
         }
 
@@ -84,10 +147,42 @@ class CowSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         farm_id = validated_data.pop('farm_id')
+        
+        # Remove additional fields that aren't part of the Cow model
+        reproduction_data = {
+            'is_pregnant': validated_data.pop('is_pregnant', False),
+            'until_calving': validated_data.pop('until_calving', None),
+            'heat_shown': validated_data.pop('heat_shown', False),
+            'heat_start_date': validated_data.pop('heat_start_date', None),
+            'heat_end_date': validated_data.pop('heat_end_date', None),
+            'heat_signs': validated_data.pop('heat_signs', None),
+            'service_per_conception': validated_data.pop('service_per_conception', None)
+        }
+        
+        medical_data = {
+            'reproductive_health': validated_data.pop('reproductive_health', 'Normal'),
+            'metabolic_disease': validated_data.pop('metabolic_disease', 'Normal'),
+            'udder_health': validated_data.pop('udder_health', '4qt normal'),
+            'mastitis': validated_data.pop('mastitis', 'Negative'),
+            'general_health': validated_data.pop('general_health', 'Normal'),
+            'is_vaccinated': validated_data.pop('is_vaccinated', False),
+            'vaccination_date': validated_data.pop('vaccination_date', None),
+            'vaccination_type': validated_data.pop('vaccination_type', None),
+            'deworming': validated_data.pop('deworming', False),
+            'deworming_date': validated_data.pop('deworming_date', None),
+            'deworming_type': validated_data.pop('deworming_type', None)
+        }
+        
         try:
             farm = Farm.objects.get(farm_id=farm_id)
             validated_data['farm'] = farm
-            return super().create(validated_data)
+            instance = super().create(validated_data)
+            
+            # Add the data back to validated_data for the ViewSet to use
+            validated_data.update(reproduction_data)
+            validated_data.update(medical_data)
+            
+            return instance
         except Farm.DoesNotExist:
             raise serializers.ValidationError({'farm_id': f'Farm with ID {farm_id} not found'})
 
@@ -256,20 +351,12 @@ class HeatSignRecordSerializer(serializers.Serializer):
 
 
 class MonitorPregnancySerializer(serializers.Serializer):
-    farm_id = serializers.CharField(required=True)
-    cow_id = serializers.CharField(required=True)
-    is_pregnant = serializers.BooleanField(required=True)
-    lactation_number = serializers.IntegerField(required=True, min_value=0)
-
-    class Meta:
-        swagger_schema_fields = {
-            "example": {
-                "farm_id": "FARM001",
-                "cow_id": "COW001",
-                "is_pregnant": True,
-                "lactation_number": 2
-            }
-        }
+    farm_id = serializers.CharField(required=True, help_text="This identifies where the cow belongs (This is initially given to you)")
+    cow_id = serializers.CharField(required=True, help_text="Identification number for the cow")
+    pregnancy_date = serializers.DateField(required=True, help_text="Date of the pregnancy")
+    days_until_calving = serializers.IntegerField(required=True, help_text="The number of days until expected date of calving")
+    service_per_conception = serializers.IntegerField(required=True, help_text="Number of service per conception")
+    lactation_number = serializers.IntegerField(required=True, help_text="What is the number of lactation for the cow so far?")
 
     def validate(self, data):
         try:
@@ -430,36 +517,21 @@ class DoctorMedicalAssessmentSerializer(serializers.Serializer):
 
 
 class MonitorHeatSignSerializer(serializers.Serializer):
-    farm_id = serializers.CharField(required=True)
-    cow_id = serializers.CharField(required=True)
-    is_inseminated = serializers.BooleanField(required=False)
-    inseminated_now = serializers.CharField(required=False)
-    inseminated_time = serializers.CharField(required=False)
-    insemination_time = serializers.TimeField(required=False, allow_null=True)
-    insemination_count = serializers.IntegerField(required=False, min_value=0)
-    insemination_number = serializers.CharField(required=False)
-    lactation_number = serializers.IntegerField(required=False, min_value=0)
-    lactation_no = serializers.CharField(required=False)
+    farm_id = serializers.CharField(required=True, help_text="Farm identifier")
+    cow_id = serializers.CharField(required=True, help_text="Cow identifier")
+    inseminated_now = serializers.CharField(required=True, help_text="Is the cow Inseminated?")
+    date_of_insemination = serializers.DateField(required=True, help_text="Date of Insemination")
+    insemination_number = serializers.CharField(required=True, help_text="How many times was the cow Inseminated so far?")
+    lactation_no = serializers.CharField(required=True, help_text="What is the lactation number for the cow?")
 
     def validate(self, data):
         try:
-            if 'inseminated_now' in data:
-                data['is_inseminated'] = data['inseminated_now'].lower() == 'yes'
+            # Convert yes/no to boolean
+            data['is_inseminated'] = data['inseminated_now'].lower() == 'yes'
             
-            if 'inseminated_time' in data:
-                time_str = data['inseminated_time'].split('.')[0]
-                data['insemination_time'] = time_str
-            
-            if 'insemination_number' in data:
-                data['insemination_count'] = int(data['insemination_number'])
-            
-            if 'lactation_no' in data:
-                data['lactation_number'] = int(data['lactation_no'])
-
-            if 'is_inseminated' not in data:
-                raise serializers.ValidationError("Either is_inseminated or inseminated_now is required")
-            if 'lactation_number' not in data:
-                raise serializers.ValidationError("Either lactation_number or lactation_no is required")
+            # Convert string numbers to integers
+            data['insemination_count'] = int(data['insemination_number'])
+            data['lactation_number'] = int(data['lactation_no'])
 
             cow = Cow.objects.get(farm__farm_id=data['farm_id'], cow_id=data['cow_id'])
             
@@ -469,16 +541,24 @@ class MonitorHeatSignSerializer(serializers.Serializer):
             if not cow.farm.inseminator.is_active:
                 raise serializers.ValidationError("Assigned inseminator is not active")
 
-            if data['is_inseminated']:
-                if not data.get('insemination_time') and not data.get('inseminated_time'):
-                    raise serializers.ValidationError(
-                        "Insemination time is required when cow is inseminated"
-                    )
-                if not data.get('insemination_count'):
-                    raise serializers.ValidationError(
-                        "Insemination count is required when cow is inseminated"
-                    )
+            data['cow'] = cow
+            return data
+        except Cow.DoesNotExist:
+            raise serializers.ValidationError("Cow not found")
+        except ValueError:
+            raise serializers.ValidationError("Invalid number format for insemination count or lactation number")
 
+
+class MonitorBirthSerializer(serializers.Serializer):
+    farm_id = serializers.CharField(required=True, help_text="This identifies where the cow belongs (This is initially given to you)")
+    cow_id = serializers.CharField(required=True, help_text="Identification number for the cow")
+    calving_date = serializers.DateField(required=True, help_text="Date of Calving")
+    last_calving_date = serializers.DateField(required=True, help_text="Date of last calving")
+    calf_sex = serializers.ChoiceField(choices=['M', 'F'], required=True, help_text="What is the Sex of the Calf?")
+
+    def validate(self, data):
+        try:
+            cow = Cow.objects.get(farm__farm_id=data['farm_id'], cow_id=data['cow_id'])
             data['cow'] = cow
             return data
         except Cow.DoesNotExist:

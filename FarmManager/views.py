@@ -57,6 +57,7 @@ from .serializers import (
     DoctorMedicalAssessmentSerializer,
     MonitorHeatSignSerializer,
     DoctorSerializer,
+    MonitorBirthSerializer,
 )
 
 # initiating the logger
@@ -269,25 +270,56 @@ class CowViewSet(viewsets.ModelViewSet):
         })
 
     def perform_create(self, serializer):
-        """Override perform_create to automatically create reproduction record"""
+        """Override perform_create to automatically create reproduction and medical assessment records"""
         try:
             with transaction.atomic():
                 # Save the cow first
                 cow = serializer.save()
                 self.logger.info(f"Created new cow: {cow.cow_id} for farm {cow.farm.farm_id}")
 
-                # Create default reproduction record
+                # Create reproduction record with data from the request
                 Reproduction.objects.create(
                     cow=cow,
                     farm=cow.farm,
-                    is_cow_pregnant=False,
+                    is_cow_pregnant=serializer.validated_data.get('is_pregnant', False),
+                    pregnancy_date=serializer.validated_data.get('last_date_insemination'),
+                    calving_date=serializer.validated_data.get('last_calving_date'),
                     heat_sign_start=None,
                     heat_signs_seen=None
                 )
-                self.logger.info(f"Created default reproduction record for cow {cow.cow_id}")
+                self.logger.info(f"Created reproduction record for cow {cow.cow_id}")
+
+                # Get default status objects
+                general_health = GeneralHealthStatus.objects.get(name='Normal')
+                udder_health = UdderHealthStatus.objects.get(name='4qt normal')
+                mastitis = MastitisStatus.objects.get(name='Clinical mastitis')
+
+                # Create medical assessment with data from the request
+                MedicalAssessment.objects.create(
+                    farm=cow.farm,
+                    cow=cow,
+                    assessed_by=cow.farm.doctor,
+                    is_cow_sick=False,
+                    general_health=general_health,
+                    udder_health=udder_health,
+                    mastitis=mastitis,
+                    body_condition_score=int(cow.bcs),
+                    reproductive_health=serializer.validated_data.get('reproductive_health', 'Normal'),
+                    metabolic_disease=serializer.validated_data.get('metabolic_disease', 'Normal'),
+                    is_cow_vaccinated=serializer.validated_data.get('is_vaccinated', False),
+                    vaccination_date=serializer.validated_data.get('vaccination_date'),
+                    vaccination_type=serializer.validated_data.get('vaccination_type'),
+                    has_deworming=serializer.validated_data.get('deworming', False),
+                    deworming_date=serializer.validated_data.get('deworming_date'),
+                    deworming_type=serializer.validated_data.get('deworming_type'),
+                    diagnosis='',
+                    treatment='',
+                    prescription=''
+                )
+                self.logger.info(f"Created medical assessment for cow {cow.cow_id}")
 
         except Exception as e:
-            self.logger.error(f"Error creating cow with reproduction record: {str(e)}")
+            self.logger.error(f"Error creating cow with reproduction and medical records: {str(e)}")
             raise
 
     @action(detail=False, methods=["post"])
@@ -438,43 +470,54 @@ class CowViewSet(viewsets.ModelViewSet):
 
         try:
             with transaction.atomic():
-                cow = serializer.validated_data['cow']
-                is_pregnant = serializer.validated_data['is_pregnant']
-                lactation_number = serializer.validated_data['lactation_number']
+                validated_data = serializer.validated_data
+                cow = validated_data['cow']
+
+                # Calculate expected calving date
+                expected_calving_date = validated_data['pregnancy_date']
 
                 # Update or create reproduction record
                 reproduction, created = Reproduction.objects.get_or_create(
                     cow=cow,
                     farm=cow.farm,
                     defaults={
-                        "is_cow_pregnant": is_pregnant,
-                        "lactation_number": lactation_number
+                        "is_cow_pregnant": True,
+                        "pregnancy_date": validated_data['pregnancy_date'],
+                        "calving_date": expected_calving_date,
                     }
                 )
 
                 if not created:
-                    reproduction.is_cow_pregnant = is_pregnant
-                    reproduction.lactation_number = lactation_number
+                    reproduction.is_cow_pregnant = True
+                    reproduction.pregnancy_date = validated_data['pregnancy_date']
+                    reproduction.calving_date = expected_calving_date
                     reproduction.save()
 
+                # Update cow record
+                cow.number_of_inseminations = validated_data['service_per_conception']
+                cow.lactation_number = validated_data['lactation_number']
+                cow.save()
+
                 # Send notification
-                message_text = (
-                    f"Pregnancy Confirmed: Cow {cow.cow_id} "
-                    if is_pregnant
-                    else f"Pregnancy Status Update: Cow {cow.cow_id} is not pregnant"
+                farmer_message = (
+                    f"🐄 Pregnancy Recorded!\n"
+                    f"Cow: {cow.cow_id}\n"
+                    f"Pregnancy Date: {validated_data['pregnancy_date'].strftime('%Y-%m-%d')}\n"
+                    f"Expected Calving Date: {expected_calving_date.strftime('%Y-%m-%d')}\n"
+                    f"Services Required: {validated_data['service_per_conception']}\n"
+                    f"Lactation Number: {validated_data['lactation_number']}"
                 )
-                message_text += f". Lactation number: {lactation_number}"
 
                 Message.objects.create(
                     farm=cow.farm,
                     cow=cow,
-                    message_text=message_text,
+                    message_text=farmer_message,
                     message_type="pregnancy_update",
                     is_sent=True
                 )
 
                 # Send alert to farmer
-                send_alert("+251949911940", message_text) # TODO: change to farmer's phone number
+                send_alert(cow.farm.telephone_number, farmer_message)
 
                 self.logger.info(f"Successfully updated pregnancy status for cow {cow.cow_id}")
                 return Response(
@@ -482,8 +525,10 @@ class CowViewSet(viewsets.ModelViewSet):
                         "message": "Pregnancy monitoring record updated successfully",
                         "cow_id": cow.cow_id,
                         "farm_id": cow.farm.farm_id,
-                        "is_pregnant": is_pregnant,
-                        "lactation_number": lactation_number
+                        "pregnancy_date": validated_data['pregnancy_date'],
+                        "expected_calving_date": expected_calving_date,
+                        "service_per_conception": validated_data['service_per_conception'],
+                        "lactation_number": validated_data['lactation_number']
                     },
                     status=status.HTTP_200_OK
                 )
@@ -647,21 +692,33 @@ class CowViewSet(viewsets.ModelViewSet):
                     cow=cow,
                     inseminator=cow.farm.inseminator,
                     is_inseminated=validated_data['is_inseminated'],
-                    insemination_time=validated_data.get('insemination_time'),
-                    insemination_count=validated_data.get('insemination_count', 0),
+                    insemination_count=validated_data['insemination_count'],
                     lactation_number=validated_data['lactation_number']
                 )
+
+                # Update reproduction record if cow is inseminated
+                if validated_data['is_inseminated']:
+                    reproduction, _ = Reproduction.objects.get_or_create(
+                        cow=cow,
+                        farm=cow.farm,
+                        defaults={
+                            'is_cow_pregnant': False,
+                        }
+                    )
+                    reproduction.pregnancy_date = validated_data['date_of_insemination']
+                    reproduction.save()
 
                 # Notify farmer
                 farmer_message = (
                     f"Heat Sign Monitoring Update\n"
                     f"Cow: {cow.cow_id}\n"
                     f"Status: {'Inseminated' if validated_data['is_inseminated'] else 'Not inseminated'}\n"
-                    f"Lactation Number: {validated_data['lactation_number']}"
+                    f"Lactation Number: {validated_data['lactation_number']}\n"
+                    f"Insemination Count: {validated_data['insemination_count']}"
                 )
 
                 if validated_data['is_inseminated']:
-                    farmer_message += f"\nInsemination Time: {validated_data['insemination_time']}"
+                    farmer_message += f"\nDate of Insemination: {validated_data['date_of_insemination'].strftime('%Y-%m-%d')}"
 
                 send_alert("+251952137166", farmer_message) # TODO: change to farmer's phone number
                 Message.objects.create(
@@ -678,11 +735,12 @@ class CowViewSet(viewsets.ModelViewSet):
                     f"Farm: {cow.farm.farm_id}\n"
                     f"Cow: {cow.cow_id}\n"
                     f"Status: {'Inseminated' if validated_data['is_inseminated'] else 'Not inseminated'}\n"
-                    f"Lactation Number: {validated_data['lactation_number']}"
+                    f"Lactation Number: {validated_data['lactation_number']}\n"
+                    f"Insemination Count: {validated_data['insemination_count']}"
                 )
 
                 if validated_data['is_inseminated']:
-                    inseminator_message += f"\nInsemination Time: {validated_data['insemination_time']}"
+                    inseminator_message += f"\nDate of Insemination: {validated_data['date_of_insemination'].strftime('%Y-%m-%d')}"
 
                 send_alert("+251949911940", inseminator_message) # TODO: change to inseminator's phone number
                 Message.objects.create(
@@ -710,6 +768,236 @@ class CowViewSet(viewsets.ModelViewSet):
                 {"error": "Failed to record heat sign monitoring"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+    @action(detail=False, methods=["post"])
+    def monitor_birth(self, request):
+        """Record birth event for a cow"""
+        serializer = MonitorBirthSerializer(data=request.data)
+        if not serializer.is_valid():
+            self.logger.warning(f"Invalid birth monitoring data: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                validated_data = serializer.validated_data
+                cow = validated_data['cow']
+
+                # Check if there's an existing reproduction record
+                reproduction = Reproduction.objects.filter(cow=cow, is_cow_pregnant=True).first()
+                if reproduction:
+                    # Update existing reproduction record
+                    reproduction.is_cow_pregnant = False
+                    reproduction.calving_date = validated_data['calving_date']
+                    reproduction.save()
+
+                # Update cow record
+                cow.parity += 1  # Increment number of births
+                cow.last_calving_date = validated_data['last_calving_date']
+                cow.save()
+
+                # Create message for farmer
+                farmer_message = (
+                    f"🎉 Birth Event Recorded!\n"
+                    f"Cow: {cow.cow_id}\n"
+                    f"Calving Date: {validated_data['calving_date']}\n"
+                    f"Last Calving Date: {validated_data['last_calving_date']}\n"
+                    f"Calf Sex: {'Male' if validated_data['calf_sex'] == 'M' else 'Female'}"
+                )
+
+                # Send notifications
+                send_alert(cow.farm.telephone_number, farmer_message)
+                Message.objects.create(
+                    farm=cow.farm,
+                    cow=cow,
+                    message_text=farmer_message,
+                    message_type="birth_alert",
+                    is_sent=True
+                )
+
+                self.logger.info(f"Successfully recorded birth event for cow {cow.cow_id}")
+                return Response(
+                    {
+                        "message": "Birth event recorded successfully",
+                        "cow_id": cow.cow_id,
+                        "farm_id": cow.farm.farm_id,
+                        "calving_date": validated_data['calving_date'],
+                        "last_calving_date": validated_data['last_calving_date'],
+                        "calf_sex": validated_data['calf_sex'],
+                        "parity": cow.parity
+                    },
+                    status=status.HTTP_200_OK
+                )
+
+        except Exception as e:
+            self.logger.error(f"Error in birth monitoring: {str(e)}")
+            return Response(
+                {"error": "Failed to record birth event"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=["get"])
+    def pregnancy_records(self, request):
+        """Get pregnancy monitoring records"""
+        farm_id = request.query_params.get('farm_id')
+        cow_id = request.query_params.get('cow_id')
+        
+        if not farm_id:
+            return Response(
+                {"error": "farm_id query parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        queryset = Reproduction.objects.filter(
+            farm__farm_id=farm_id,
+            is_cow_pregnant=True
+        )
+        
+        if cow_id:
+            queryset = queryset.filter(cow__cow_id=cow_id)
+            
+        data = []
+        for record in queryset:
+            data.append({
+                'farm_id': record.farm.farm_id,
+                'cow_id': record.cow.cow_id,
+                'pregnancy_date': record.pregnancy_date,
+                'expected_calving_date': record.calving_date,
+                'service_per_conception': record.cow.number_of_inseminations,
+                'lactation_number': record.cow.lactation_number
+            })
+            
+        return Response(data)
+
+    @action(detail=False, methods=["get"])
+    def birth_records(self, request):
+        """Get birth monitoring records"""
+        farm_id = request.query_params.get('farm_id')
+        cow_id = request.query_params.get('cow_id')
+        
+        if not farm_id:
+            return Response(
+                {"error": "farm_id query parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        queryset = Reproduction.objects.filter(
+            farm__farm_id=farm_id,
+            calving_date__isnull=False
+        )
+        
+        if cow_id:
+            queryset = queryset.filter(cow__cow_id=cow_id)
+            
+        data = []
+        for record in queryset:
+            data.append({
+                'farm_id': record.farm.farm_id,
+                'cow_id': record.cow.cow_id,
+                'calving_date': record.calving_date,
+                'last_calving_date': record.cow.last_calving_date,
+                'parity': record.cow.parity
+            })
+            
+        return Response(data)
+
+    @action(detail=False, methods=["get"])
+    def heat_sign_records(self, request):
+        """Get heat sign monitoring records"""
+        farm_id = request.query_params.get('farm_id')
+        cow_id = request.query_params.get('cow_id')
+        
+        if not farm_id:
+            return Response(
+                {"error": "farm_id query parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        queryset = InseminationRecord.objects.filter(farm__farm_id=farm_id)
+        
+        if cow_id:
+            queryset = queryset.filter(cow__cow_id=cow_id)
+            
+        data = []
+        for record in queryset:
+            data.append({
+                'farm_id': record.farm.farm_id,
+                'cow_id': record.cow.cow_id,
+                'is_inseminated': record.is_inseminated,
+                'insemination_time': record.insemination_time,
+                'insemination_count': record.insemination_count,
+                'lactation_number': record.lactation_number,
+                'recorded_date': record.recorded_date
+            })
+            
+        return Response(data)
+
+    @action(detail=False, methods=["get"])
+    def medical_records(self, request):
+        """Get medical assessment records"""
+        farm_id = request.query_params.get('farm_id')
+        cow_id = request.query_params.get('cow_id')
+        record_type = request.query_params.get('type', 'all')  # 'farmer' or 'doctor' or 'all'
+        
+        if not farm_id:
+            return Response(
+                {"error": "farm_id query parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        data = []
+        
+        # Get farmer medical reports if requested
+        if record_type in ['farmer', 'all']:
+            farmer_reports = FarmerMedicalReport.objects.filter(farm__farm_id=farm_id)
+            if cow_id:
+                farmer_reports = farmer_reports.filter(cow__cow_id=cow_id)
+                
+            for report in farmer_reports:
+                data.append({
+                    'type': 'farmer_report',
+                    'farm_id': report.farm.farm_id,
+                    'cow_id': report.cow.cow_id,
+                    'reported_date': report.reported_date,
+                    'sickness_description': report.sickness_description,
+                    'is_reviewed': report.is_reviewed,
+                    'reviewed_by': report.reviewed_by.name if report.reviewed_by else None,
+                    'review_date': report.review_date
+                })
+        
+        # Get doctor medical assessments if requested
+        if record_type in ['doctor', 'all']:
+            assessments = MedicalAssessment.objects.filter(farm__farm_id=farm_id)
+            if cow_id:
+                assessments = assessments.filter(cow__cow_id=cow_id)
+                
+            for assessment in assessments:
+                data.append({
+                    'type': 'doctor_assessment',
+                    'farm_id': assessment.farm.farm_id,
+                    'cow_id': assessment.cow.cow_id,
+                    'assessment_date': assessment.assessment_date,
+                    'assessed_by': assessment.assessed_by.name,
+                    'is_cow_sick': assessment.is_cow_sick,
+                    'sickness_type': assessment.sickness_type,
+                    'general_health': assessment.general_health.name,
+                    'udder_health': assessment.udder_health.name,
+                    'mastitis': assessment.mastitis.name,
+                    'body_condition_score': assessment.body_condition_score,
+                    'reproductive_health': assessment.reproductive_health,
+                    'metabolic_disease': assessment.metabolic_disease,
+                    'is_cow_vaccinated': assessment.is_cow_vaccinated,
+                    'vaccination_date': assessment.vaccination_date,
+                    'vaccination_type': assessment.vaccination_type,
+                    'has_deworming': assessment.has_deworming,
+                    'deworming_date': assessment.deworming_date,
+                    'deworming_type': assessment.deworming_type,
+                    'diagnosis': assessment.diagnosis,
+                    'treatment': assessment.treatment,
+                    'prescription': assessment.prescription,
+                    'next_assessment_date': assessment.next_assessment_date
+                })
+        
+        return Response(data)
 
 
 class MessageViewSet(viewsets.ReadOnlyModelViewSet):

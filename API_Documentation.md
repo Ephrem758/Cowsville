@@ -75,7 +75,7 @@ Currently using Django's default authentication system.
 
 - **URL:** `/cows/`
 - **Method:** `POST`
-- **Description:** Register a new cow
+- **Description:** Register a new cow. Automatically creates a default reproduction record for the cow.
 - **Request Body:**
   ```json
   {
@@ -99,6 +99,15 @@ Currently using Django's default authentication system.
     "gynecological_status": 1
   }
   ```
+- **Actions Performed:**
+  1. Creates the cow record with provided details
+  2. Automatically creates a default reproduction record with:
+     - `is_cow_pregnant`: false
+     - `heat_sign_start`: null
+     - `heat_signs_seen`: null
+- **Error Responses:**
+  - `400 Bad Request`: Invalid data provided
+  - `500 Internal Server Error`: Failed to create cow or reproduction record
 
 #### Farmer Medical Assessment
 
@@ -151,33 +160,114 @@ Currently using Django's default authentication system.
 
 - **URL:** `/cows/monitor_heat_sign/`
 - **Method:** `POST`
-- **Description:** Record heat signs and insemination details
+- **Description:** Record heat signs and insemination details. Updates both insemination records and reproduction records if the cow is inseminated. Sends notifications to both farmer and inseminator.
 - **Request Body:**
   ```json
   {
     "farm_id": "FARM001",
     "cow_id": "01",
-    "is_inseminated": true,
-    "insemination_time": "14:30",
-    "insemination_count": 2,
-    "lactation_number": 3
+    "inseminated_now": "Yes",
+    "date_of_insemination": "2024-03-21",
+    "insemination_number": "2",
+    "lactation_no": "3"
   }
   ```
+- **Success Response:**
+  ```json
+  {
+    "message": "Heat sign monitoring recorded successfully",
+    "record_id": 1,
+    "farm_id": "FARM001",
+    "cow_id": "01"
+  }
+  ```
+- **Field Descriptions:**
+
+  - `farm_id`: Farm identifier (required)
+  - `cow_id`: Cow identifier (required)
+  - `inseminated_now`: Whether the cow was inseminated ("Yes" or "No") (required)
+  - `date_of_insemination`: Date when the cow was inseminated (YYYY-MM-DD format) (required)
+  - `insemination_number`: Number of times the cow has been inseminated (required)
+  - `lactation_no`: Current lactation number of the cow (required)
+
+- **Actions Performed:**
+
+  1. Creates an insemination record with the provided details
+  2. If cow is inseminated (inseminated_now = "Yes"):
+     - Updates or creates a reproduction record with the insemination date
+  3. Sends notifications:
+     - To Farmer: Includes cow status, lactation number, insemination count, and date of insemination
+     - To Inseminator: Includes farm details, cow status, lactation number, insemination count, and date of insemination
+
+- **Error Responses:**
+
+  - `400 Bad Request`: Invalid data provided
+    ```json
+    {
+      "error": "Invalid data format",
+      "details": {
+        "field_name": ["error message"]
+      }
+    }
+    ```
+  - `500 Internal Server Error`: Server-side error
+    ```json
+    {
+      "error": "Failed to record heat sign monitoring"
+    }
+    ```
+
+- **Validation Rules:**
+  1. Farm and cow must exist in the system
+  2. Farm must have an active inseminator assigned
+  3. Insemination number and lactation number must be valid integers
+  4. Date must be in YYYY-MM-DD format
 
 #### Monitor Pregnancy
 
 - **URL:** `/cows/monitor_pregnancy/`
 - **Method:** `POST`
-- **Description:** Update pregnancy status
+- **Description:** Update pregnancy status and related information for a cow. Creates or updates reproduction records and sends notifications.
 - **Request Body:**
   ```json
   {
     "farm_id": "FARM001",
     "cow_id": "01",
-    "is_pregnant": true,
-    "lactation_number": 2
+    "pregnancy_date": "2024-03-21",
+    "days_until_calving": 280,
+    "service_per_conception": 2,
+    "lactation_number": 3
   }
   ```
+- **Success Response:**
+  ```json
+  {
+    "message": "Pregnancy monitoring record updated successfully",
+    "cow_id": "01",
+    "farm_id": "FARM001",
+    "pregnancy_date": "2024-03-21",
+    "expected_calving_date": "2024-12-25",
+    "service_per_conception": 2,
+    "lactation_number": 3
+  }
+  ```
+- **Actions Performed:**
+
+  1. Creates or updates reproduction record with pregnancy information
+  2. Updates cow's insemination and lactation records
+  3. Calculates expected calving date
+  4. Sends notification to farmer with pregnancy details
+
+- **Error Responses:**
+
+  - `400 Bad Request`: Invalid data provided
+  - `500 Internal Server Error`: Failed to update pregnancy status
+
+- **Validation Rules:**
+  1. Farm and cow must exist in the system
+  2. All fields are required
+  3. Numbers must be valid integers
+  4. Date must be in YYYY-MM-DD format
 
 #### Record Heat Sign
 
@@ -254,6 +344,97 @@ You can also filter cows using the main cows endpoint:
 - **Method:** `GET`
 - **Description:** Filter cows by farm ID using query parameter
 
+#### Monitor Birth
+
+- **URL:** `/cows/monitor_birth/`
+- **Method:** `POST`
+- **Description:** Record birth event for a cow. Updates reproduction records and cow details, and sends notifications.
+- **Request Body:**
+  ```json
+  {
+    "farm_id": "FARM001",
+    "cow_id": "01",
+    "calving_date": "2024-03-21",
+    "last_calving_date": "2023-03-21",
+    "calf_sex": "M"
+  }
+  ```
+- **Success Response:**
+  ```json
+  {
+    "message": "Birth event recorded successfully",
+    "cow_id": "01",
+    "farm_id": "FARM001",
+    "calving_date": "2024-03-21",
+    "last_calving_date": "2023-03-21",
+    "calf_sex": "M",
+    "parity": 3
+  }
+  ```
+- **Actions Performed:**
+
+  1. Updates or creates reproduction record with calving information
+  2. Updates cow's parity and last calving date
+  3. Sends notification to farmer with birth details
+
+- **Error Responses:**
+  - `400 Bad Request`: Invalid data provided
+  - `500 Internal Server Error`: Failed to record birth event
+
+#### Change Farm's Inseminator
+
+- **URL:** `/farms/{farm_id}/change_inseminator/`
+- **Method:** `POST`
+- **Description:** Assign a new inseminator to the farm
+- **Request Body:**
+  ```json
+  {
+    "inseminator_id": 1
+  }
+  ```
+- **Success Response:**
+  ```json
+  {
+    "message": "inseminator changed successfully",
+    "farm_id": "FARM001",
+    "new_staff_id": 1,
+    "old_staff_id": 2
+  }
+  ```
+- **Actions Performed:**
+  1. Updates farm's assigned inseminator
+  2. Deactivates old inseminator if exists
+  3. Sends notifications to:
+     - Old inseminator about unassignment
+     - New inseminator with farm details
+     - Creates message record in system
+
+#### Replace Inseminator
+
+- **URL:** `/inseminators/{inseminator_id}/replace_inseminator/`
+- **Method:** `POST`
+- **Description:** Update existing inseminator's details and notify affected farms
+- **Request Body:**
+  ```json
+  {
+    "name": "John Doe",
+    "phone_number": "+251912345678",
+    "address": "Addis Ababa"
+  }
+  ```
+- **Success Response:**
+  ```json
+  {
+    "message": "Inseminator details updated successfully",
+    "affected_farms_count": 5,
+    "new_details": {
+      "name": "John Doe",
+      "phone": "+251912345678",
+      "address": "Addis Ababa"
+    }
+  }
+  ```
+
 ### 3. Medical Assessments
 
 #### List Medical Assessments
@@ -286,155 +467,28 @@ You can also filter cows using the main cows endpoint:
 #### Create Inseminator
 
 - **URL:** `/inseminators/`
-- **Method:** `POST`
-- **Description:** Register a new inseminator
-- **Data:**
-  ```json
-  {
-    "name": "John Doe",
-    "phone_number": "+251912345678",
-    "address": "Addis Ababa",
-    "is_active": true,
-    "license_number": "INS123"
-  }
-  ```
 
-#### Replace Inseminator
+### Messages
 
-- **URL:** `/inseminators/{inseminator_id}/replace_inseminator/`
-- **Method:** `POST`
-- **Description:** Update inseminator details
-- **Request Body:**
-  ```json
-  {
-    "name": "John Doe",
-    "phone_number": "+251912345678",
-    "address": "Addis Ababa"
-  }
-  ```
+#### List Messages
 
-### 5. Doctors Management
-
-#### List Doctors
-
-- **URL:** `/doctors/`
+- **URL:** `/messages/`
 - **Method:** `GET`
-- **Description:** Get all registered doctors
+- **Description:** Get all messages with optional filtering
+- **Query Parameters:**
+  - `farm_id`: Filter by farm ID
+  - `cow_id`: Filter by cow ID (requires farm_id)
+  - `search`: Search in message text or type
+- **Note:** Cow ID filtering only works when farm ID is also provided
 
-#### Create Doctor
+### Reproduction Records
 
-- **URL:** `/doctors/`
-- **Method:** `POST`
-- **Description:** Register a new doctor
-- **Data:**
-  ```json
-  {
-    "name": "Dr. John Smith",
-    "phone_number": "+251912345678",
-    "address": "Addis Ababa",
-    "is_active": true,
-    "specialization": "Veterinary Medicine",
-    "license_number": "VET123"
-  }
-  ```
+#### List Reproduction Records
 
-### 6. Choice Models (Read-only)
-
-#### List Breed Types
-
-- **URL:** `/breedtypes/`
+- **URL:** `/reproduction-records/`
 - **Method:** `GET`
-- **Description:** Get all available breed types
-
-#### List Housing Types
-
-- **URL:** `/housingtypes/`
-- **Method:** `GET`
-- **Description:** Get all available housing types
-
-#### List Floor Types
-
-- **URL:** `/floortypes/`
-- **Method:** `GET`
-- **Description:** Get all available floor types
-
-#### List Water Sources
-
-- **URL:** `/watersources/`
-- **Method:** `GET`
-- **Description:** Get all available water sources
-
-#### List Feeding Frequencies
-
-- **URL:** `/feedingfrequencies/`
-- **Method:** `GET`
-- **Description:** Get all available feeding frequencies
-
-### 7. Farmer Medical Reports
-
-#### List Farmer Reports
-
-- **URL:** `/farmer-medical-reports/`
-- **Method:** `GET`
-- **Description:** Get all farmer-submitted medical reports
+- **Description:** Get all reproduction records with optional filtering
 - **Query Parameters:**
   - `farm_id`: Filter by farm ID
   - `cow_id`: Filter by cow ID
-  - `is_reviewed`: Filter by review status (true/false)
-- **Success Response:** `200 OK`
-
-#### Get Single Farmer Report
-
-- **URL:** `/farmer-medical-reports/{id}/`
-- **Method:** `GET`
-- **Description:** Get details of a specific farmer medical report
-- **Success Response:** `200 OK`
-
-### 8. Insemination Records
-
-#### List Insemination Records
-
-- **URL:** `/insemination-records/`
-- **Method:** `GET`
-- **Description:** Get all insemination records
-- **Query Parameters:**
-  - `farm_id`: Filter by farm ID
-  - `cow_id`: Filter by cow ID
-  - `inseminator_id`: Filter by inseminator ID
-  - `is_inseminated`: Filter by insemination status (true/false)
-- **Success Response:** `200 OK`
-
-#### Get Single Record
-
-- **URL:** `/insemination-records/{id}/`
-- **Method:** `GET`
-- **Description:** Get details of a specific insemination record
-- **Success Response:** `200 OK`
-
-## Message Types
-
-- `heat_alert`: Heat detection alerts
-- `health_alert`: Health-related notifications
-- `vaccination_alert`: Vaccination reminders
-- `pregnancy_update`: Pregnancy status updates
-- `inseminator_alert`: Inseminator notifications
-- `farmer_alert`: General farmer notifications
-- `doctor_alert`: Doctor notifications
-- `doctor_assignment`: Doctor assignment updates
-- `inseminator_assignment`: Inseminator assignment updates
-- `pregnancy_confirmation`: Pregnancy confirmation notices
-
-## Error Responses
-
-- `400 Bad Request`: Missing or invalid parameters
-- `401 Unauthorized`: Authentication required
-- `403 Forbidden`: Insufficient permissions
-- `404 Not Found`: Resource not found
-- `500 Internal Server Error`: Server error
-
-## Notes
-
-- All IDs referenced in requests must exist in the system
-- Dates should be in YYYY-MM-DD format
-- Times should be in HH:MM format
-- Phone numbers should be in international format (+251XXXXXXXXX)
+  - `is_pregnant`: Filter by pregnancy status (true/false)

@@ -1,4 +1,5 @@
 import logging
+import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.jobstores.memory import MemoryJobStore
@@ -7,7 +8,10 @@ from FarmManager.models import Reproduction, Message
 from .sendMesage import send_alert
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
+# Global scheduler instance
+scheduler = None
 
 def check_heat_sign_alerts():
     """Checks cows for heat sign alerts and sends notifications if necessary"""
@@ -35,25 +39,47 @@ def check_heat_sign_alerts():
                         message_type="heat_alert",
                         is_sent=True,
                     )
-                    logging.info(
+                    logger.info(
                         f"✅ Heat Sign Alert sent and recorded for Cow {cow.cow.id}"
                     )
                 else:
-                    logging.error(
+                    logger.error(
                         f"❌ Failed to send alert for Cow {cow.cow.id}: {alert_response.get('message')}"
                     )
 
     return f"Checked {len(cows)} cows for heat sign alerts"
 
+def shutdown():
+    """Properly shut down the scheduler"""
+    global scheduler
+    if scheduler and scheduler.running:
+        logger.info("Shutting down APScheduler...")
+        scheduler.shutdown()
+        logger.info("APScheduler shutdown complete")
 
 def start():
     """Start APScheduler for heat sign alerts every 24 hours"""
+    global scheduler
+    
+    # Don't start if already running
+    if scheduler and scheduler.running:
+        logger.warning("APScheduler is already running")
+        return
+
     jobstores = {"default": MemoryJobStore()}
     executors = {"default": ThreadPoolExecutor(2)}
     scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors)
 
-    # Schedule the task to run every 24 hours
-    scheduler.add_job(check_heat_sign_alerts, "interval", hours=24)
+    # Schedule the task to run every 24 hours, starting immediately
+    scheduler.add_job(
+        check_heat_sign_alerts, 
+        "interval", 
+        hours=24,
+        next_run_time=now()  # Run immediately when started
+    )
 
-    logging.info("✅ APScheduler started for heat sign alerts (every 24 hours)")
+    # Register the shutdown handler
+    atexit.register(shutdown)
+
+    logger.info("✅ APScheduler started for heat sign alerts (every 24 hours)")
     scheduler.start()

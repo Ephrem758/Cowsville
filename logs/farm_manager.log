@@ -40,3 +40,7 @@ INFO 2025-03-20 23:04:35,921 views Created new cow: 12 for farm FARM001
 ERROR 2025-03-20 23:04:35,922 views Error creating cow with reproduction record: NOT NULL constraint failed: FarmManager_reproduction.heat_signs_seen
 INFO 2025-03-20 23:06:24,088 views Created new cow: 2 for farm FARM001
 INFO 2025-03-20 23:06:24,090 views Created default reproduction record for cow 2
+WARNING 2025-04-01 17:13:27,496 views Invalid birth monitoring data: {'non_field_errors': [ErrorDetail(string='Cow not found', code='invalid')]}
+WARNING 2025-04-01 17:13:44,556 views Invalid birth monitoring data: {'non_field_errors': [ErrorDetail(string='No pregnancy record found for this cow', code='invalid')]}
+INFO 2025-04-01 17:19:50,313 views Successfully recorded birth event for cow 1
+INFO 2025-04-01 17:20:10,954 views Successfully recorded birth event for cow 1
