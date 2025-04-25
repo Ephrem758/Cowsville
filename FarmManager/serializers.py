@@ -20,6 +20,7 @@ from .models import (
     Reproduction,
 )
 from decimal import Decimal
+from datetime import datetime
 
 
 class FarmSerializer(serializers.ModelSerializer):
@@ -30,90 +31,70 @@ class FarmSerializer(serializers.ModelSerializer):
 
 class CowSerializer(serializers.ModelSerializer):
     farm_id = serializers.CharField(write_only=True)
-    body_weight = serializers.DecimalField(max_digits=6, decimal_places=2)
-    bcs = serializers.DecimalField(max_digits=2, decimal_places=1)
-    average_daily_milk = serializers.DecimalField(max_digits=6, decimal_places=2)
-    
-    # Additional fields for reproduction
-    is_pregnant = serializers.BooleanField(write_only=True, required=False)
-    until_calving = serializers.IntegerField(write_only=True, required=False)
+    cow_id = serializers.CharField(write_only=True)
+    breed = serializers.PrimaryKeyRelatedField(queryset=BreedType.objects.all())
+    other_breed = serializers.CharField(write_only=True, required=False)
+    cow_age = serializers.IntegerField(write_only=True, source='age_in_days')
+    sex = serializers.CharField(write_only=True)
+    parity = serializers.IntegerField(write_only=True)
+    body_weight = serializers.DecimalField(max_digits=6, decimal_places=2, write_only=True)
+    bcs = serializers.DecimalField(max_digits=2, decimal_places=1, write_only=True)
+    gyn_status = serializers.CharField(write_only=True, source='gynecological_status')
+    lactation_no = serializers.IntegerField(write_only=True, source='lactation_number')
+    milk_days = serializers.IntegerField(write_only=True, source='days_in_milk')
+    daily_milk = serializers.DecimalField(max_digits=6, decimal_places=2, write_only=True, source='average_daily_milk')
+    inseminated_before = serializers.BooleanField(write_only=True)
+    ai_date = serializers.DateField(write_only=True, source='last_date_insemination', input_formats=['%Y-%m-%d', '%b %d, %Y'])
+    insemination_no = serializers.IntegerField(write_only=True, source='number_of_inseminations')
+    sire_breed = serializers.CharField(write_only=True, source='id_or_breed_bull_used')
+    after_calving = serializers.IntegerField(write_only=True, source='days_after_last_calving')
+    is_pregnant = serializers.BooleanField(write_only=True)
+    until_claving = serializers.IntegerField(write_only=True, source='days_until_calving')
     heat_shown = serializers.BooleanField(write_only=True, required=False)
     heat_start_date = serializers.DateField(write_only=True, required=False)
     heat_end_date = serializers.DateField(write_only=True, required=False)
     heat_signs = serializers.CharField(write_only=True, required=False)
-    service_per_conception = serializers.IntegerField(write_only=True, required=False)
-    
-    # Additional fields for medical assessment
-    reproductive_health = serializers.CharField(write_only=True, required=False)
-    metabolic_disease = serializers.CharField(write_only=True, required=False)
-    udder_health = serializers.CharField(write_only=True, required=False)
-    mastitis = serializers.CharField(write_only=True, required=False)
-    general_health = serializers.CharField(write_only=True, required=False)
-    
-    # Vaccination fields
-    is_vaccinated = serializers.BooleanField(write_only=True, required=False)
-    vaccination_date = serializers.DateField(write_only=True, required=False)
-    vaccination_type = serializers.CharField(write_only=True, required=False)
-    
-    # Deworming fields
-    deworming = serializers.BooleanField(write_only=True, required=False)
-    deworming_date = serializers.DateField(write_only=True, required=False)
-    deworming_type = serializers.CharField(write_only=True, required=False)
+    nsc = serializers.IntegerField(write_only=True, source='service_per_conception')
+    udder_health = serializers.CharField(write_only=True)
+    mastitis = serializers.CharField(write_only=True)
+    general_health = serializers.CharField(write_only=True)
+    reproductive_health = serializers.CharField(write_only=True)
+    other_reproductive_health = serializers.CharField(write_only=True, required=False)
+    metabolic_disease = serializers.CharField(write_only=True)
+    other_metabolic_disease = serializers.CharField(write_only=True, required=False)
+    is_vaccinated = serializers.BooleanField(write_only=True)
+    vaccination_date = serializers.DateField(write_only=True, input_formats=['%Y-%m-%d', '%b %d, %Y'])
+    vaccination_type = serializers.CharField(write_only=True)
+    deworming = serializers.BooleanField(write_only=True)
+    deworming_date = serializers.DateField(write_only=True, input_formats=['%Y-%m-%d', '%b %d, %Y'])
+    deworming_type = serializers.CharField(write_only=True)
 
     class Meta:
         model = Cow
         fields = [
-            'farm_id',
-            'cow_id',
-            'breed',
-            'age_in_days',
-            'sex',
-            'parity',
-            'body_weight',
-            'bcs',
-            'gynecological_status',
-            'lactation_number',
-            'days_in_milk',
-            'average_daily_milk',
-            'cow_inseminated_before',
-            'last_date_insemination',
-            'number_of_inseminations',
-            'id_or_breed_bull_used',
-            'last_calving_date',
-            # Additional fields
-            'is_pregnant',
-            'until_calving',
-            'heat_shown',
-            'heat_start_date',
-            'heat_end_date',
-            'heat_signs',
-            'service_per_conception',
-            'reproductive_health',
-            'metabolic_disease',
-            'udder_health',
-            'mastitis',
-            'general_health',
-            'is_vaccinated',
-            'vaccination_date',
-            'vaccination_type',
-            'deworming',
-            'deworming_date',
-            'deworming_type'
+            'farm_id', 'cow_id', 'breed', 'other_breed', 'cow_age', 'sex', 'parity', 
+            'body_weight', 'bcs', 'gyn_status', 'lactation_no', 'milk_days', 'daily_milk', 
+            'inseminated_before', 'ai_date', 'insemination_no', 'sire_breed', 'after_calving', 
+            'is_pregnant', 'until_claving', 'heat_shown', 'heat_start_date', 'heat_end_date', 
+            'heat_signs', 'nsc', 'udder_health', 'mastitis', 'general_health', 
+            'reproductive_health', 'other_reproductive_health', 'metabolic_disease', 
+            'other_metabolic_disease', 'is_vaccinated', 'vaccination_date', 
+            'vaccination_type', 'deworming', 'deworming_date', 'deworming_type'
         ]
         swagger_schema_fields = {
             "example": {
                 "farm_id": "12",
                 "cow_id": "34",
                 "breed": "HF",
-                "age_in_days": 34,
+                "cow_age": 34,
                 "sex": "F",
                 "parity": 6,
                 "body_weight": "350.0",
                 "bcs": "3",
-                "gynecological_status": "AI",
+                "gyn_status": "AI",
                 "lactation_number": 6,
                 "days_in_milk": 2,
-                "average_daily_milk": "10.0",
+                "daily_milk": "10.0",
                 "cow_inseminated_before": True,
                 "last_date_insemination": "2024-11-21",
                 "number_of_inseminations": 2,
@@ -139,6 +120,79 @@ class CowSerializer(serializers.ModelSerializer):
                 "deworming_type": "Albendazole"
             }
         }
+
+    def validate_sex(self, value):
+        """Convert 'Milking Cow' to 'F' for female"""
+        if value.lower() == 'milking cow':
+            return 'F'
+        return value.upper()
+
+    def validate_breed(self, value):
+        """Handle breed name to ID conversion"""
+        try:
+            if isinstance(value, str):
+                # Try exact match first
+                try:
+                    breed = BreedType.objects.get(name__iexact=value)
+                    return breed.id
+                except BreedType.DoesNotExist:
+                    # Try common variations
+                    breed_map = {
+                        'hf': 'hf',
+                        'holstein': 'hf',
+                        'holstein friesian': 'hf',
+                        'zebu': 'zebu',
+                        'cross': 'hf_zebu_cross',
+                        'crossbreed': 'hf_zebu_cross',
+                        'other': 'other'
+                    }
+                    normalized_value = value.lower().strip()
+                    if normalized_value in breed_map:
+                        breed = BreedType.objects.get(name=breed_map[normalized_value])
+                        return breed.id
+                    raise serializers.ValidationError(
+                        f"Invalid breed type. Valid options are: HF, Zebu, HF*Zebu Cross, Other"
+                    )
+            return value
+        except BreedType.DoesNotExist:
+            raise serializers.ValidationError(
+                f"Invalid breed type. Valid options are: HF, Zebu, HF*Zebu Cross, Other"
+            )
+
+    def validate_gyn_status(self, value):
+        """Handle gynecological status name to ID conversion"""
+        try:
+            if isinstance(value, str):
+                # Try exact match first
+                try:
+                    status = GynecologicalStatus.objects.get(name__iexact=value)
+                    return status.id
+                except GynecologicalStatus.DoesNotExist:
+                    # Try common variations
+                    status_map = {
+                        'estrus': 'estrus',
+                        'heat': 'estrus',
+                        'ai': 'ai',
+                        'artificial insemination': 'ai',
+                        'pregnant': 'pregnant',
+                        'pregnancy': 'pregnant',
+                        'abortion': 'abortion',
+                        'fresh': 'fresh',
+                        'birth': 'birth',
+                        'calving': 'birth'
+                    }
+                    normalized_value = value.lower().strip()
+                    if normalized_value in status_map:
+                        status = GynecologicalStatus.objects.get(name=status_map[normalized_value])
+                        return status.id
+                    raise serializers.ValidationError(
+                        f"Invalid gynecological status. Valid options are: Estrus, AI, Pregnant, Abortion, Fresh, Birth"
+                    )
+            return value
+        except GynecologicalStatus.DoesNotExist:
+            raise serializers.ValidationError(
+                f"Invalid gynecological status. Valid options are: Estrus, AI, Pregnant, Abortion, Fresh, Birth"
+            )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -334,6 +388,7 @@ class HeatSignRecordSerializer(serializers.Serializer):
     farm_id = serializers.CharField(required=True)
     cow_id = serializers.CharField(required=True)
     heat_signs = serializers.CharField(required=False, default="")
+    heat_start_time = serializers.DateTimeField(required=True)
 
     def validate(self, data):
         try:

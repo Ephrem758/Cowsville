@@ -70,12 +70,14 @@ def start():
     executors = {"default": ThreadPoolExecutor(2)}
     scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors)
 
-    # Schedule the task to run every 24 hours, starting immediately
+    # Manually trigger the initial check
+    check_heat_sign_alerts()
+
+    # Schedule the task to run every 24 hours
     scheduler.add_job(
         check_heat_sign_alerts, 
         "interval", 
-        hours=24,
-        next_run_time=now()  # Run immediately when started
+        hours=24
     )
 
     # Register the shutdown handler

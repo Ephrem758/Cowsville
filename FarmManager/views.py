@@ -247,27 +247,92 @@ class CowViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["cow_id", "breed__name"]
     logger = logging.getLogger(__name__)
-    filterset_fields = ['farm_id']  # Add this line
+    filterset_fields = ['farm_id']
+
+    def create(self, request, *args, **kwargs):
+        """Create a new cow with logging"""
+        self.logger.info(f"Received cow creation request with data: {request.data}")
+        try:
+            response = super().create(request, *args, **kwargs)
+            self.logger.info(f"Successfully created cow with ID: {response.data.get('cow_id')}")
+            return response
+        except Exception as e:
+            self.logger.error(f"Error creating cow: {str(e)}", exc_info=True)
+            raise
+
+    def update(self, request, *args, **kwargs):
+        """Update a cow with logging"""
+        self.logger.info(f"Received cow update request for cow {kwargs.get('pk')} with data: {request.data}")
+        try:
+            response = super().update(request, *args, **kwargs)
+            self.logger.info(f"Successfully updated cow {kwargs.get('pk')}")
+            return response
+        except Exception as e:
+            self.logger.error(f"Error updating cow {kwargs.get('pk')}: {str(e)}", exc_info=True)
+            raise
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete a cow with logging"""
+        self.logger.info(f"Received cow deletion request for cow {kwargs.get('pk')}")
+        try:
+            response = super().destroy(request, *args, **kwargs)
+            self.logger.info(f"Successfully deleted cow {kwargs.get('pk')}")
+            return response
+        except Exception as e:
+            self.logger.error(f"Error deleting cow {kwargs.get('pk')}: {str(e)}", exc_info=True)
+            raise
+
+    def list(self, request, *args, **kwargs):
+        """List cows with logging"""
+        self.logger.info(f"Received cow list request with query params: {request.query_params}")
+        try:
+            response = super().list(request, *args, **kwargs)
+            self.logger.info(f"Successfully retrieved {len(response.data)} cows")
+            return response
+        except Exception as e:
+            self.logger.error(f"Error listing cows: {str(e)}", exc_info=True)
+            raise
+
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve a single cow with logging"""
+        self.logger.info(f"Received cow retrieve request for cow {kwargs.get('pk')}")
+        try:
+            response = super().retrieve(request, *args, **kwargs)
+            self.logger.info(f"Successfully retrieved cow {kwargs.get('pk')}")
+            return response
+        except Exception as e:
+            self.logger.error(f"Error retrieving cow {kwargs.get('pk')}: {str(e)}", exc_info=True)
+            raise
 
     @action(detail=False, methods=['GET'])
-    
     def by_farm(self, request):
-        """Get all cows for a specific farm"""
+        """Get all cows for a specific farm with logging"""
         farm_id = request.query_params.get('farm_id')
+        self.logger.info(f"Received by_farm request for farm {farm_id}")
+        
         if not farm_id:
+            self.logger.warning("by_farm request missing farm_id parameter")
             return Response(
                 {"error": "farm_id query parameter is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        cows = self.get_queryset().filter(farm__farm_id=farm_id)
-        serializer = self.get_serializer(cows, many=True)
-        
-        return Response({
-            "farm_id": farm_id,
-            "total_cows": len(serializer.data),
-            "cows": serializer.data
-        })
+        try:
+            cows = self.get_queryset().filter(farm__farm_id=farm_id)
+            serializer = self.get_serializer(cows, many=True)
+            self.logger.info(f"Successfully retrieved {len(serializer.data)} cows for farm {farm_id}")
+            
+            return Response({
+                "farm_id": farm_id,
+                "total_cows": len(serializer.data),
+                "cows": serializer.data
+            })
+        except Exception as e:
+            self.logger.error(f"Error retrieving cows for farm {farm_id}: {str(e)}", exc_info=True)
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def perform_create(self, serializer):
         """Override perform_create to automatically create reproduction and medical assessment records"""
@@ -337,12 +402,14 @@ class CowViewSet(viewsets.ModelViewSet):
         try:
             cow = serializer.validated_data["cow"]
             heat_signs = serializer.validated_data["heat_signs"]
+            heat_start_time = serializer.validated_data["heat_start_time"]
+            heat_sign_recorded_at = serializer.validated_data["heat_sign_recorded_at"]
             self.logger.info(
                 f"Recording heat sign for cow {cow.cow_id} from farm {cow.farm.farm_id}"
             )
 
             # record heat sign
-            reproduction = self._create_or_update_reproduction(cow, heat_signs)
+            reproduction = self._create_or_update_reproduction(cow, heat_signs, heat_start_time, heat_sign_recorded_at)
 
             # send message to farmer
             self._send_heat_sign_message(cow, heat_signs)
@@ -357,6 +424,7 @@ class CowViewSet(viewsets.ModelViewSet):
                     "cow_id": cow.cow_id,
                     "farm_id": cow.farm.farm_id,
                     "heat_sign_start": reproduction.heat_sign_start,
+                    "heat_sign_recorded_at": reproduction.heat_sign_recorded_at,
                     "alert_sent": True,
                 },
                 status=status.HTTP_200_OK,
@@ -371,7 +439,7 @@ class CowViewSet(viewsets.ModelViewSet):
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    def _create_or_update_reproduction(self, cow, heat_signs):
+    def _create_or_update_reproduction(self, cow, heat_signs, heat_start_time, heat_sign_recorded_at=None):
         """create or update reproduction record based on heat signs"""
         self.logger.info(
             f"Creating or updating reproduction record for cow {cow.cow_id} from farm {cow.farm.farm_id}"
@@ -382,14 +450,17 @@ class CowViewSet(viewsets.ModelViewSet):
             farm=cow.farm,
             defaults={
                 "is_cow_pregnant": False,
-                "heat_sign_start": now(),
+                "heat_sign_start": heat_start_time,
                 "heat_signs_seen": heat_signs,
+                "heat_sign_recorded_at": heat_sign_recorded_at or now(),
             },
         )
 
         if not created:
-            reproduction.heat_sign_start = now()
+            reproduction.heat_sign_start = heat_start_time
             reproduction.heat_signs_seen = heat_signs
+            if heat_sign_recorded_at:
+                reproduction.heat_sign_recorded_at = heat_sign_recorded_at
             reproduction.save()
 
         self.logger.info(
@@ -902,33 +973,50 @@ class CowViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def heat_sign_records(self, request):
-        """Get heat sign monitoring records"""
+        """Get heat sign records from Reproduction or InseminationRecord"""
         farm_id = request.query_params.get('farm_id')
         cow_id = request.query_params.get('cow_id')
-        
+        record_type = request.query_params.get('record_type', 'all')  # Default to all
+
         if not farm_id:
             return Response(
                 {"error": "farm_id query parameter is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
-        queryset = InseminationRecord.objects.filter(farm__farm_id=farm_id)
-        
-        if cow_id:
-            queryset = queryset.filter(cow__cow_id=cow_id)
-            
+
         data = []
-        for record in queryset:
-            data.append({
-                'farm_id': record.farm.farm_id,
-                'cow_id': record.cow.cow_id,
-                'is_inseminated': record.is_inseminated,
-                'insemination_time': record.insemination_time,
-                'insemination_count': record.insemination_count,
-                'lactation_number': record.lactation_number,
-                'recorded_date': record.recorded_date
-            })
-            
+
+        if record_type in ['reproduction', 'all']:
+            reproduction_queryset = Reproduction.objects.filter(
+                farm__farm_id=farm_id,
+                is_cow_pregnant=False
+            ).order_by('-heat_sign_recorded_at')
+            if cow_id:
+                reproduction_queryset = reproduction_queryset.filter(cow__cow_id=cow_id)
+            for record in reproduction_queryset:
+                data.append({
+                    'type': 'reproduction',
+                    'farm_id': record.farm.farm_id,
+                    'cow_id': record.cow.cow_id,
+                    'heat_sign_start': record.heat_sign_start,
+                    'heat_sign_recorded_at': record.heat_sign_recorded_at,
+                })
+
+        if record_type in ['insemination', 'all']:
+            insemination_queryset = InseminationRecord.objects.filter(
+                farm__farm_id=farm_id
+            ).order_by('-recorded_date')
+            if cow_id:
+                insemination_queryset = insemination_queryset.filter(cow__cow_id=cow_id)
+            for record in insemination_queryset:
+                data.append({
+                    'type': 'insemination',
+                    'farm_id': record.farm.farm_id,
+                    'cow_id': record.cow.cow_id,
+                    'insemination_time': record.insemination_time,
+                    'recorded_date': record.recorded_date,
+                })
+
         return Response(data)
 
     @action(detail=False, methods=["get"])

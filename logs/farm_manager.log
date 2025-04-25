@@ -44,3 +44,310 @@ WARNING 2025-04-01 17:13:27,496 views Invalid birth monitoring data: {'non_field
 WARNING 2025-04-01 17:13:44,556 views Invalid birth monitoring data: {'non_field_errors': [ErrorDetail(string='No pregnancy record found for this cow', code='invalid')]}
 INFO 2025-04-01 17:19:50,313 views Successfully recorded birth event for cow 1
 INFO 2025-04-01 17:20:10,954 views Successfully recorded birth event for cow 1
+INFO 2025-04-09 10:52:09,629 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-09 10:52:09,633 views Error creating cow: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'age_in_days': [ErrorDetail(string='This field is required.', code='required')], 'sex': [ErrorDetail(string='"milking" is not a valid choice.', code='invalid_choice')], 'gynecological_status': [ErrorDetail(string='This field is required.', code='required')], 'average_daily_milk': [ErrorDetail(string='This field is required.', code='required')]}
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 231, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'age_in_days': [ErrorDetail(string='This field is required.', code='required')], 'sex': [ErrorDetail(string='"milking" is not a valid choice.', code='invalid_choice')], 'gynecological_status': [ErrorDetail(string='This field is required.', code='required')], 'average_daily_milk': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-04-09 10:54:59,575 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-09 10:54:59,577 views Error creating cow: The field 'average_daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+                      ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1079, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1175, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'average_daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+INFO 2025-04-09 10:56:28,357 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-09 10:56:28,359 views Error creating cow: The field 'average_daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+                      ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1079, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1175, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'average_daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+INFO 2025-04-10 11:59:57,300 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 11:59:57,302 views Error creating cow: The field 'average_daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+                      ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1079, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1175, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'average_daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+INFO 2025-04-10 12:07:56,406 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:07:56,409 views Error creating cow: The field 'daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 372, in fields
+    for key, value in self.get_fields().items():
+                      ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1079, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 1175, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'daily_milk' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+INFO 2025-04-10 12:24:55,838 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:24:55,843 views Error creating cow: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'sex': [ErrorDetail(string='"milking" is not a valid choice.', code='invalid_choice')], 'average_daily_milk': [ErrorDetail(string='This field is required.', code='required')]}
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 231, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'sex': [ErrorDetail(string='"milking" is not a valid choice.', code='invalid_choice')], 'average_daily_milk': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-04-10 12:39:15,674 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:39:15,677 views Error creating cow: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 373, in fields
+    fields[key] = value
+    ~~~~~~^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\utils\serializer_helpers.py", line 167, in __setitem__
+    field.bind(field_name=key, parent=self.serializer)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\fields.py", line 358, in bind
+    assert self.source != field_name, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+INFO 2025-04-10 12:39:41,143 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:39:41,148 views Error creating cow: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 373, in fields
+    fields[key] = value
+    ~~~~~~^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\utils\serializer_helpers.py", line 167, in __setitem__
+    field.bind(field_name=key, parent=self.serializer)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\fields.py", line 358, in bind
+    assert self.source != field_name, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+INFO 2025-04-10 12:41:04,758 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:41:04,761 views Error creating cow: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 373, in fields
+    fields[key] = value
+    ~~~~~~^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\utils\serializer_helpers.py", line 167, in __setitem__
+    field.bind(field_name=key, parent=self.serializer)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\fields.py", line 358, in bind
+    assert self.source != field_name, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+INFO 2025-04-10 12:41:19,634 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:41:19,637 views Error creating cow: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 495, in to_internal_value
+    for field in fields:
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 378, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 373, in fields
+    fields[key] = value
+    ~~~~~~^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\utils\serializer_helpers.py", line 167, in __setitem__
+    field.bind(field_name=key, parent=self.serializer)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\fields.py", line 358, in bind
+    assert self.source != field_name, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: It is redundant to specify `source='breed'` on field 'PrimaryKeyRelatedField' in serializer 'CowSerializer', because it is the same as the field name. Remove the `source` keyword argument.
+INFO 2025-04-10 12:46:44,809 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:46:44,819 views Error creating cow: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'lactation_no': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'ai_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: [Jan-Dec] DD, YYYY.', code='invalid')], 'heat_shown': [ErrorDetail(string='This field is required.', code='required')], 'vaccination_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: [Jan-Dec] DD, YYYY.', code='invalid')], 'deworming_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: [Jan-Dec] DD, YYYY.', code='invalid')]}
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 231, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'lactation_no': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'ai_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: [Jan-Dec] DD, YYYY.', code='invalid')], 'heat_shown': [ErrorDetail(string='This field is required.', code='required')], 'vaccination_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: [Jan-Dec] DD, YYYY.', code='invalid')], 'deworming_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: [Jan-Dec] DD, YYYY.', code='invalid')]}
+INFO 2025-04-10 12:50:55,152 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:50:55,159 views Error creating cow: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'lactation_no': [ErrorDetail(string='A valid integer is required.', code='invalid')]}
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 231, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'lactation_no': [ErrorDetail(string='A valid integer is required.', code='invalid')]}
+INFO 2025-04-10 12:54:59,751 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-04-10 12:54:59,757 views Error creating cow: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'lactation_no': [ErrorDetail(string='A valid integer is required.', code='invalid')]}
+Traceback (most recent call last):
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\FarmManager\views.py", line 256, in create
+    response = super().create(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 231, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'lactation_no': [ErrorDetail(string='A valid integer is required.', code='invalid')]}

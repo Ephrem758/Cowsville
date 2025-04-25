@@ -223,27 +223,30 @@ class Cow(SoftDeleteModel):
 
 class Reproduction(SoftDeleteModel):
     farm = models.ForeignKey(
-        Farm, on_delete=models.CASCADE, related_name="reproduction_records"
+        Farm, on_delete=models.CASCADE, related_name="reproductions"
     )
     cow = models.ForeignKey(
-        Cow, on_delete=models.CASCADE, related_name="reproduction_records"
+        Cow, on_delete=models.CASCADE, related_name="reproductions"
     )
 
     # Heat Detection
     heat_sign_start = models.DateTimeField(null=True, blank=True)
     heat_sign_end = models.DateTimeField(null=True, blank=True)
-    heat_signs_seen = models.BooleanField(null=True, blank=True)
+    heat_signs_seen = models.TextField(null=True, blank=True)
 
     # Pregnancy Tracking
     is_cow_pregnant = models.BooleanField(default=False)
     pregnancy_date = models.DateField(null=True, blank=True)
     calving_date = models.DateField(null=True, blank=True)
 
+    # New field to track when heat sign was recorded
+    heat_sign_recorded_at = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
-        return f"Reproduction Record - Cow {self.cow.cow_id}"
+        return f"Reproduction record for {self.cow.cow_id} at {self.heat_sign_recorded_at}"
 
     class Meta:
-        verbose_name_plural = "Reproduction Records"
+        ordering = ["-heat_sign_recorded_at"]  # Order by most recent heat sign records first
 
 
 class Message(SoftDeleteModel):
