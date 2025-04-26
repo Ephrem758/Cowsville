@@ -38,7 +38,7 @@ function Projects({ cows, farm }) {
   const rows = (cows || []).map((cow) => ({
     cow_id: cow.cow_id || "N/A",
     gynecological_status: cow.gynecological_status || "N/A",
-    lactation_number: cow.lactation_number !== undefined ? cow.lactation_number : "N/A", // Check for undefined
+    parity: cow.parity !== undefined ? cow.parity : "N/A", // Check for undefined
     last_date_insemination: cow.last_date_insemination || "N/A",
   }));
 
@@ -47,7 +47,7 @@ function Projects({ cows, farm }) {
     rows.push({
       cow_id: "N/A",
       gynecological_status: "N/A",
-      lactation_number: "N/A",
+      parity: "N/A",
       last_date_insemination: "N/A",
     });
   }

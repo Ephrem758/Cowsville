@@ -36,7 +36,7 @@ import {
   getFarms,
   getCows,
   getCowDetails,
-  getCowHeatSign,
+  getHeatSignData,
   getInseminationCount,
   getDateOfAI,
 } from "api/farmsService";
@@ -157,12 +157,22 @@ function Dashboard() {
             {
               cow_id: "COW456",
               heat_sign_time: "2024-03-21T08:00:00Z",
-              farm_id: "MOCK",
+              farm_id: "28",
               heat_signs: "Mounting, Mucus Discharge",
               dalc: "7 days",
               date_of_ai: "15 MAR 2:15 PM",
               insemination_number: "2",
               breed: "Holstein",
+            },
+            {
+              cow_id: "16",
+              heat_sign_time: "2024-03-21T06:00:00Z",
+              farm_id: "MOCK",
+              heat_signs: "Bellowing, Restlessness, Off-Feed",
+              dalc: "5 days",
+              date_of_ai: "21 DEC 9:34 PM",
+              insemination_number: "3",
+              breed: "Zebu",
             },
           ];
           setCows([...allCows, ...mockCows]);
@@ -215,7 +225,7 @@ function Dashboard() {
 
       // Fetch additional data for the cow
       const [heatSigns, inseminationCount, dateOfAI] = await Promise.all([
-        getCowHeatSign(farmId, cowDetails.cow_id),
+        getHeatSignData(farmId, cowDetails.cow_id),
         getInseminationCount(farmId, cowDetails.cow_id),
         getDateOfAI(cowDetails.cow_id),
       ]);
@@ -331,7 +341,7 @@ function Dashboard() {
                     setSelectedCow(foundCow);
                   } else {
                     // Fetch heat_sign_time from API for real cows
-                    const heatSignTime = await getCowHeatSign(foundCow.farm_id, foundCow.cow_id);
+                    const heatSignTime = await getHeatSignData(foundCow.farm_id, foundCow.cow_id);
                     setSelectedCow({
                       ...foundCow,
                       heat_sign_time: heatSignTime || "06:00",

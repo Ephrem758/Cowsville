@@ -19,7 +19,19 @@ function FarmCards() {
   const [error, setError] = useState(null);
   // Hardcoded farms (replace with API data later)
 
-  // FarmCards.js
+  const farmImageMapping = {
+    28: "/images/farm-cards/image-1.jpg",
+    31: "/images/farm-cards/image-3.jpg",
+    24: "/images/farm-cards/image-4.jpg",
+    12: "/images/farm-cards/image-5.jpg",
+    9: "/images/farm-cards/image-6.jpg",
+    4: "/images/farm-cards/image-2.jpg",
+    FARM001: "/images/farm-cards/image-2.jpg",
+    1: "/images/farm-cards/image-2.jpg",
+    3: "/images/farm-cards/image-2.jpg",
+    // Add more mappings as needed
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -31,44 +43,32 @@ function FarmCards() {
           : farmsResponse.farms || [];
         const allCows = Array.isArray(cowsResponse) ? cowsResponse : cowsResponse.cows || [];
 
-        // Calculate total cows per farm from backend data
+        console.log("All Cows Data:", allCows); // Debugging cows data
+
+        // Calculate total cows per farm using cow.farm_id
         const backendFarmCowCounts = allCows.reduce((acc, cow) => {
-          acc[cow.farm_id] = (acc[cow.farm_id] || 0) + 1;
+          if (cow.farm_id) {
+            acc[cow.farm_id] = (acc[cow.farm_id] || 0) + 1;
+          }
           return acc;
         }, {});
 
-        // Merge backend farms with calculated totals
+        console.log("Cow Counts:", backendFarmCowCounts); // Debugging cow counts
+
+        // Merge backend farms with calculated totals using farm.farm_id as the key
         const mergedFarms = backendFarms.map((farm) => ({
           ...farm,
-          totalCows: backendFarmCowCounts[farm.id] || 0,
+          totalCows: backendFarmCowCounts[farm.farm_id] || 0,
           image: farm.image || "/images/farm-cards/default-image.jpg",
         }));
 
-        // Use mockCows-derived farms if backend data is empty
-        if (mergedFarms.length === 0) {
-          const mockFarmIds = [...new Set(mockCows.map((cow) => cow.farm_id))];
-          const mockFarms = mockFarmIds.map((farmId) => ({
-            id: farmId,
-            name: mockCows.find((cow) => cow.farm_id === farmId)?.owner_name || "Unnamed Farm",
-            totalCows: mockCows.filter((cow) => cow.farm_id === farmId).length,
-            image: "/images/farm-cards/default-image.jpg",
-          }));
-          setFarms(mockFarms);
-        } else {
-          setFarms(mergedFarms);
-        }
+        console.log("Backend Farms:", mergedFarms); // Debugging backend farms
+
+        // Use only backend data (no mock data)
+        setFarms(mergedFarms);
       } catch (err) {
         console.error("Error fetching data:", err);
-
-        // Fallback to mockCows-derived farms
-        const mockFarmIds = [...new Set(mockCows.map((cow) => cow.farm_id))];
-        const mockFarms = mockFarmIds.map((farmId) => ({
-          id: farmId,
-          name: mockCows.find((cow) => cow.farm_id === farmId)?.owner_name || "Unnamed Farm",
-          totalCows: mockCows.filter((cow) => cow.farm_id === farmId).length,
-          image: "/images/farm-cards/default-image.jpg",
-        }));
-        setFarms(mockFarms);
+        setError(err);
       } finally {
         setLoading(false);
       }
@@ -93,13 +93,17 @@ function FarmCards() {
                   transition: "transform 0.2s",
                   "&:hover": { transform: "scale(1.05)" },
                 }}
-                // onClick={() => navigate(`/tables?farm_id=${farm.id}`)} // Add later
+                onClick={() => navigate(`/tables?farm_id=${farm.farm_id}`)} // Add later
               >
                 <MDBox p={3} textAlign="center">
                   <MDBox
                     component="img"
-                    src="/images/farm-cards/image-2.jpg"
+                    // src="/images/farm-cards/image-2.jpg"
+                    src={farmImageMapping[farm.farm_id] || "/images/farm-cards/default-image.jpg"} // Use mapping
                     alt={farm.name}
+                    onError={(e) => {
+                      e.target.src = "/images/farm-cards/fallback-image.jpg"; // Fallback
+                    }}
                     width="80%"
                     height="150px"
                     mx="auto"
@@ -137,7 +141,8 @@ function FarmCards() {
                       Total Cows :
                     </MDTypography>
                     <MDTypography variant="h6" fontWeight="medium" color="info">
-                      {farm.totalCows}
+                      {/* {farm.totalCows} */}
+                      {farm.total_number_of_cows}
                     </MDTypography>
                   </MDBox>
                 </MDBox>

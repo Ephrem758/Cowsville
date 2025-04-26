@@ -37,14 +37,14 @@ function OrdersOverview({ cow }) {
         <TimelineItem
           color="error"
           icon="inventory_2"
-          title="Days in Milk"
-          description={cow?.days_in_milk || "N/A"}
+          title="Calving Date"
+          description={cow?.calving_date || "50"}
         />
         <TimelineItem
           color="info"
           icon="shopping_cart"
           title="Date of AI"
-          description={cow?.last_date_insemination || "N/A"}
+          description={cow?.last_date_insemination || "2024-03-22"}
         />
         <TimelineItem
           color="warning"
@@ -69,7 +69,7 @@ OrdersOverview.propTypes = {
   cow: PropTypes.shape({
     cow_id: PropTypes.string,
     heat_signs: PropTypes.string,
-    days_in_milk: PropTypes.string,
+    calving_date: PropTypes.string,
     last_date_insemination: PropTypes.string,
     insemination_number: PropTypes.string,
     breed: PropTypes.string,

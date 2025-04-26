@@ -107,6 +107,136 @@ export const mockCows = [
     insemination_count: 4, // Exactly 3 inseminations
     pregnancy_status: true, // Not pregnant
     pregnancy_date: "2023-09-10",
+    mastitis: "negative",
+    reproductive_health: "normal",
+    lameness: "No",
+    general_health: "normal",
+  },
+  {
+    cow_id: "1509",
+    farm_id: "29",
+    owner_name: "Yemane Abdi",
+    vaccination_date: "2024-03-20",
+    udder_health: "Healthy",
+    body_condition_score: "3.5",
+    deworming_date: "2024-03-15",
+    calving_date: "2023-07-01",
+    last_calving_date: "2022-06-01",
+    recent_insemination_date: "2023-08-30",
+    heat_sign_date: "2023-07-25",
+    insemination_count: 4, // Exactly 3 inseminations
+    pregnancy_status: true, // Not pregnant
+    pregnancy_date: "2023-09-10",
+    date_of_birth: "2023-09-10",
+    mastitis: "negative",
+    reproductive_health: "normal",
+    lameness: "no",
+    general_health: "sick",
+  },
+  {
+    cow_id: "1550",
+    farm_id: "29",
+    owner_name: "Yemane Abdi",
+    vaccination_date: "2022-06-04",
+    udder_health: "Healthy",
+    body_condition_score: "2.0",
+    deworming_date: "2022-06-15",
+    calving_date: "2024-04-01",
+    last_calving_date: "2023-01-15",
+    recent_insemination_date: "2024-02-30",
+    heat_sign_date: "2025-10-10",
+    insemination_count: 4, // Exactly 3 inseminations
+    pregnancy_status: true, // Not pregnant
+    pregnancy_date: "2024-11-20",
+    date_of_birth: "2019-10-16",
+    mastitis: "CMT +",
+    reproductive_health: "Dystocia",
+    lameness: "yes",
+    general_health: "sick",
+  },
+  {
+    cow_id: "1588",
+    farm_id: "29",
+    owner_name: "Yemane Abdi",
+    vaccination_date: "2020-08-14",
+    udder_health: "Healthy",
+    body_condition_score: "5.0",
+    deworming_date: "2021-05-10",
+    calving_date: "2024-04-01",
+    last_calving_date: "2023-01-15",
+    recent_insemination_date: "2024-02-30",
+    heat_sign_date: "2025-10-10",
+    insemination_count: 4, // Exactly 3 inseminations
+    pregnancy_status: true, // Not pregnant
+    pregnancy_date: "2024-11-20",
+    date_of_birth: "2018-03-19",
+    mastitis: "negative",
+    reproductive_health: "normal",
+    lameness: "no",
+    general_health: "normal",
+  },
+  {
+    cow_id: "1650",
+    farm_id: "29",
+    owner_name: "Yemane Abdi",
+    vaccination_date: "2023-09-20",
+    udder_health: "Healthy",
+    body_condition_score: "4.0",
+    deworming_date: "2024-01-15",
+    calving_date: "2024-04-01",
+    last_calving_date: "2023-01-15",
+    recent_insemination_date: "2024-02-30",
+    heat_sign_date: "2025-10-10",
+    insemination_count: 4, // Exactly 3 inseminations
+    pregnancy_status: true, // Not pregnant
+    pregnancy_date: "2024-11-20",
+    date_of_birth: "2021-01-23",
+    mastitis: "negative",
+    reproductive_health: "normal",
+    lameness: "no",
+    general_health: "normal",
+  },
+  {
+    cow_id: "1697",
+    farm_id: "29",
+    owner_name: "Yemane Abdi",
+    vaccination_date: "2024-06-24",
+    udder_health: "Healthy",
+    body_condition_score: "3.5",
+    deworming_date: "2023-12-15",
+    calving_date: "2024-04-01",
+    last_calving_date: "2023-01-15",
+    recent_insemination_date: "2024-02-30",
+    heat_sign_date: "2025-10-10",
+    insemination_count: 4, // Exactly 3 inseminations
+    pregnancy_status: true, // Not pregnant
+    pregnancy_date: "2024-11-20",
+    date_of_birth: "2017-01-02",
+    mastitis: "negative",
+    reproductive_health: "normal",
+    lameness: "no",
+    general_health: "normal",
+  },
+  {
+    cow_id: "1707",
+    farm_id: "29",
+    owner_name: "Yemane Abdi",
+    vaccination_date: "2018-02-13",
+    udder_health: "Healthy",
+    body_condition_score: "1.5",
+    deworming_date: "2019-05-12",
+    calving_date: "2024-04-01",
+    last_calving_date: "2023-01-15",
+    recent_insemination_date: "2024-02-30",
+    heat_sign_date: "2025-10-10",
+    insemination_count: 4, // Exactly 3 inseminations
+    pregnancy_status: true, // Not pregnant
+    pregnancy_date: "2024-11-20",
+    date_of_birth: "2016-09-29",
+    mastitis: "clinical mastitis",
+    reproductive_health: "Abortion",
+    lameness: "yes",
+    general_health: "sick",
   },
 ];
 
@@ -119,6 +249,7 @@ function Tables() {
   const [farms, setFarms] = useState([]); // Store farms for ownerName lookup
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [ownerName, setOwnerName] = useState("Unknown");
   // Generate rows using the filtered assessments
   // const { columns } = authorsTableData(); // Keep existing columns
   const { columns: pColumns, rows: pRows } = projectsTableData();
@@ -132,38 +263,74 @@ function Tables() {
         const cowsData = Array.isArray(cowsResponse) ? cowsResponse : cowsResponse.cows || [];
 
         // Fetch additional data from APIs
-        const [monitorBirth, heatSign, inseminationCount, pregnancyData] = await Promise.all([
+        const [
+          monitorBirth,
+          heatSign,
+          inseminationCount,
+          pregnancyData,
+          assessments, // Fetch doctor assessments
+        ] = await Promise.all([
           getMonitorBirthData(tableSearchQuery),
           getHeatSignData(tableSearchQuery, "ALL"),
           getInseminationCountData(tableSearchQuery, "ALL"),
           getMonitorPregnancyData(tableSearchQuery, "ALL"),
+          getDoctorAssessments(tableSearchQuery), // Add this line
         ]);
 
         // Merge all data into a unified structure
-        const mergedCows = cowsData.map((cow) => ({
-          ...cow,
-          calving_date:
-            monitorBirth.find((b) => b.cow_id === cow.cow_id)?.calving_date || cow.calving_date,
-          last_calving_date:
-            monitorBirth.find((b) => b.cow_id === cow.cow_id)?.last_calving_date ||
-            cow.last_calving_date,
-          heat_sign_date:
-            heatSign.find((h) => h.cow_id === cow.cow_id)?.heat_sign_time || cow.heat_sign_date,
-          insemination_count:
-            inseminationCount.find((i) => i.cow_id === cow.cow_id)?.insemination_count ||
-            cow.insemination_count,
-          pregnancy_date:
-            pregnancyData.find((p) => p.cow_id === cow.cow_id)?.pregnancy_date ||
-            cow.pregnancy_date,
-          is_pregnant:
-            pregnancyData.find((p) => p.cow_id === cow.cow_id)?.is_pregnant || cow.is_pregnant,
-        }));
+        const mergedCows = cowsData.map((cow) => {
+          // Find matching assessment for the cow
+          const assessment =
+            assessments.find((a) => a.cow_id === cow.cow_id && a.farm_id === cow.farm_id) || {};
+
+          return {
+            ...cow,
+            calving_date:
+              monitorBirth.find((b) => b.cow_id === cow.cow_id)?.calving_date || cow.calving_date,
+            last_calving_date:
+              monitorBirth.find((b) => b.cow_id === cow.cow_id)?.last_calving_date ||
+              cow.last_calving_date,
+            heat_sign_date:
+              heatSign.find((h) => h.cow_id === cow.cow_id)?.heat_sign_time || cow.heat_sign_date,
+            insemination_count:
+              inseminationCount.find((i) => i.cow_id === cow.cow_id)?.insemination_count ||
+              cow.insemination_count,
+            pregnancy_date:
+              pregnancyData.find((p) => p.cow_id === cow.cow_id)?.pregnancy_date ||
+              cow.pregnancy_date,
+            is_pregnant:
+              pregnancyData.find((p) => p.cow_id === cow.cow_id)?.is_pregnant || cow.is_pregnant,
+            // Merge doctor assessment fields
+            vaccination_date: assessment.vaccination_date || cow.vaccination_date || "N/A",
+            mastitis: assessment.mastitis || cow.mastitis || "N/A",
+            reproductive_health: assessment.reproductive_health || cow.reproductive_health || "N/A",
+            udder_health: assessment.udder_health || cow.udder_health || "N/A",
+            body_condition_score:
+              assessment.body_condition_score || cow.body_condition_score || "N/A",
+            deworming_date: assessment.deworming_date || cow.deworming_date || "N/A",
+            date_of_birth: assessment.date_of_birth || cow.date_of_birth || "N/A",
+            lameness: assessment.lameness || cow.lameness || "N/A",
+            general_health: assessment.general_health || cow.general_health || "N/A",
+          };
+        });
 
         // Conditionally include mock cows
         if (tableSearchQuery?.toLowerCase() === "mock") {
           setCows(mockCows);
+
+          const mockOwner = mockCows[0]?.owner_name || "Unknown";
+          setOwnerName(mockOwner);
         } else {
-          setCows(mergedCows);
+          const mockCowsForFarm = mockCows.filter((cow) => cow.farm_id === tableSearchQuery);
+          const mergedOwner = farms.find((farm) => farm.farm_id === tableSearchQuery)?.owner_name;
+
+          // Set owner name from mockCows or farms
+          const ownerFromMock = mockCowsForFarm[0]?.owner_name;
+          const finalOwnerName = ownerFromMock || mergedOwner || "Unknown";
+
+          // Use mergedCows if backend data exists, else use filtered mock data
+          setCows(mergedCows.length > 0 ? mergedCows : mockCowsForFarm);
+          setOwnerName(finalOwnerName);
         }
 
         setFarms(await getFarms());
@@ -178,64 +345,27 @@ function Tables() {
     fetchData();
   }, [tableSearchQuery]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setLoading(true);
-  //     try {
-  //       // Fetch cows (filtered by farm ID if provided)
-  //       const cowsResponse = await getCows(tableSearchQuery);
-  //       const cowsData = Array.isArray(cowsResponse) ? cowsResponse : cowsResponse.cows || [];
-
-  //       // Fetch doctor assessments
-  //       const assessmentsData = await getDoctorAssessments();
-
-  //       // Fetch farms
-  //       const farmsData = await getFarms();
-
-  //       // Merge cow data with doctor assessments
-  //       const mergedCows = cowsData.map((cow) => {
-  //         const assessment = assessmentsData.find((a) => a.cow_id === cow.cow_id);
-  //         return {
-  //           ...cow,
-  //           vaccination_date: assessment?.vaccination_date || "N/A",
-  //           udder_health: assessment?.udder_health || "N/A",
-  //           body_condition_score: assessment?.body_condition_score || "N/A",
-  //           deworming_date: assessment?.deworming_date || "N/A",
-  //         };
-  //       });
-
-  //       // Conditionally include mock cows
-  //       if (tableSearchQuery?.toLowerCase() === "mock") {
-  //         if (mergedCows.length === 0) {
-  //           setCows(mockCows); // Use mock cows only if no real data
-  //         } else {
-  //           setCows(mergedCows); // Use real MOCK farm data if available
-  //         }
-  //       } else {
-  //         setCows(mergedCows); // Use real data for other farms
-  //       }
-  //       setFarms(farmsData);
-  //     } catch (err) {
-  //       console.error("Error fetching data:", err);
-  //       setError(err.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [tableSearchQuery]);
-
   // Generate rows **only if cows is defined**
   const rows =
     cows.length > 0
       ? cows.map((cow) => ({
           cow_id: cow.cow_id || "N/A",
+          date_of_birth: cow.date_of_birth || "N/A",
           vaccination_date: cow.vaccination_date || "N/A",
           udder_health: cow.udder_health || "N/A",
           body_condition_score: cow.body_condition_score || "N/A",
           deworming_date: cow.deworming_date || "N/A",
-          owner_name: farms.find((farm) => farm.farm_id === cow.farm_id)?.owner_name || "N/A",
+          mastitis: cow.mastitis || "N/A",
+          reproductive_health: cow.reproductive_health || "N/A",
+          lameness: cow.lameness || "N/A",
+          general_health: cow.general_health || "N/A",
+
+          // owner_name: farms.find((farm) => farm.farm_id === cow.farm_id)?.owner_name || "N/A",
+          owner_name:
+            // Use mock farm owner if available, else fallback to backend farms
+            mockCows.find((farm) => farm.farm_id === cow.farm_id)?.owner_name ||
+            farms.find((farm) => farm.farm_id === cow.farm_id)?.owner_name ||
+            "N/A",
         }))
       : [];
 
@@ -261,7 +391,7 @@ function Tables() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Cow Health and Farm Data
+                  {`${ownerName} Farm - Cow Health and Farm Data`}
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -275,11 +405,17 @@ function Tables() {
                             {
                               // Default row
                               cow_id: "N/A",
+                              date_of_birth: "N/A",
                               vaccination_date: "N/A",
                               udder_health: "N/A",
                               body_condition_score: "N/A",
                               deworming_date: "N/A",
-                              owner_name: "N/A",
+                              mastitis: "N/A",
+                              reproductive_health: "N/A",
+                              lameness: "N/A",
+                              general_health: "N/A",
+
+                              // owner_name: "N/A",
                             },
                           ],
                   }}

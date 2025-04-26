@@ -66,7 +66,7 @@ function Footer({ company, links }) {
             favorite
           </Icon>
         </MDBox>
-        by Ephrem Alemayehu, Samuel Girma and Yohanes Alemu
+        by Ephrem Alemayehu and Samuel Girma
       </MDBox>
       <MDBox
         component="ul"

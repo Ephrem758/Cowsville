@@ -163,14 +163,14 @@ export default function data(searchedFarmId = null, mockCows = []) {
     columns: [
       { Header: "Indicator", accessor: "indicator", width: "30%", align: "left" },
       { Header: "Value", accessor: "value", align: "left" },
-      { Header: "Unit", accessor: "unit", align: "center" },
+      // { Header: "Unit", accessor: "unit", align: "center" },
       { Header: "Goal", accessor: "goal", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
 
     rows: [
       {
-        indicator: <Project image={LogoAsana} name="Insemination after calving" />,
+        indicator: <Project image={LogoAsana} name="Insemination after calving (days)" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
             {averageInseminationAfterCalving.toFixed(2)}
@@ -181,7 +181,8 @@ export default function data(searchedFarmId = null, mockCows = []) {
             Days
           </MDTypography>
         ),
-        goal: <Progress color="info" value={60} />,
+        // goal: <Progress color="info" value={60} />,
+        goal: "< 60 days",
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -189,7 +190,7 @@ export default function data(searchedFarmId = null, mockCows = []) {
         ),
       },
       {
-        indicator: <Project image={LogoAsana} name="Average Calving interval" />,
+        indicator: <Project image={LogoAsana} name="Average Calving interval (months)" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
             {averageCalvingInterval.toFixed(2)}
@@ -200,7 +201,8 @@ export default function data(searchedFarmId = null, mockCows = []) {
             Months
           </MDTypography>
         ),
-        goal: <Progress color="success" value={100} />,
+        // goal: <Progress color="success" value={100} />,
+        goal: "< 12 months",
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -208,7 +210,7 @@ export default function data(searchedFarmId = null, mockCows = []) {
         ),
       },
       {
-        indicator: <Project image={LogoAsana} name="Heat after calving" />,
+        indicator: <Project image={LogoAsana} name="Heat after calving (days)" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
             {averageHeatAfterCalving.toFixed(2)}
@@ -219,7 +221,8 @@ export default function data(searchedFarmId = null, mockCows = []) {
             Days
           </MDTypography>
         ),
-        goal: <Progress color="error" value={30} />,
+        // goal: <Progress color="error" value={30} />,
+        goal: "< 45 days",
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -227,7 +230,9 @@ export default function data(searchedFarmId = null, mockCows = []) {
         ),
       },
       {
-        indicator: <Project image={LogoAsana} name="Cows return to heat within 60 days" />,
+        indicator: (
+          <Project image={LogoAsana} name="Cows return to heat within 60 days after calving (%)" />
+        ),
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
             {cowsReturnToHeatWithin60Days.toFixed(2)}
@@ -238,7 +243,8 @@ export default function data(searchedFarmId = null, mockCows = []) {
             %
           </MDTypography>
         ),
-        goal: <Progress color="info" value={80} />,
+        // goal: <Progress color="info" value={80} />,
+        goal: "90 %",
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -246,7 +252,9 @@ export default function data(searchedFarmId = null, mockCows = []) {
         ),
       },
       {
-        indicator: <Project image={LogoAsana} name="No. of inseminations per conception" />,
+        indicator: (
+          <Project image={LogoAsana} name="No. of inseminations per conception (number)" />
+        ),
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
             {averageServicesPerConception.toFixed(2)}
@@ -257,7 +265,8 @@ export default function data(searchedFarmId = null, mockCows = []) {
             Number
           </MDTypography>
         ),
-        goal: <Progress color="error" value={0} />,
+        // goal: <Progress color="error" value={0} />,
+        goal: "< 3",
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -265,7 +274,7 @@ export default function data(searchedFarmId = null, mockCows = []) {
         ),
       },
       {
-        indicator: <Project image={LogoAsana} name="Rate of mature cows doing 03 services" />,
+        indicator: <Project image={LogoAsana} name="Rate of repeat breeders (%)" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
             {rateOfMatureCowsDoing3Services.toFixed(2)}
@@ -276,7 +285,8 @@ export default function data(searchedFarmId = null, mockCows = []) {
             %
           </MDTypography>
         ),
-        goal: <Progress color="success" value={100} />,
+        // goal: <Progress color="success" value={100} />,
+        goal: "< 10 %",
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>
@@ -284,12 +294,7 @@ export default function data(searchedFarmId = null, mockCows = []) {
         ),
       },
       {
-        indicator: (
-          <Project
-            image={LogoAsana}
-            name="Rate of cows with interval between calving and pregnancy"
-          />
-        ),
+        indicator: <Project image={LogoAsana} name="Non-pregnant cows 3 month after calving (%)" />,
         value: (
           <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
             {rateOfCowsWithIntervalBetweenCalvingAndPregnancy.toFixed(2)}
@@ -300,7 +305,8 @@ export default function data(searchedFarmId = null, mockCows = []) {
             %
           </MDTypography>
         ),
-        goal: <Progress color="success" value={100} />,
+        // goal: <Progress color="success" value={100} />,
+        goal: "< 10 %",
         action: (
           <MDTypography component="a" href="#" color="text">
             <Icon>more_vert</Icon>

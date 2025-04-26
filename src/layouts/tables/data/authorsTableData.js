@@ -31,11 +31,16 @@ export default function data() {
   return {
     columns: [
       { Header: "Cow ID number", accessor: "cow_id", align: "left" },
-      { Header: "Vaccination", accessor: "vaccination_date", align: "left" },
-      { Header: "Udder health", accessor: "udder_health", align: "center" },
+      { Header: "Date of Birth", accessor: "date_of_birth", align: "left" },
       { Header: "Body Condition Score", accessor: "body_condition_score", align: "center" },
-      { Header: "Deworming", accessor: "deworming_date", align: "center" },
-      { Header: "Farm Owner", accessor: "owner_name", align: "left" },
+      { Header: "Vaccination Date", accessor: "vaccination_date", align: "left" },
+      { Header: "Deworming Date", accessor: "deworming_date", align: "center" },
+      // { Header: "Udder health", accessor: "udder_health", align: "center" },
+      { Header: "Mastitis", accessor: "mastitis", align: "center" },
+      { Header: "Reproductive Health", accessor: "reproductive_health", align: "center" },
+      { Header: "Lameness", accessor: "lameness", align: "center" },
+      { Header: "General Health", accessor: "general_health", align: "center" },
+      // { Header: "Farm Owner", accessor: "owner_name", align: "left" },
     ],
   };
 }

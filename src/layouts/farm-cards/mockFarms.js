@@ -17,6 +17,18 @@ const mockFarms = [
     totalCows: 28,
     image: "/images/farm-cards/image-3.jpg",
   },
+  {
+    id: "28",
+    name: "Yemane Abdi",
+    totalCows: "6",
+    image: "/images/farm-cards/image-2.jpg",
+  },
+  {
+    id: "3",
+    name: "Aster  Kebede",
+    totalCows: "26",
+    image: "/images/farm-cards/image-2.jpg",
+  },
 ];
 
 export default mockFarms;

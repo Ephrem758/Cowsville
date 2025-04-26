@@ -78,7 +78,7 @@ export default function data() {
         width: "10%",
         align: "left",
       },
-      { Header: "Lactation No", accessor: "lactation_number", align: "center" },
+      { Header: "Parity", accessor: "parity", align: "center" },
       { Header: "Last insemination date", accessor: "last_date_insemination", align: "center" },
     ],
   };

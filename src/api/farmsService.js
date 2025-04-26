@@ -34,19 +34,37 @@ export const getCows = async (farmId = null) => {
   }
 };
 
-export const getDoctorAssessments = async () => {
+export const getDoctorAssessments = async (farmId = null, cowId = null) => {
   try {
-    const response = await axios.get("http://localhost:8000/api/cows/doctor_assessment/");
-    return response.data; // Returns all cow assessments
+    const params = {};
+    if (farmId) params.farm_id = farmId; // Required parameter
+    if (cowId) params.cow_id = cowId; // Optional parameter
+
+    const response = await axios.get("http://localhost:8000/api/medical-assessments/", { params });
+    return response.data.results || []; // Adjust based on your API response
   } catch (error) {
     console.error("Error fetching doctor assessments:", error);
     return [];
   }
 };
 
+// export const getDoctorAssessments = async (farmId = null, cowId = null) => {
+//   try {
+//     const params = {};
+//     if (farmId) params.farm_id = farmId; // Required parameter
+//     if (cowId) params.cow_id = cowId;
+
+//     const response = await axios.get("http://localhost:8000/api/cows/medical_records/", { params });
+//     return response.data.results || []; // Adjust based on actual API response
+//   } catch (error) {
+//     console.error("Error fetching medical records:", error);
+//     return [];
+//   }
+// };
+
 export const getCowHeatSign = async (farmId, cowId) => {
   try {
-    const response = await axios.post("http://localhost:8000/api/cows/record_heat_sign/", {
+    const response = await axios.get("http://localhost:8000/api/cows/record_heat_sign/", {
       farm_id: farmId,
       cow_id: cowId,
     });
@@ -108,7 +126,7 @@ export const getMonitorBirthData = async (farmId = null) => {
 
 export const getHeatSignData = async (farmId = null) => {
   try {
-    const response = await axios.post(`${COW_API_URL}record_heat_sign/`, {
+    const response = await axios.get(`${COW_API_URL}heat_sign_records/`, {
       farm_id: farmId || "ALL", // Use "ALL" for bulk data
       cow_id: "ALL",
     });
@@ -121,7 +139,7 @@ export const getHeatSignData = async (farmId = null) => {
 
 export const getInseminationCountData = async (farmId = null) => {
   try {
-    const response = await axios.post(`${COW_API_URL}monitor_heat_sign/`, {
+    const response = await axios.get(`${COW_API_URL}monitor_heat_sign/`, {
       farm_id: farmId || "ALL", // Use "ALL" for bulk data
       cow_id: "ALL",
     });
@@ -132,15 +150,30 @@ export const getInseminationCountData = async (farmId = null) => {
   }
 };
 
-export const getMonitorPregnancyData = async (farmId = null) => {
+// export const getMonitorPregnancyData = async (farmId = null) => {
+//   try {
+//     const response = await axios.post(`${COW_API_URL}monitor_pregnancy/`, {
+//       farm_id: farmId || "ALL", // Use "ALL" for bulk data
+//       cow_id: "ALL",
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching pregnancy data:", error);
+//     return [];
+//   }
+// };
+export const getMonitorPregnancyData = async (farmId = null, cowId = null) => {
   try {
-    const response = await axios.post(`${COW_API_URL}monitor_pregnancy/`, {
-      farm_id: farmId || "ALL", // Use "ALL" for bulk data
-      cow_id: "ALL",
+    const params = {};
+    if (farmId) params.farm_id = farmId;
+    if (cowId) params.cow_id = cowId;
+
+    const response = await axios.get("http://localhost:8000/api/cows/pregnancy_records/", {
+      params,
     });
-    return response.data;
+    return response.data.results || []; // Adjust based on API response
   } catch (error) {
-    console.error("Error fetching pregnancy data:", error);
+    console.error("Error fetching pregnancy records:", error);
     return [];
   }
 };
