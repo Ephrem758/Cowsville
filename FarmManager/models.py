@@ -173,7 +173,7 @@ class Cow(SoftDeleteModel):
     breed = models.ForeignKey(BreedType, on_delete=models.PROTECT, related_name="cows")
 
     # Demographics
-    age_in_days = models.PositiveIntegerField()
+    date_of_birth = models.DateField(null=True, blank=True)
     sex = models.CharField(max_length=1, choices=Gender.choices)
 
     # Health Metrics
@@ -364,6 +364,7 @@ class MedicalAssessment(SoftDeleteModel):
     general_health = models.ForeignKey(GeneralHealthStatus, on_delete=models.PROTECT)
     udder_health = models.ForeignKey(UdderHealthStatus, on_delete=models.PROTECT)
     mastitis = models.ForeignKey(MastitisStatus, on_delete=models.PROTECT)
+    has_lameness = models.BooleanField(default=False, help_text=_("Whether the cow shows signs of lameness"))
     body_condition_score = models.IntegerField()
     reproductive_health = models.TextField()
     metabolic_disease = models.TextField(blank=True)

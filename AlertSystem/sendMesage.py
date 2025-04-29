@@ -9,9 +9,10 @@ load_dotenv()
 # Get API token from .env
 API_TOKEN = os.getenv("AFROMESSAGE_API_TOKEN")
 
-# Ensure token is available
+# Development mode - don't require API token
 if not API_TOKEN:
-    raise ValueError("ERROR: Missing AFROMESSAGE_API_TOKEN in .env file!")
+    logging.warning("⚠️ Development mode: AFROMESSAGE_API_TOKEN not set. SMS sending is disabled.")
+    API_TOKEN = "development_token"
 
 # API Details
 BASE_URL = "https://api.afromessage.com/api/send"
@@ -29,6 +30,11 @@ def send_alert(phone_number, message):
     :param message: The message content to send.
     :return: API response or error message.
     """
+    # In development mode, just log the message instead of sending it
+    if API_TOKEN == "development_token":
+        logging.info(f"📱 [DEV MODE] Would send SMS to {phone_number}: {message}")
+        return {"status": "success", "response": {"acknowledge": "success", "message": "Development mode - no actual SMS sent"}}
+
     try:
         # Construct the request URL
         params = {

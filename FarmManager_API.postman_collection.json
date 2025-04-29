@@ -1,28 +1,32 @@
 {
   "info": {
     "name": "Farm Manager API",
-    "description": "Complete API documentation for Farm Management System. Includes endpoints for farm management, cow tracking, medical assessments, and more.",
+    "description": "API collection for Farm Manager System",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
       "name": "Farms",
-      "description": "Endpoints for managing farms and their details",
       "item": [
         {
           "name": "List Farms",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/farms/",
-            "description": "Get all registered farms. Can be filtered by farm_id, owner_name, or address. Returns basic farm information including assigned doctor and inseminator."
+            "url": "{{base_url}}/farms/",
+            "query": [
+              {
+                "key": "search",
+                "value": "",
+                "description": "Search farms by ID, owner name, or address"
+              }
+            ]
           }
         },
         {
           "name": "Create Farm",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/farms/",
-            "description": "Register a new farm in the system. Requires farm identification, owner details, and farm infrastructure information. Optional: can assign doctor and inseminator during creation.",
+            "url": "{{base_url}}/farms/",
             "body": {
               "mode": "raw",
               "raw": {
@@ -30,12 +34,18 @@
                 "owner_name": "John Doe",
                 "address": "Addis Ababa",
                 "telephone_number": "+251912345678",
+                "fertility_camp_no": 1,
+                "total_number_of_cows": 10,
+                "number_of_calves": 2,
+                "number_of_milking_cows": 5,
+                "total_daily_milk": 100,
                 "type_of_housing": 1,
                 "type_of_floor": 1,
+                "main_feed": "Grass and hay",
+                "rate_of_cow_feeding": 1,
                 "source_of_water": 1,
-                "feeding_frequency": 1,
-                "inseminator": 1,
-                "doctor": 1
+                "rate_of_water_giving": 1,
+                "farm_hygiene_score": 3
               }
             }
           }
@@ -44,7 +54,7 @@
           "name": "Change Farm's Doctor",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/farms/{farm_id}/change_doctor/",
+            "url": "{{base_url}}/farms/{{farm_id}}/change_doctor/",
             "body": {
               "mode": "raw",
               "raw": {
@@ -62,11 +72,22 @@
           "name": "List Cows",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/cows/",
+            "url": "{{base_url}}/cows/",
             "query": [
               {
                 "key": "farm_id",
-                "value": "FARM001"
+                "value": "{{farm_id}}",
+                "description": "Filter by farm ID"
+              },
+              {
+                "key": "breed",
+                "value": "",
+                "description": "Filter by breed type"
+              },
+              {
+                "key": "search",
+                "value": "",
+                "description": "Search by cow ID or breed name"
               }
             ]
           }
@@ -75,36 +96,75 @@
           "name": "Create Cow",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/cows/",
+            "url": "{{base_url}}/cows/",
             "body": {
               "mode": "raw",
               "raw": {
-                "farm": "FARM001",
-                "cow_id": "COW001",
-                "breed": 1,
+                "is_deleted": false,
+                "cow_id": "01",
                 "age_in_days": 730,
                 "sex": "F",
+                "parity": 2,
                 "body_weight": 450.5,
                 "bcs": 3.5,
-                "gynecological_status": 1,
                 "lactation_number": 2,
-                "average_daily_milk": 25.5
+                "days_in_milk": 100,
+                "average_daily_milk": 25.5,
+                "cow_inseminated_before": true,
+                "last_date_insemination": "2025-03-11",
+                "number_of_inseminations": 2,
+                "id_or_breed_bull_used": "HF-BULL-001",
+                "last_calving_date": "2025-03-11",
+                "farm": "01",
+                "breed": 1,
+                "gynecological_status": 1
               }
             }
+          }
+        },
+        {
+          "name": "Get Cows by Farm",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cows/by_farm/",
+            "query": [
+              {
+                "key": "farm_id",
+                "value": "{{farm_id}}",
+                "description": "The ID of the farm to filter cows"
+              }
+            ]
           }
         },
         {
           "name": "Record Heat Sign",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/cows/record_heat_sign/",
-            "description": "Record heat signs for a cow and notify relevant parties",
+            "url": "{{base_url}}/cows/record_heat_sign/",
             "body": {
               "mode": "raw",
               "raw": {
-                "farm_id": "FARM001",
-                "cow_id": "COW001",
+                "farm_id": "{{farm_id}}",
+                "cow_id": "{{cow_id}}",
                 "heat_signs": "Mounting behavior, Restlessness"
+              }
+            }
+          }
+        },
+        {
+          "name": "Monitor Heat Sign",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/cows/monitor_heat_sign/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "{{farm_id}}",
+                "cow_id": "{{cow_id}}",
+                "is_inseminated": true,
+                "date_of_insemination": "2024-03-21",
+                "insemination_count": 2,
+                "lactation_number": 3
               }
             }
           }
@@ -113,30 +173,127 @@
           "name": "Monitor Pregnancy",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/cows/monitor_pregnancy/",
-            "description": "Record or update pregnancy monitoring information",
+            "url": "{{base_url}}/cows/monitor_pregnancy/",
             "body": {
               "mode": "raw",
               "raw": {
-                "farm_id": "FARM001",
-                "cow_id": "COW001",
-                "is_pregnant": true,
-                "lactation_number": 2
+                "farm_id": "{{farm_id}}",
+                "cow_id": "{{cow_id}}",
+                "pregnancy_date": "2024-03-21",
+                "service_per_conception": 2,
+                "lactation_number": 3
               }
             }
-          },
-          "response": [
+          }
+        },
+        {
+          "name": "Monitor Birth",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/cows/monitor_birth/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "{{farm_id}}",
+                "cow_id": "{{cow_id}}",
+                "calving_date": "2024-03-21",
+                "last_calving_date": "2023-03-21",
+                "calf_sex": "M"
+              }
+            }
+          }
+        },
+        {
+          "name": "Get Records",
+          "item": [
             {
-              "status": "200 OK",
-              "body": {
-                "message": "Pregnancy monitoring record updated successfully",
-                "cow_id": "COW001",
-                "farm_id": "FARM001",
-                "is_pregnant": true,
-                "lactation_number": 2
+              "name": "Pregnancy Records",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/cows/pregnancy_records/",
+                "query": [
+                  {
+                    "key": "farm_id",
+                    "value": "{{farm_id}}"
+                  },
+                  {
+                    "key": "cow_id",
+                    "value": "{{cow_id}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Birth Records",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/cows/birth_records/",
+                "query": [
+                  {
+                    "key": "farm_id",
+                    "value": "{{farm_id}}"
+                  },
+                  {
+                    "key": "cow_id",
+                    "value": "{{cow_id}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Heat Sign Records",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/cows/heat_sign_records/",
+                "query": [
+                  {
+                    "key": "farm_id",
+                    "value": "{{farm_id}}"
+                  },
+                  {
+                    "key": "cow_id",
+                    "value": "{{cow_id}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Medical Records",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/cows/medical_records/",
+                "query": [
+                  {
+                    "key": "farm_id",
+                    "value": "{{farm_id}}"
+                  },
+                  {
+                    "key": "cow_id",
+                    "value": "{{cow_id}}"
+                  },
+                  {
+                    "key": "type",
+                    "value": "all"
+                  }
+                ]
               }
             }
           ]
+        },
+        {
+          "name": "Farmer Medical Assessment",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/cows/farmer_medical_assessment/",
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "farm_id": "{{farm_id}}",
+                "cow_id": "{{cow_id}}",
+                "sickness_description": "Reduced appetite and lethargy"
+              }
+            }
+          }
         }
       ]
     },
@@ -443,25 +600,6 @@
       "description": "Endpoints for tracking heat signs and insemination records",
       "item": [
         {
-          "name": "Monitor Heat Sign",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/cows/monitor_heat_sign/",
-            "description": "Record heat sign monitoring by inseminator. Tracks insemination details, updates reproduction records, and sends notifications to relevant parties. Important for breeding management.",
-            "body": {
-              "mode": "raw",
-              "raw": {
-                "farm_id": "1",
-                "cow_id": "8620",
-                "is_inseminated": true,
-                "insemination_time": "14:30",
-                "insemination_count": 2,
-                "lactation_number": 3
-              }
-            }
-          }
-        },
-        {
           "name": "List Insemination Records",
           "request": {
             "method": "GET",
@@ -475,29 +613,6 @@
               {
                 "key": "cow_id",
                 "value": "8620"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Messages",
-      "item": [
-        {
-          "name": "List Messages",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/messages/",
-            "description": "Get all messages",
-            "query": [
-              {
-                "key": "farm_id",
-                "value": "1"
-              },
-              {
-                "key": "message_type",
-                "value": "health_alert"
               }
             ]
           }

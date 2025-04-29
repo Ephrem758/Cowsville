@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.utils.timezone import now, timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from django_filters.rest_framework import DjangoFilterBackend
 
 from AlertSystem.sendMesage import send_alert
 from .models import (
@@ -244,7 +245,7 @@ class FarmViewSet(viewsets.ModelViewSet):
 class CowViewSet(viewsets.ModelViewSet):
     queryset = Cow.objects.all()
     serializer_class = CowSerializer
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ["cow_id", "breed__name"]
     logger = logging.getLogger(__name__)
     filterset_fields = ['farm_id']
@@ -368,6 +369,7 @@ class CowViewSet(viewsets.ModelViewSet):
                     general_health=general_health,
                     udder_health=udder_health,
                     mastitis=mastitis,
+                    has_lameness=serializer.validated_data.get('has_lameness', False),
                     body_condition_score=int(cow.bcs),
                     reproductive_health=serializer.validated_data.get('reproductive_health', 'Normal'),
                     metabolic_disease=serializer.validated_data.get('metabolic_disease', 'Normal'),
@@ -713,6 +715,7 @@ class CowViewSet(viewsets.ModelViewSet):
                     f"Cow: {cow.cow_id}\n"
                     f"Doctor: Dr. {doctor.name}\n"
                     f"Health Status: {'Sick' if validated_data['is_cow_sick'] else 'Healthy'}\n"
+                    f"Lameness: {'Yes' if validated_data.get('has_lameness', False) else 'No'}\n"
                     f"Diagnosis: {validated_data.get('diagnosis', 'N/A')}\n"
                     f"Treatment: {validated_data.get('treatment', 'N/A')}"
                 )
@@ -999,6 +1002,7 @@ class CowViewSet(viewsets.ModelViewSet):
                     'farm_id': record.farm.farm_id,
                     'cow_id': record.cow.cow_id,
                     'heat_sign_start': record.heat_sign_start,
+                    'heat_signs_seen': record.heat_signs_seen,
                     'heat_sign_recorded_at': record.heat_sign_recorded_at,
                 })
 
@@ -1070,6 +1074,7 @@ class CowViewSet(viewsets.ModelViewSet):
                     'general_health': assessment.general_health.name,
                     'udder_health': assessment.udder_health.name,
                     'mastitis': assessment.mastitis.name,
+                    'has_lameness': assessment.has_lameness,
                     'body_condition_score': assessment.body_condition_score,
                     'reproductive_health': assessment.reproductive_health,
                     'metabolic_disease': assessment.metabolic_disease,

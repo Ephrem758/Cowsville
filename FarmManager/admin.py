@@ -35,7 +35,7 @@ class FarmAdmin(admin.ModelAdmin):
 
 @admin.register(Cow)
 class CowAdmin(admin.ModelAdmin):
-    list_display = ("cow_id", "farm", "breed", "age_in_days", "sex")
+    list_display = ("cow_id", "farm", "breed", "date_of_birth", "sex")
     search_fields = ("cow_id", "farm__farm_id")
     list_filter = ("breed", "sex", "gynecological_status")
 

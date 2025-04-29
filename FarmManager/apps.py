@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 import os
+import sys
 
 
 class FarmManagerConfig(AppConfig):
@@ -7,7 +8,15 @@ class FarmManagerConfig(AppConfig):
     name = "FarmManager"
 
     def ready(self):
-        if os.environ.get("RUN_MAIN", None) != "true":  # Avoid duplicate schedulers
-            from AlertSystem import updater
-
-            updater.start()
+        # Check if running a management command like migrate or makemigrations
+        is_management_command = any(
+            cmd in sys.argv for cmd in ['makemigrations', 'migrate', 'showmigrations']
+        )
+        
+        if os.environ.get("RUN_MAIN", None) != "true" and not is_management_command:
+            try:
+                from AlertSystem import updater
+                updater.start()
+            except Exception as e:
+                # Handle potential errors during updater start, e.g., missing dependencies
+                print(f"Warning: Could not start AlertSystem updater: {e}")

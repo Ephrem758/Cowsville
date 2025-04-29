@@ -351,3 +351,401 @@ Traceback (most recent call last):
   File "C:\Users\Samuel Girma Megra\Desktop\Cowsville\myenv\Lib\site-packages\rest_framework\serializers.py", line 231, in is_valid
     raise ValidationError(self.errors)
 rest_framework.exceptions.ValidationError: {'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'lactation_no': [ErrorDetail(string='A valid integer is required.', code='invalid')]}
+INFO 2025-04-28 20:22:25,508 views Received cow list request with query params: <QueryDict: {}>
+ERROR 2025-04-28 20:22:25,511 views Error listing cows: no such column: FarmManager_cow.date_of_birth
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: FarmManager_cow.date_of_birth
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 289, in list
+    response = super().list(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+                                                   ^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 384, in __iter__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1935, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1622, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such column: FarmManager_cow.date_of_birth
+INFO 2025-04-28 20:47:08,226 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-04-28 20:47:08,234 views Successfully retrieved 2 cows
+INFO 2025-04-28 21:02:23,567 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-04-28 21:02:23,575 views Successfully retrieved 2 cows
+INFO 2025-04-28 21:06:59,771 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-04-28 21:06:59,777 views Successfully retrieved 2 cows
+INFO 2025-04-29 04:43:45,110 views Received cow list request with query params: <QueryDict: {}>
+ERROR 2025-04-29 04:43:45,118 views Error listing cows: The field 'inseminated_before' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 289, in list
+    response = super().list(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 525, in to_representation
+    for field in fields:
+                 ^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 386, in _readable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 374, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1081, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1177, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'inseminated_before' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+INFO 2025-04-29 04:47:16,669 views Received cow list request with query params: <QueryDict: {}>
+ERROR 2025-04-29 04:47:16,677 views Error listing cows: The field 'other_breed' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 289, in list
+    response = super().list(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 525, in to_representation
+    for field in fields:
+                 ^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 386, in _readable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 374, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1081, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1177, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'other_breed' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+INFO 2025-04-29 04:47:19,468 views Received cow list request with query params: <QueryDict: {}>
+ERROR 2025-04-29 04:47:19,473 views Error listing cows: The field 'other_breed' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 289, in list
+    response = super().list(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 525, in to_representation
+    for field in fields:
+                 ^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 386, in _readable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 374, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1081, in get_fields
+    field_names = self.get_field_names(declared_fields, info)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1177, in get_field_names
+    assert field_name in fields, (
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: The field 'other_breed' was declared on serializer CowSerializer, but has not been included in the 'fields' option.
+INFO 2025-04-29 04:49:58,957 views Received cow list request with query params: <QueryDict: {}>
+ERROR 2025-04-29 04:49:58,964 views Error listing cows: Got AttributeError when attempting to get a value for field `udder_health` on serializer `CowSerializer`.
+The serializer field might be named incorrectly and not match any attribute or key on the `Cow` instance.
+Original exception text was: 'Cow' object has no attribute 'udder_health_status'.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 437, in get_attribute
+    return get_attribute(instance, self.source_attrs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 104, in get_attribute
+    instance = getattr(instance, attr)
+AttributeError: 'Cow' object has no attribute 'udder_health_status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 289, in list
+    response = super().list(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 527, in to_representation
+    attribute = field.get_attribute(instance)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/relations.py", line 189, in get_attribute
+    return super().get_attribute(instance)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 470, in get_attribute
+    raise type(exc)(msg)
+AttributeError: Got AttributeError when attempting to get a value for field `udder_health` on serializer `CowSerializer`.
+The serializer field might be named incorrectly and not match any attribute or key on the `Cow` instance.
+Original exception text was: 'Cow' object has no attribute 'udder_health_status'.
+INFO 2025-04-29 04:51:19,105 views Received cow list request with query params: <QueryDict: {}>
+ERROR 2025-04-29 04:51:19,112 views Error listing cows: Got AttributeError when attempting to get a value for field `udder_health` on serializer `CowSerializer`.
+The serializer field might be named incorrectly and not match any attribute or key on the `Cow` instance.
+Original exception text was: 'Cow' object has no attribute 'udder_health'.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 437, in get_attribute
+    return get_attribute(instance, self.source_attrs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 104, in get_attribute
+    instance = getattr(instance, attr)
+AttributeError: 'Cow' object has no attribute 'udder_health'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 289, in list
+    response = super().list(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 527, in to_representation
+    attribute = field.get_attribute(instance)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/relations.py", line 189, in get_attribute
+    return super().get_attribute(instance)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 470, in get_attribute
+    raise type(exc)(msg)
+AttributeError: Got AttributeError when attempting to get a value for field `udder_health` on serializer `CowSerializer`.
+The serializer field might be named incorrectly and not match any attribute or key on the `Cow` instance.
+Original exception text was: 'Cow' object has no attribute 'udder_health'.
+INFO 2025-04-29 04:51:20,602 views Received cow list request with query params: <QueryDict: {}>
+ERROR 2025-04-29 04:51:20,607 views Error listing cows: Got AttributeError when attempting to get a value for field `udder_health` on serializer `CowSerializer`.
+The serializer field might be named incorrectly and not match any attribute or key on the `Cow` instance.
+Original exception text was: 'Cow' object has no attribute 'udder_health'.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 437, in get_attribute
+    return get_attribute(instance, self.source_attrs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 104, in get_attribute
+    instance = getattr(instance, attr)
+AttributeError: 'Cow' object has no attribute 'udder_health'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 289, in list
+    response = super().list(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 46, in list
+    return Response(serializer.data)
+                    ^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 797, in data
+    ret = super().data
+          ^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 251, in data
+    self._data = self.to_representation(self.instance)
+                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 716, in to_representation
+    self.child.to_representation(item) for item in iterable
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 527, in to_representation
+    attribute = field.get_attribute(instance)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/relations.py", line 189, in get_attribute
+    return super().get_attribute(instance)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 470, in get_attribute
+    raise type(exc)(msg)
+AttributeError: Got AttributeError when attempting to get a value for field `udder_health` on serializer `CowSerializer`.
+The serializer field might be named incorrectly and not match any attribute or key on the `Cow` instance.
+Original exception text was: 'Cow' object has no attribute 'udder_health'.
+INFO 2025-04-29 04:56:17,315 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-04-29 04:56:17,323 views Successfully retrieved 2 cows
+INFO 2025-04-29 05:06:21,351 views Received heat sign recording request
+WARNING 2025-04-29 05:06:21,353 views Invalid data for heat sign recording: {'farm_id': [ErrorDetail(string='This field is required.', code='required')], 'heat_start_time': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-04-29 05:06:56,890 views Received heat sign recording request
+WARNING 2025-04-29 05:06:56,900 views Invalid data for heat sign recording: {'heat_start_time': [ErrorDetail(string='Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].', code='invalid')]}
+INFO 2025-04-29 05:07:13,696 views Received heat sign recording request
+WARNING 2025-04-29 05:07:13,703 views Invalid data for heat sign recording: {'non_field_errors': [ErrorDetail(string='Cow 1 not found in farm FARM001', code='invalid')]}
+INFO 2025-04-29 05:07:20,335 views Received heat sign recording request
+WARNING 2025-04-29 05:07:20,337 views Invalid data for heat sign recording: {'non_field_errors': [ErrorDetail(string='Cow 01 not found in farm FARM001', code='invalid')]}
+INFO 2025-04-29 05:07:43,677 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-04-29 05:07:43,685 views Successfully retrieved 2 cows
+INFO 2025-04-29 05:08:00,616 views Received heat sign recording request
+INFO 2025-04-29 05:08:00,620 views Recording heat sign for cow 2 from farm FARM001
+INFO 2025-04-29 05:08:00,620 views Creating or updating reproduction record for cow 2 from farm FARM001
+INFO 2025-04-29 05:08:00,623 views Successfully created or updated reproduction record for cow 2 from farm FARM001
+INFO 2025-04-29 05:08:00,623 views Successfully sent insemination alert to inseminator
+INFO 2025-04-29 05:08:00,624 views Successfully sent insemination alert to farmer
+INFO 2025-04-29 05:08:00,624 views Successfully recorded heat sign for cow 2 from farm FARM001
+INFO 2025-04-29 05:08:16,596 views Received cow retrieve request for cow heat_sign_record
+ERROR 2025-04-29 05:08:16,598 views Error retrieving cow heat_sign_record: 
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/fields/__init__.py", line 2128, in get_prep_value
+    return int(value)
+ValueError: invalid literal for int() with base 10: 'heat_sign_record'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 19, in get_object_or_404
+    return _get_object_or_404(queryset, *filter_args, **filter_kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/shortcuts.py", line 90, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 619, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1481, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1499, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1506, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1643, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1675, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1585, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1412, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/lookups.py", line 38, in __init__
+    self.rhs = self.get_prep_lookup()
+               ~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/lookups.py", line 410, in get_prep_lookup
+    return super().get_prep_lookup()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/lookups.py", line 96, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/fields/__init__.py", line 2130, in get_prep_value
+    raise e.__class__(
+        "Field '%s' expected a number but got %r." % (self.name, value),
+    ) from e
+ValueError: Field 'id' expected a number but got 'heat_sign_record'.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 300, in retrieve
+    response = super().retrieve(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 54, in retrieve
+    instance = self.get_object()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 100, in get_object
+    obj = get_object_or_404(queryset, **filter_kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/generics.py", line 21, in get_object_or_404
+    raise Http404
+django.http.response.Http404
+WARNING 2025-04-29 05:11:46,766 views Invalid pregnancy monitoring data: {'farm_id': [ErrorDetail(string='This field is required.', code='required')], 'cow_id': [ErrorDetail(string='This field may not be blank.', code='blank')], 'pregnancy_date': [ErrorDetail(string='This field is required.', code='required')], 'days_until_calving': [ErrorDetail(string='This field is required.', code='required')], 'service_per_conception': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='A valid integer is required.', code='invalid')]}
+INFO 2025-04-29 05:12:09,720 views Successfully updated pregnancy status for cow 2
+WARNING 2025-04-29 05:13:41,055 views Invalid birth monitoring data: {'farm_id': [ErrorDetail(string='This field is required.', code='required')], 'cow_id': [ErrorDetail(string='This field may not be blank.', code='blank')], 'calving_date': [ErrorDetail(string='This field is required.', code='required')], 'last_calving_date': [ErrorDetail(string='Date has wrong format. Use one of these formats instead: YYYY-MM-DD.', code='invalid')], 'calf_sex': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-04-29 05:14:01,436 views Successfully recorded birth event for cow 2
+INFO 2025-04-29 05:15:14,211 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-04-29 05:15:14,222 views Successfully retrieved 2 cows
+INFO 2025-04-29 05:16:41,054 views Received cow list request with query params: <QueryDict: {'farm_id': ['FARM001']}>
+INFO 2025-04-29 05:16:41,061 views Successfully retrieved 2 cows
+INFO 2025-04-29 05:16:47,303 views Received cow list request with query params: <QueryDict: {'farm_id': ['FARM001']}>
+INFO 2025-04-29 05:16:47,311 views Successfully retrieved 2 cows
+INFO 2025-04-29 05:16:52,006 views Received cow list request with query params: <QueryDict: {'farm_id': ['FARM001']}>
+INFO 2025-04-29 05:16:52,017 views Successfully retrieved 2 cows
+INFO 2025-04-29 05:21:23,714 views Received cow list request with query params: <QueryDict: {'farm_id': ['FARM001']}>
+INFO 2025-04-29 05:21:23,719 views Successfully retrieved 1 cows
+INFO 2025-04-29 05:23:25,909 views Received cow list request with query params: <QueryDict: {'farm_id': ['FARM001']}>
+INFO 2025-04-29 05:23:25,918 views Successfully retrieved 1 cows
+INFO 2025-04-29 05:24:15,400 views Received cow list request with query params: <QueryDict: {'farm_id': ['1']}>
+INFO 2025-04-29 05:24:15,407 views Successfully retrieved 1 cows
