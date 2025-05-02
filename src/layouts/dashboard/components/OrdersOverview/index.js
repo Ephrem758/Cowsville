@@ -21,9 +21,9 @@ function OrdersOverview({ cow }) {
             </MDTypography>
             &nbsp;
             <MDTypography variant="button" color="text" fontWeight="medium">
-              {cow?.insemination_number || "0"} inseminations
+              {cow?.number_of_inseminations || "0"} inseminations
             </MDTypography>{" "}
-            this month
+            so far
           </MDTypography>
         </MDBox>
       </MDBox>
@@ -38,25 +38,25 @@ function OrdersOverview({ cow }) {
           color="error"
           icon="inventory_2"
           title="Calving Date"
-          description={cow?.calving_date || "50"}
+          description={cow?.calving_date || "N/A"}
         />
         <TimelineItem
           color="info"
           icon="shopping_cart"
           title="Date of AI"
-          description={cow?.last_date_insemination || "2024-03-22"}
+          description={cow?.last_date_insemination || "N/A"}
         />
         <TimelineItem
           color="warning"
           icon="payment"
           title="Insemination Count"
-          description={cow?.insemination_number || "0"}
+          description={cow?.number_of_inseminations || "0"}
         />
         <TimelineItem
           color="primary"
           icon="pets"
           title="Breed"
-          description={cow?.breed || "N/A"}
+          description={cow?.breed_name || "N/A"}
           lastItem
         />
       </MDBox>
@@ -71,8 +71,8 @@ OrdersOverview.propTypes = {
     heat_signs: PropTypes.string,
     calving_date: PropTypes.string,
     last_date_insemination: PropTypes.string,
-    insemination_number: PropTypes.string,
-    breed: PropTypes.string,
+    number_of_inseminations: PropTypes.string,
+    breed_name: PropTypes.string,
   }),
 };
 

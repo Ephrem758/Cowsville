@@ -210,25 +210,25 @@ export default function averageStatisticsData(allCows = []) {
           </MDTypography>
         ),
       },
-      {
-        indicator: <Project image={LogoAsana} name="Cows return to heat within 60 days" />,
-        value: (
-          <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-            {cowsReturnToHeatWithin60Days.toFixed(2)}
-          </MDTypography>
-        ),
-        unit: (
-          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            %
-          </MDTypography>
-        ),
-        goal: <Progress color="info" value={80} />,
-        action: (
-          <MDTypography component="a" href="#" color="text">
-            <Icon>more_vert</Icon>
-          </MDTypography>
-        ),
-      },
+      // {
+      //   indicator: <Project image={LogoAsana} name="Cows return to heat within 60 days" />,
+      //   value: (
+      //     <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
+      //       {cowsReturnToHeatWithin60Days.toFixed(2)}
+      //     </MDTypography>
+      //   ),
+      //   unit: (
+      //     <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+      //       %
+      //     </MDTypography>
+      //   ),
+      //   goal: <Progress color="info" value={80} />,
+      //   action: (
+      //     <MDTypography component="a" href="#" color="text">
+      //       <Icon>more_vert</Icon>
+      //     </MDTypography>
+      //   ),
+      // },
       {
         indicator: <Project image={LogoAsana} name="No. of inseminations per conception" />,
         value: (

@@ -146,18 +146,22 @@ function Dashboard() {
           const mockCows = [
             {
               cow_id: "COW123",
-              heat_sign_time: "2024-03-21T06:00:00Z",
+              heat_sign_time: "2024-03-21T00:00:00Z",
+              // farm: { farm_id: "MOCK", owner_name: "Phos" },
               farm_id: "MOCK",
+              owner_name: "Phos Abdi",
               heat_signs: "Bellowing, Restlessness, Off-Feed",
               dalc: "5 days",
-              date_of_ai: "21 DEC 9:34 PM",
+              last_date_insemination: "21 DEC 9:34 PM",
               insemination_number: "3",
               breed: "Zebu",
+              calving_date: "21 Dec 10:15 AM",
             },
             {
               cow_id: "COW456",
               heat_sign_time: "2024-03-21T08:00:00Z",
               farm_id: "28",
+              owner_name: "Abebe Alemayehu",
               heat_signs: "Mounting, Mucus Discharge",
               dalc: "7 days",
               date_of_ai: "15 MAR 2:15 PM",
@@ -206,7 +210,7 @@ function Dashboard() {
         return;
       }
 
-      const farmId = cowDetails.farm_id; // Get the farm ID of the cow
+      const farmId = cowDetails.farm?.farm_id || cowDetails.farm_id; // Get the farm ID of the cow
 
       // Check if the current farm matches the cow's farm
       if (!selectedFarm || selectedFarm.farm_id !== farmId) {
@@ -225,18 +229,23 @@ function Dashboard() {
 
       // Fetch additional data for the cow
       const [heatSigns, inseminationCount, dateOfAI] = await Promise.all([
-        getHeatSignData(farmId, cowDetails.cow_id),
-        getInseminationCount(farmId, cowDetails.cow_id),
-        getDateOfAI(cowDetails.cow_id),
+        getHeatSignData(farmId, cowDetails.cow_id, token),
+        getInseminationCount(farmId, cowDetails.cow_id, token),
+        getDateOfAI(cowDetails.cow_id, token),
       ]);
 
       // Update the selected cow with all required fields
       setSelectedCow({
         ...cowDetails,
         heat_signs: heatSigns || "No heat signs recorded",
-        insemination_count: inseminationCount || 0,
+        number_of_inseminations: inseminationCount || foundCow.number_of_inseminations || 0,
         date_of_ai: dateOfAI || "N/A",
         breed: cowDetails.breed || "N/A",
+        // owner_name: selectedFarm?.owner_name || "Unknown",
+        heat_sign_time: heatSignTime || foundCow.heat_sign_time || "06:00",
+        last_date_insemination: dateOfAI || foundCow.last_date_insemination || "N/A",
+        breed_name: foundCow.breed_name || "N/A",
+        owner_name: cowDetails.farm?.owner_name || "N/A",
       });
 
       // Add the cow to the cows state if it doesn't already exist
@@ -332,7 +341,9 @@ function Dashboard() {
               color="info"
               onClick={async () => {
                 const foundCow = cows.find(
-                  (cow) => cow.cow_id.toLowerCase() === cowSearchInput.toLowerCase()
+                  (cow) =>
+                    cow.cow_id.toLowerCase() === cowSearchInput.toLowerCase() &&
+                    (cow.farm_id === "MOCK" || cow.farm?.farm_id === selectedFarm?.farm_id)
                 );
 
                 if (foundCow) {
@@ -360,6 +371,14 @@ function Dashboard() {
               Search
             </MDButton>
           </MDBox>
+        </MDBox>
+        {/* title */}
+        <MDBox mt={2} mb={2}>
+          <MDTypography variant="h5" fontWeight="bold" color="info">
+            {selectedCow
+              ? `Fertility Window: ${selectedCow.farm?.owner_name} Farm; COW ID = ${selectedCow.cow_id}`
+              : `Fertility Window - ${selectedFarm?.owner_name || "Farm"}`}
+          </MDTypography>
         </MDBox>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
@@ -391,7 +410,9 @@ function Dashboard() {
             <Grid item xs={12} md={6} lg={8}>
               <Projects
                 cows={
-                  selectedFarm ? cows.filter((cow) => cow.farm_id === selectedFarm.farm_id) : []
+                  selectedFarm
+                    ? cows.filter((cow) => cow.farm?.farm_id === selectedFarm.farm_id)
+                    : []
                 }
                 farm={firstFarm}
               />

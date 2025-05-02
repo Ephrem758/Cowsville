@@ -15,38 +15,51 @@ import annotationPlugin from "chartjs-plugin-annotation";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, annotationPlugin);
 
 const SimpleLineChart = ({ cow }) => {
-  // Get H from cow data or default to 6am
-  const H = cow?.heat_sign_time
-    ? (() => {
-        // Check if it's an ISO datetime string
-        if (cow.heat_sign_time.includes("T")) {
-          return parseInt(cow.heat_sign_time.split("T")[1].split(":")[0], 10);
-        }
-        // Handle simple time strings (e.g., "06:00")
-        return parseInt(cow.heat_sign_time.split(":")[0], 10);
-      })()
-    : 6;
+  // Safely derive H (hour) from cow.heat_sign_time, with robust type-checking:
+  const H = (() => {
+    const t = cow?.heat_sign_time;
+    if (!t) return 6; // fallback default
+
+    // If it's already a number (0–23), use it
+    if (typeof t === "number") {
+      return t;
+    }
+
+    // If it's a Date object, grab its hour
+    if (t instanceof Date) {
+      return t.getHours();
+    }
+
+    // If it's a string, try parsing it
+    if (typeof t === "string") {
+      // ISO timestamp?
+      if (t.includes("T")) {
+        const d = new Date(t);
+        if (!isNaN(d)) return d.getHours();
+      }
+      // HH:mm format?
+      const m = t.match(/^(\d{1,2}):\d{2}/);
+      if (m) return parseInt(m[1], 10);
+    }
+
+    // Last resort
+    return 6;
+  })();
+
   const currentTime = new Date().getHours();
 
-  // Generate labels and data
+  // Build your labels/data exactly as before
   const labels = [];
   const data = [];
-  for (let i = 0; i <= 22; i += 2) {
-    const hour = H + 6 + i; // Actual hour (H+6 to H+28)
-    const formattedHour = hour % 24; // For display
-    labels.push(`${formattedHour.toString().padStart(2, "0")}:00`);
-
-    // Conditions based on ACTUAL HOUR
-    if (hour > H + 9 && hour < H + 24) {
-      data.push(100); // Green
-    } else if (hour >= H + 24 && hour <= H + 28) {
-      data.push(50); // Yellow
-    } else {
-      data.push(50); // Yellow
-    }
+  for (let i = 0; i <= 33; i += 3) {
+    labels.push(`${i}`);
+    if (i < 6) data.push(10);
+    else if (i < 9) data.push(50);
+    else if (i < 21) data.push(100);
+    else if (i < 27) data.push(50);
+    else data.push(10);
   }
 
-  // Chart configuration
   const chartData = {
     labels,
     datasets: [
@@ -54,8 +67,14 @@ const SimpleLineChart = ({ cow }) => {
         label: "Probability",
         data,
         segment: {
-          borderColor: (ctx) => (ctx.p0.parsed.y === 100 ? "#4CAF50" : "#FFEB3B"),
-          backgroundColor: (ctx) => (ctx.p0.parsed.y === 100 ? "#4CAF5030" : "#FFEB3B30"),
+          borderColor: (ctx) => {
+            const y = ctx.p0.parsed.y;
+            return y === 100 ? "#4CAF50" : y === 50 ? "#FFEB3B" : "#FF0000";
+          },
+          backgroundColor: (ctx) => {
+            const y = ctx.p0.parsed.y;
+            return y === 100 ? "#4CAF5030" : y === 50 ? "#FFEB3B30" : "#FF000030";
+          },
         },
         fill: true,
         tension: 0.4,
@@ -63,18 +82,15 @@ const SimpleLineChart = ({ cow }) => {
     ],
   };
 
-  // Pointer logic
-  const pointerPosition =
-    labels.find((label) => {
-      const [hourStr] = label.split(":");
-      return parseInt(hourStr, 10) >= currentTime;
-    }) || labels[0];
+  const pointerPosition = labels.find((lbl) => parseInt(lbl, 10) >= currentTime) || labels[0];
 
   const chartOptions = {
     responsive: true,
     plugins: {
       legend: { display: false },
       tooltip: {
+        mode: "index",
+        intersect: false,
         callbacks: {
           label: (ctx) => `Hour: ${ctx.label}, Probability: ${ctx.parsed.y}%`,
         },
@@ -85,30 +101,38 @@ const SimpleLineChart = ({ cow }) => {
             type: "line",
             xMin: pointerPosition,
             xMax: pointerPosition,
-            borderColor: "rgba(255, 255, 255, 0.8)",
+            borderColor: "rgba(255,255,255,0.8)",
             borderWidth: 2,
-            label: {
-              content: "Now",
-              enabled: true,
-              position: "top",
-            },
+            label: { enabled: true, content: "Now", position: "top" },
           },
         },
       },
     },
     scales: {
-      x: { grid: { display: false } },
-      y: { min: 0, max: 100, ticks: { stepSize: 50 } },
+      x: {
+        title: { display: true, text: "Time of Estrus" },
+        grid: { display: false },
+        ticks: { autoSkip: false, maxRotation: 0, minRotation: 0 },
+      },
+      y: {
+        title: { display: true, text: "Likelihood of pregnancy" },
+        min: 0,
+        max: 100,
+        ticks: { stepSize: 50 },
+      },
     },
   };
 
   return <Line data={chartData} options={chartOptions} />;
 };
 
-// ADD PROP-TYPES VALIDATION
 SimpleLineChart.propTypes = {
   cow: PropTypes.shape({
-    heat_sign_time: PropTypes.string,
+    heat_sign_time: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+      PropTypes.instanceOf(Date),
+    ]),
   }),
 };
 

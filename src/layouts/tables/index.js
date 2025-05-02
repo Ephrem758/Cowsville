@@ -281,7 +281,9 @@ function Tables() {
         const mergedCows = cowsData.map((cow) => {
           // Find matching assessment for the cow
           const assessment =
-            assessments.find((a) => a.cow_id === cow.cow_id && a.farm_id === cow.farm_id) || {};
+            assessments.find(
+              (a) => a.cow_id === cow.cow_id && a.farm?.farm_id === cow.farm?.farm_id
+            ) || {};
 
           return {
             ...cow,
@@ -321,7 +323,12 @@ function Tables() {
           const mockOwner = mockCows[0]?.owner_name || "Unknown";
           setOwnerName(mockOwner);
         } else {
-          const mockCowsForFarm = mockCows.filter((cow) => cow.farm_id === tableSearchQuery);
+          // const mockCowsForFarm = mockCows.filter((cow) => cow.farm?.farm_id === tableSearchQuery);
+          const mockCowsForFarm = mockCows.filter(
+            (cow) =>
+              cow.farm_id === tableSearchQuery || // Mock cow (flat farm_id)
+              cow.farm?.farm_id === tableSearchQuery // Backend cow (nested farm)
+          );
           const mergedOwner = farms.find((farm) => farm.farm_id === tableSearchQuery)?.owner_name;
 
           // Set owner name from mockCows or farms
@@ -362,6 +369,7 @@ function Tables() {
 
           // owner_name: farms.find((farm) => farm.farm_id === cow.farm_id)?.owner_name || "N/A",
           owner_name:
+            cow.farm?.owner_name ||
             // Use mock farm owner if available, else fallback to backend farms
             mockCows.find((farm) => farm.farm_id === cow.farm_id)?.owner_name ||
             farms.find((farm) => farm.farm_id === cow.farm_id)?.owner_name ||
