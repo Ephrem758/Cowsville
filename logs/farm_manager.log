@@ -749,3 +749,472 @@ INFO 2025-04-29 05:23:25,909 views Received cow list request with query params: 
 INFO 2025-04-29 05:23:25,918 views Successfully retrieved 1 cows
 INFO 2025-04-29 05:24:15,400 views Received cow list request with query params: <QueryDict: {'farm_id': ['1']}>
 INFO 2025-04-29 05:24:15,407 views Successfully retrieved 1 cows
+INFO 2025-05-09 06:31:57,025 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-05-09 06:31:57,051 views Successfully retrieved 2 cows
+INFO 2025-05-09 06:32:01,899 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-05-09 06:32:01,900 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-05-09 06:32:01,928 views Successfully retrieved 2 cows
+INFO 2025-05-09 06:32:01,928 views Successfully retrieved 2 cows
+INFO 2025-05-09 06:32:02,571 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-05-09 06:32:02,578 views Successfully retrieved 2 cows
+INFO 2025-05-09 06:32:02,691 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-05-09 06:32:02,698 views Successfully retrieved 2 cows
+INFO 2025-05-09 06:32:12,141 views Received cow creation request with data: {'_id': 460962080, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id': '1', 'cow_id': '1', 'breed': 'hf', 'cow_age': '250', 'sex': 'milking', 'parity': '2', 'body_weight': '25.0', 'bcs': '3', 'gyn_status': 'abortion', 'lactation_no': '3.5', 'milk_days': '250', 'daily_milk': '25.0', 'inseminated_before': 'yes', 'ai_date': '2025-04-09', 'insemination_no': '3', 'sire_breed': '12', 'after_calving': '25', 'is_pregnant': 'yes', 'until_claving': '25', 'nsc': '25', 'udder_health': '4qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'dystocia', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-04-17', 'vaccination_type': '7sjs', 'deworming': 'yes', 'deworming_date': '2025-04-09', 'deworming_type': 'Ysz', '__version__': 'vqUW3wKh35WQk97mirF844', 'meta/instanceID': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'f37ba2f7-6d62-4329-91e6-e86e1fff1d6a', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-04-09T07:47:00', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'meta/rootUuid': 'uuid:f37ba2f7-6d62-4329-91e6-e86e1fff1d6a'}
+ERROR 2025-05-09 06:32:12,144 views Error creating cow: {'sex': [ErrorDetail(string='"milking" is not a valid choice.', code='invalid_choice')], 'bcs': [ErrorDetail(string='"3" is not a valid choice.', code='invalid_choice')], 'average_daily_milk': [ErrorDetail(string='This field is required.', code='required')], 'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'gynecological_status': [ErrorDetail(string='This field is required.', code='required')]}
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 257, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 233, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'sex': [ErrorDetail(string='"milking" is not a valid choice.', code='invalid_choice')], 'bcs': [ErrorDetail(string='"3" is not a valid choice.', code='invalid_choice')], 'average_daily_milk': [ErrorDetail(string='This field is required.', code='required')], 'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'gynecological_status': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-09 06:47:56,530 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 06:47:56,536 views Error creating cow: {'cow_id': [ErrorDetail(string='This field is required.', code='required')], 'bcs': [ErrorDetail(string='"2" is not a valid choice.', code='invalid_choice')], 'lactation_number': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'gynecological_status': [ErrorDetail(string='This field is required.', code='required')]}
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 257, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 233, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'cow_id': [ErrorDetail(string='This field is required.', code='required')], 'bcs': [ErrorDetail(string='"2" is not a valid choice.', code='invalid_choice')], 'lactation_number': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'breed': [ErrorDetail(string='Incorrect type. Expected pk value, received str.', code='incorrect_type')], 'gynecological_status': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-09 06:58:38,329 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 06:58:38,332 views Error creating cow: Field name `reproductive_health` is not valid for model `Cow` in `FarmManager.serializers.CowCreateUpdateSerializer`.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 444, in run_validation
+    value = self.to_internal_value(data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 497, in to_internal_value
+    for field in fields:
+                 ^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 380, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 374, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1105, in get_fields
+    field_class, field_kwargs = self.build_field(
+                                ~~~~~~~~~~~~~~~~^
+        source, info, model, depth
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1251, in build_field
+    return self.build_unknown_field(field_name, model_class)
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1369, in build_unknown_field
+    raise ImproperlyConfigured(
+    ...<2 lines>...
+    )
+django.core.exceptions.ImproperlyConfigured: Field name `reproductive_health` is not valid for model `Cow` in `FarmManager.serializers.CowCreateUpdateSerializer`.
+INFO 2025-05-09 07:04:49,489 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 07:04:49,491 views Error creating cow: Field name `vaccination_date` is not valid for model `Cow` in `FarmManager.serializers.CowCreateUpdateSerializer`.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 444, in run_validation
+    value = self.to_internal_value(data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 497, in to_internal_value
+    for field in fields:
+                 ^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 380, in _writable_fields
+    for field in self.fields.values():
+                 ^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 374, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1105, in get_fields
+    field_class, field_kwargs = self.build_field(
+                                ~~~~~~~~~~~~~~~~^
+        source, info, model, depth
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1251, in build_field
+    return self.build_unknown_field(field_name, model_class)
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1369, in build_unknown_field
+    raise ImproperlyConfigured(
+    ...<2 lines>...
+    )
+django.core.exceptions.ImproperlyConfigured: Field name `vaccination_date` is not valid for model `Cow` in `FarmManager.serializers.CowCreateUpdateSerializer`.
+INFO 2025-05-09 07:06:12,319 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 07:06:12,323 views Error creating cow: {'bcs': [ErrorDetail(string='"2" is not a valid choice.', code='invalid_choice')], 'lactation_number': [ErrorDetail(string='A valid integer is required.', code='invalid')]}
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 233, in is_valid
+    raise ValidationError(self.errors)
+rest_framework.exceptions.ValidationError: {'bcs': [ErrorDetail(string='"2" is not a valid choice.', code='invalid_choice')], 'lactation_number': [ErrorDetail(string='A valid integer is required.', code='invalid')]}
+INFO 2025-05-09 07:15:42,352 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 07:15:42,355 views Error creating cow: 'float' object has no attribute 'as_tuple'
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 444, in run_validation
+    value = self.to_internal_value(data)
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 145, in to_internal_value
+    return super().to_internal_value(data)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 501, in to_internal_value
+    validated_value = field.run_validation(primitive_value)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 539, in run_validation
+    self.run_validators(value)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/fields.py", line 553, in run_validators
+    validator(value)
+    ~~~~~~~~~^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/core/validators.py", line 539, in __call__
+    digit_tuple, exponent = value.as_tuple()[1:]
+                            ^^^^^^^^^^^^^^
+AttributeError: 'float' object has no attribute 'as_tuple'
+INFO 2025-05-09 07:19:11,546 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 07:19:11,554 views Error creating cow with reproduction and medical records: {'farm_id_input': ErrorDetail(string='Farm with ID 01 not found', code='invalid')}
+ERROR 2025-05-09 07:19:11,554 views Error creating cow: {'farm_id_input': ErrorDetail(string='Farm with ID 01 not found', code='invalid')}
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 243, in create
+    farm = Farm.objects.get(farm_id=farm_id)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 633, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+FarmManager.models.Farm.DoesNotExist: Farm matching query does not exist.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 350, in perform_create
+    cow = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 252, in create
+    raise serializers.ValidationError({'farm_id_input': f'Farm with ID {farm_id} not found'})
+rest_framework.exceptions.ValidationError: {'farm_id_input': ErrorDetail(string='Farm with ID 01 not found', code='invalid')}
+INFO 2025-05-09 07:27:54,046 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 07:27:54,059 views Error creating cow with reproduction and medical records: [ErrorDetail(string='Error creating cow: Got a `TypeError` when calling `Cow.objects.create()`. This may be because you have a writable field on the serializer class that is not a valid argument to `Cow.objects.create()`. You may need to make the field read-only, or override the CowCreateUpdateSerializer.create() method to handle this correctly.\nOriginal exception was:\n Traceback (most recent call last):\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create\n    instance = ModelClass._default_manager.create(**validated_data)\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method\n    return getattr(self.get_queryset(), name)(*args, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 661, in create\n    obj = self.model(**kwargs)\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 569, in __init__\n    raise TypeError(\n    ...<2 lines>...\n    )\nTypeError: Cow() got unexpected keyword arguments: \'has_lameness\', \'reproductive_health\', \'metabolic_disease\', \'is_vaccinated\', \'vaccination_date\', \'vaccination_type\', \'deworming_date\', \'deworming_type\', \'is_pregnant\', \'has_deworming\'\n', code='invalid')]
+ERROR 2025-05-09 07:27:54,059 views Error creating cow: [ErrorDetail(string='Error creating cow: Got a `TypeError` when calling `Cow.objects.create()`. This may be because you have a writable field on the serializer class that is not a valid argument to `Cow.objects.create()`. You may need to make the field read-only, or override the CowCreateUpdateSerializer.create() method to handle this correctly.\nOriginal exception was:\n Traceback (most recent call last):\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create\n    instance = ModelClass._default_manager.create(**validated_data)\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method\n    return getattr(self.get_queryset(), name)(*args, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 661, in create\n    obj = self.model(**kwargs)\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 569, in __init__\n    raise TypeError(\n    ...<2 lines>...\n    )\nTypeError: Cow() got unexpected keyword arguments: \'has_lameness\', \'reproductive_health\', \'metabolic_disease\', \'is_vaccinated\', \'vaccination_date\', \'vaccination_type\', \'deworming_date\', \'deworming_type\', \'is_pregnant\', \'has_deworming\'\n', code='invalid')]
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 661, in create
+    obj = self.model(**kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 569, in __init__
+    raise TypeError(
+    ...<2 lines>...
+    )
+TypeError: Cow() got unexpected keyword arguments: 'has_lameness', 'reproductive_health', 'metabolic_disease', 'is_vaccinated', 'vaccination_date', 'vaccination_type', 'deworming_date', 'deworming_type', 'is_pregnant', 'has_deworming'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 249, in create
+    instance = super().create(validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 1010, in create
+    raise TypeError(msg)
+TypeError: Got a `TypeError` when calling `Cow.objects.create()`. This may be because you have a writable field on the serializer class that is not a valid argument to `Cow.objects.create()`. You may need to make the field read-only, or override the CowCreateUpdateSerializer.create() method to handle this correctly.
+Original exception was:
+ Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 661, in create
+    obj = self.model(**kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 569, in __init__
+    raise TypeError(
+    ...<2 lines>...
+    )
+TypeError: Cow() got unexpected keyword arguments: 'has_lameness', 'reproductive_health', 'metabolic_disease', 'is_vaccinated', 'vaccination_date', 'vaccination_type', 'deworming_date', 'deworming_type', 'is_pregnant', 'has_deworming'
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 350, in perform_create
+    cow = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 254, in create
+    raise serializers.ValidationError(f"Error creating cow: {str(e)}")
+rest_framework.exceptions.ValidationError: [ErrorDetail(string='Error creating cow: Got a `TypeError` when calling `Cow.objects.create()`. This may be because you have a writable field on the serializer class that is not a valid argument to `Cow.objects.create()`. You may need to make the field read-only, or override the CowCreateUpdateSerializer.create() method to handle this correctly.\nOriginal exception was:\n Traceback (most recent call last):\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create\n    instance = ModelClass._default_manager.create(**validated_data)\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method\n    return getattr(self.get_queryset(), name)(*args, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 661, in create\n    obj = self.model(**kwargs)\n  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 569, in __init__\n    raise TypeError(\n    ...<2 lines>...\n    )\nTypeError: Cow() got unexpected keyword arguments: \'has_lameness\', \'reproductive_health\', \'metabolic_disease\', \'is_vaccinated\', \'vaccination_date\', \'vaccination_type\', \'deworming_date\', \'deworming_type\', \'is_pregnant\', \'has_deworming\'\n', code='invalid')]
+INFO 2025-05-09 07:29:15,058 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-09 07:29:15,061 views Created new cow: 56 for farm 01
+INFO 2025-05-09 07:29:15,061 views Created reproduction record for cow 56
+ERROR 2025-05-09 07:29:15,062 views Could not find default health status: GeneralHealthStatus matching query does not exist.
+ERROR 2025-05-09 07:29:15,062 views Error creating cow with reproduction and medical records: 'bool' object has no attribute 'lower'
+ERROR 2025-05-09 07:29:15,062 views Error creating cow: 'bool' object has no attribute 'lower'
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 390, in perform_create
+    has_lameness = medical_fields['has_lameness'].lower() == 'yes'
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'bool' object has no attribute 'lower'
+INFO 2025-05-09 07:30:39,152 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-09 07:30:39,159 views Created new cow: 56 for farm 01
+INFO 2025-05-09 07:30:39,160 views Created reproduction record for cow 56
+ERROR 2025-05-09 07:30:39,160 views Could not find default health status: GeneralHealthStatus matching query does not exist.
+ERROR 2025-05-09 07:30:39,163 views Error creating cow with reproduction and medical records: NOT NULL constraint failed: FarmManager_medicalassessment.assessed_by_id
+ERROR 2025-05-09 07:30:39,163 views Error creating cow: NOT NULL constraint failed: FarmManager_medicalassessment.assessed_by_id
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: NOT NULL constraint failed: FarmManager_medicalassessment.assessed_by_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 419, in perform_create
+    MedicalAssessment.objects.create(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        farm=cow.farm,
+        ^^^^^^^^^^^^^^
+    ...<18 lines>...
+        prescription=''
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1854, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1881, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: NOT NULL constraint failed: FarmManager_medicalassessment.assessed_by_id
+INFO 2025-05-09 07:33:44,596 views Received cow creation request with data: {'_id': 476312912, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': 'b593f883-9f57-4ec8-b112-ab18ef3f4158', 'meta/rootUuid': 'uuid:b593f883-9f57-4ec8-b112-ab18ef3f4158', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T06:46:58', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-09 07:33:44,603 views Created new cow: 56 for farm 01
+INFO 2025-05-09 07:33:44,604 views Created reproduction record for cow 56
+WARNING 2025-05-09 07:33:44,604 views No doctor assigned to farm 01, skipping medical assessment creation
+INFO 2025-05-09 07:33:44,605 views Successfully created cow with ID: None
+INFO 2025-05-09 07:38:13,699 views Received cow creation request with data: {'_id': 476331899, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': '8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/rootUuid': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T07:38:13', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-09 07:38:13,706 views Error creating cow with reproduction and medical records: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+ERROR 2025-05-09 07:38:13,706 views Error creating cow: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 265, in create
+    instance = super().create(validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1854, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1881, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 264, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 350, in perform_create
+    cow = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 275, in create
+    raise serializers.ValidationError(f"Error creating cow: {str(e)}")
+rest_framework.exceptions.ValidationError: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+INFO 2025-05-09 07:39:14,323 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-05-09 07:39:14,341 views Successfully retrieved 3 cows

@@ -35,6 +35,7 @@ from .models import (
 from .serializers import (
     FarmSerializer,
     CowSerializer,
+    CowCreateUpdateSerializer,
     HeatSignRecordSerializer,
     MessageSerializer,
     InseminatorSerializer,
@@ -250,6 +251,12 @@ class CowViewSet(viewsets.ModelViewSet):
     logger = logging.getLogger(__name__)
     filterset_fields = ['farm_id']
 
+    def get_serializer_class(self):
+        """Use different serializers for different operations"""
+        if self.action in ['create', 'update', 'partial_update']:
+            return CowCreateUpdateSerializer
+        return CowSerializer
+
     def create(self, request, *args, **kwargs):
         """Create a new cow with logging"""
         self.logger.info(f"Received cow creation request with data: {request.data}")
@@ -343,42 +350,105 @@ class CowViewSet(viewsets.ModelViewSet):
                 cow = serializer.save()
                 self.logger.info(f"Created new cow: {cow.cow_id} for farm {cow.farm.farm_id}")
 
+                # Get extra fields from serializer context
+                medical_fields = serializer.context.get('medical_fields', {})
+                reproduction_fields = serializer.context.get('reproduction_fields', {})
+
+                # Convert is_pregnant from yes/no to boolean if present
+                is_pregnant = False
+                if 'is_pregnant' in reproduction_fields:
+                    # Check if value is already a boolean
+                    if isinstance(reproduction_fields['is_pregnant'], bool):
+                        is_pregnant = reproduction_fields['is_pregnant']
+                    else:
+                        is_pregnant = reproduction_fields['is_pregnant'].lower() == 'yes'
+
                 # Create reproduction record with data from the request
                 Reproduction.objects.create(
                     cow=cow,
                     farm=cow.farm,
-                    is_cow_pregnant=serializer.validated_data.get('is_pregnant', False),
+                    is_cow_pregnant=is_pregnant,
                     pregnancy_date=serializer.validated_data.get('last_date_insemination'),
                     calving_date=serializer.validated_data.get('last_calving_date'),
-                    heat_sign_start=None,
-                    heat_signs_seen=None
+                    heat_sign_start=serializer.validated_data.get('heat_start_date', None),
+                    heat_sign_end=serializer.validated_data.get('heat_end_date', None),
+                    heat_signs_seen=serializer.validated_data.get('heat_signs', None)
                 )
                 self.logger.info(f"Created reproduction record for cow {cow.cow_id}")
 
+                # Get a doctor for the assessment - use the farm's doctor or find a fallback
+                assessed_by = cow.farm.doctor
+                if not assessed_by:
+                    # Try to get the first available active doctor
+                    assessed_by = Doctor.objects.filter(is_active=True).first()
+                    if not assessed_by:
+                        # If no active doctors, get any doctor
+                        assessed_by = Doctor.objects.first()
+                    
+                    if assessed_by:
+                        self.logger.info(f"No doctor assigned to farm, using fallback doctor: {assessed_by.name}")
+                    else:
+                        self.logger.warning(f"No doctors available in the system, skipping medical assessment creation")
+                        return
+                
                 # Get default status objects
-                general_health = GeneralHealthStatus.objects.get(name='Normal')
-                udder_health = UdderHealthStatus.objects.get(name='4qt normal')
-                mastitis = MastitisStatus.objects.get(name='Clinical mastitis')
+                try:
+                    general_health = GeneralHealthStatus.objects.get(name='Normal')
+                    udder_health = UdderHealthStatus.objects.get(name='4qt normal')
+                    mastitis = MastitisStatus.objects.get(name='Clinical mastitis')
+                except (GeneralHealthStatus.DoesNotExist, UdderHealthStatus.DoesNotExist, MastitisStatus.DoesNotExist) as e:
+                    self.logger.error(f"Could not find default health status: {str(e)}")
+                    # Fallback to first available
+                    general_health = GeneralHealthStatus.objects.first()
+                    udder_health = UdderHealthStatus.objects.first()
+                    mastitis = MastitisStatus.objects.first()
+
+                # Convert medical field values if they're not already booleans
+                has_lameness = False
+                if 'has_lameness' in medical_fields:
+                    if isinstance(medical_fields['has_lameness'], bool):
+                        has_lameness = medical_fields['has_lameness']
+                    else:
+                        has_lameness = medical_fields['has_lameness'].lower() == 'yes'
+                    
+                is_vaccinated = False
+                if 'is_vaccinated' in medical_fields:
+                    if isinstance(medical_fields['is_vaccinated'], bool):
+                        is_vaccinated = medical_fields['is_vaccinated']
+                    else:
+                        is_vaccinated = medical_fields['is_vaccinated'].lower() == 'yes'
+                    
+                has_deworming = False
+                if 'has_deworming' in medical_fields:
+                    if isinstance(medical_fields['has_deworming'], bool):
+                        has_deworming = medical_fields['has_deworming']
+                    else:
+                        has_deworming = medical_fields['has_deworming'].lower() == 'yes'
+                elif 'deworming' in serializer.validated_data:
+                    if isinstance(serializer.validated_data['deworming'], bool):
+                        has_deworming = serializer.validated_data['deworming']
+                    else:
+                        has_deworming = serializer.validated_data['deworming'].lower() == 'yes'
 
                 # Create medical assessment with data from the request
                 MedicalAssessment.objects.create(
                     farm=cow.farm,
                     cow=cow,
-                    assessed_by=cow.farm.doctor,
+                    assessed_by=assessed_by,
                     is_cow_sick=False,
                     general_health=general_health,
                     udder_health=udder_health,
                     mastitis=mastitis,
-                    has_lameness=serializer.validated_data.get('has_lameness', False),
-                    body_condition_score=int(cow.bcs),
-                    reproductive_health=serializer.validated_data.get('reproductive_health', 'Normal'),
-                    metabolic_disease=serializer.validated_data.get('metabolic_disease', 'Normal'),
-                    is_cow_vaccinated=serializer.validated_data.get('is_vaccinated', False),
-                    vaccination_date=serializer.validated_data.get('vaccination_date'),
-                    vaccination_type=serializer.validated_data.get('vaccination_type'),
-                    has_deworming=serializer.validated_data.get('deworming', False),
-                    deworming_date=serializer.validated_data.get('deworming_date'),
-                    deworming_type=serializer.validated_data.get('deworming_type'),
+                    has_lameness=has_lameness,
+                    body_condition_score=int(float(cow.bcs)),
+                    reproductive_health=medical_fields.get('reproductive_health', 'Normal'),
+                    metabolic_disease=medical_fields.get('metabolic_disease', 'Normal'),
+                    is_cow_vaccinated=is_vaccinated,
+                    vaccination_date=medical_fields.get('vaccination_date'),
+                    vaccination_type=medical_fields.get('vaccination_type', ''),
+                    has_deworming=has_deworming,
+                    deworming_date=medical_fields.get('deworming_date'),
+                    deworming_type=medical_fields.get('deworming_type', ''),
                     diagnosis='',
                     treatment='',
                     prescription=''

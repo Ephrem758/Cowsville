@@ -19,14 +19,24 @@ from .models import (
     FarmerMedicalReport,
     Reproduction,
 )
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from datetime import datetime
+from django.db import models
 
 
 class FarmSerializer(serializers.ModelSerializer):
+    # Include nested serialization for related fields
+    type_of_housing_name = serializers.CharField(source='type_of_housing.display_name', read_only=True)
+    type_of_floor_name = serializers.CharField(source='type_of_floor.display_name', read_only=True)
+    source_of_water_name = serializers.CharField(source='source_of_water.display_name', read_only=True)
+    rate_of_cow_feeding_name = serializers.CharField(source='rate_of_cow_feeding.display_name', read_only=True)
+    rate_of_water_giving_name = serializers.CharField(source='rate_of_water_giving.display_name', read_only=True)
+    doctor_name = serializers.CharField(source='doctor.name', read_only=True, allow_null=True)
+    inseminator_name = serializers.CharField(source='inseminator.name', read_only=True, allow_null=True)
+    
     class Meta:
         model = Farm
-        fields = ['farm_id', 'owner_name', 'address', 'telephone_number']
+        fields = '__all__'
 
 
 class CowSerializer(serializers.ModelSerializer):
@@ -60,39 +70,204 @@ class CowSerializer(serializers.ModelSerializer):
 class CowCreateUpdateSerializer(serializers.ModelSerializer):
     farm_id_input = serializers.CharField(write_only=True, source='farm_id')
     cow_id_input = serializers.CharField(write_only=True, source='cow_id')
-    # Use PrimaryKeyRelatedField for inputting related objects by ID
-    breed = serializers.PrimaryKeyRelatedField(queryset=BreedType.objects.all())
-    gynecological_status = serializers.PrimaryKeyRelatedField(queryset=GynecologicalStatus.objects.all())
-    # ... include other writable fields ...
+    
+    # Fields that need conversion
+    breed = serializers.CharField(write_only=True)
+    gynecological_status_name = serializers.CharField(write_only=True, required=False)
+    gynecological_status = serializers.PrimaryKeyRelatedField(queryset=GynecologicalStatus.objects.all(), required=False)
+    has_lameness = serializers.CharField(required=False)
+    cow_inseminated_before = serializers.CharField(required=False)
+    is_vaccinated = serializers.CharField(required=False)
+    
+    # Override BCS field to accept string input
+    bcs = serializers.CharField(required=False)
+    
+    # Fields to handle yes/no
+    deworming = serializers.CharField(required=False)
+    
+    # These fields don't exist in the Cow model but are used in create
+    reproductive_health = serializers.CharField(required=False, write_only=True)
+    metabolic_disease = serializers.CharField(required=False, write_only=True)
+    is_pregnant = serializers.CharField(required=False, write_only=True)
+    
+    # Vaccination fields
+    vaccination_date = serializers.DateField(required=False, write_only=True)
+    vaccination_type = serializers.CharField(required=False, write_only=True)
+    
+    # Deworming fields
+    deworming_date = serializers.DateField(required=False, write_only=True)
+    deworming_type = serializers.CharField(required=False, write_only=True)
+    
+    # Heat sign fields for Reproduction model
+    heat_start_date = serializers.DateTimeField(required=False, write_only=True)
+    heat_end_date = serializers.DateTimeField(required=False, write_only=True)
+    heat_signs = serializers.CharField(required=False, write_only=True)
+    
     class Meta:
         model = Cow
         fields = [
              'farm_id_input', 'cow_id_input', 'breed', 'date_of_birth', 'sex', 'parity', 
-             'body_weight', 'bcs', 'gynecological_status', 'lactation_number', 
+             'body_weight', 'bcs', 'gynecological_status', 'gynecological_status_name', 'lactation_number', 
              'days_in_milk', 'average_daily_milk', 'cow_inseminated_before', 
              'last_date_insemination', 'number_of_inseminations', 'id_or_breed_bull_used', 
              'last_calving_date', 'has_lameness', 'reproductive_health', 'metabolic_disease',
-             'is_vaccinated', 'vaccination_date', 'vaccination_type', 'has_deworming',
-             'deworming_date', 'deworming_type'
-             # Add other writable fields as needed
+             'is_vaccinated', 'vaccination_date', 'vaccination_type', 'deworming',
+             'deworming_date', 'deworming_type', 'is_pregnant', 'heat_start_date', 
+             'heat_end_date', 'heat_signs'
         ]
         
+    def to_internal_value(self, data):
+        """Custom field processing before validation"""
+        # Handle lactation_number conversion
+        if 'lactation_number' in data and data['lactation_number']:
+            try:
+                # Convert to float first, then to int
+                data = data.copy()
+                data['lactation_number'] = int(float(data['lactation_number']))
+            except (ValueError, TypeError):
+                # Let the field validator handle this error
+                pass
+                
+        return super().to_internal_value(data)
+        
+    def validate_bcs(self, value):
+        """Convert string BCS to a valid choice"""
+        try:
+            # Convert to float
+            bcs_float = float(value)
+            
+            # Clamp to valid range
+            if bcs_float < 1.0:
+                bcs_float = 1.0
+            elif bcs_float > 5.0:
+                bcs_float = 5.0
+                
+            # Round to nearest 0.5
+            rounded = round(bcs_float * 2) / 2
+            
+            # Get valid choices from model
+            valid_choices = [x / 2 for x in range(2, 11)]  # [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+            
+            # Find closest valid choice
+            valid_bcs = min(valid_choices, key=lambda x: abs(x - rounded))
+            
+            # Return as Decimal with str conversion for exact representation
+            return Decimal(str(valid_bcs))
+        except (ValueError, TypeError, InvalidOperation):
+            raise serializers.ValidationError("BCS must be a number between 1.0 and 5.0")
+
+    def validate_lactation_number(self, value):
+        """Convert lactation number to integer"""
+        try:
+            # Convert to float first to handle cases like "2.5"
+            float_value = float(value)
+            # Convert to integer
+            return int(float_value)
+        except (ValueError, TypeError):
+            raise serializers.ValidationError("Lactation number must be a valid number")
+
+    def validate_has_lameness(self, value):
+        """Convert yes/no string to boolean"""
+        return value.lower() == 'yes'
+        
+    def validate_cow_inseminated_before(self, value):
+        """Convert yes/no string to boolean"""
+        return value.lower() == 'yes'
+        
+    def validate_is_vaccinated(self, value):
+        """Convert yes/no string to boolean"""
+        return value.lower() == 'yes'
+        
+    def validate_deworming(self, value):
+        """Convert yes/no string to boolean"""
+        return value.lower() == 'yes'
+        
+    def validate(self, data):
+        """Handle breed and gynecological_status lookups by name"""
+        try:
+            # Handle breed lookup
+            breed_name = data.pop('breed', None)
+            if breed_name:
+                try:
+                    # Try exact match on name
+                    breed = BreedType.objects.get(name__iexact=breed_name)
+                except BreedType.DoesNotExist:
+                    # Try partial match on name or display_name
+                    breed = BreedType.objects.filter(
+                        models.Q(name__icontains=breed_name) | 
+                        models.Q(display_name__icontains=breed_name)
+                    ).first()
+                    
+                    if not breed:
+                        raise serializers.ValidationError({'breed': f'Breed "{breed_name}" not found'})
+                        
+                data['breed'] = breed
+                
+            # Handle gynecological status lookup if name provided
+            gyn_status_name = data.pop('gynecological_status_name', None)
+            if gyn_status_name and 'gynecological_status' not in data:
+                try:
+                    # Try exact match on name
+                    gyn_status = GynecologicalStatus.objects.get(name__iexact=gyn_status_name)
+                except GynecologicalStatus.DoesNotExist:
+                    # Try partial match on name or display_name
+                    gyn_status = GynecologicalStatus.objects.filter(
+                        models.Q(name__icontains=gyn_status_name) | 
+                        models.Q(display_name__icontains=gyn_status_name)
+                    ).first()
+                    
+                    if not gyn_status:
+                        raise serializers.ValidationError(
+                            {'gynecological_status': f'Status "{gyn_status_name}" not found'}
+                        )
+                        
+                data['gynecological_status'] = gyn_status
+                
+            # Move deworming boolean to has_deworming
+            if 'deworming' in data:
+                data['has_deworming'] = data.pop('deworming')
+                
+            return data
+        except Exception as e:
+            raise serializers.ValidationError(f"Error validating data: {str(e)}")
+        
     def create(self, validated_data):
-         # Pop the input-only fields before calling super().create
+        # Pop the input-only fields before calling super().create
         farm_id = validated_data.pop('farm_id', None) 
         cow_id = validated_data.pop('cow_id', None) 
 
         if not farm_id:
-             raise serializers.ValidationError({'farm_id_input': 'This field is required.'})
+            raise serializers.ValidationError({'farm_id_input': 'This field is required.'})
 
         try:
+            # Get farm
             farm = Farm.objects.get(farm_id=farm_id)
             validated_data['farm'] = farm
             if cow_id:
-                 validated_data['cow_id'] = cow_id
+                validated_data['cow_id'] = cow_id
             
-            # Create the cow instance
+            # Extract non-Cow model fields for later use
+            medical_fields = {}
+            reproduction_fields = {}
+            
+            # Fields for Medical Assessment
+            for field in ['has_lameness', 'reproductive_health', 'metabolic_disease', 
+                          'is_vaccinated', 'vaccination_date', 'vaccination_type',
+                          'deworming_date', 'deworming_type', 'has_deworming']:
+                if field in validated_data:
+                    medical_fields[field] = validated_data.pop(field)
+            
+            # Fields for Reproduction
+            if 'is_pregnant' in validated_data:
+                reproduction_fields['is_pregnant'] = validated_data.pop('is_pregnant')
+            
+            # Create the cow instance with only valid Cow model fields
             instance = super().create(validated_data)
+            
+            # Save extracted data in view's perform_create method
+            self.context['medical_fields'] = medical_fields
+            self.context['reproduction_fields'] = reproduction_fields
+            
             return instance
         except Farm.DoesNotExist:
             raise serializers.ValidationError({'farm_id_input': f'Farm with ID {farm_id} not found'})
