@@ -18,7 +18,7 @@ const SimpleLineChart = ({ cow }) => {
   // Safely derive H (hour) from cow.heat_sign_time, with robust type-checking:
   const H = (() => {
     const t = cow?.heat_sign_time;
-    if (!t) return 6; // fallback default
+    if (!t) return 4; // fallback default
 
     // If it's already a number (0–23), use it
     if (typeof t === "number") {
@@ -35,7 +35,8 @@ const SimpleLineChart = ({ cow }) => {
       // ISO timestamp?
       if (t.includes("T")) {
         const d = new Date(t);
-        if (!isNaN(d)) return d.getHours();
+        // if (!isNaN(d)) return d.getHours();
+        if (!isNaN(d)) return d.getUTCHours();
       }
       // HH:mm format?
       const m = t.match(/^(\d{1,2}):\d{2}/);
@@ -43,7 +44,7 @@ const SimpleLineChart = ({ cow }) => {
     }
 
     // Last resort
-    return 6;
+    return 4;
   })();
 
   const currentTime = new Date().getHours();
@@ -51,13 +52,14 @@ const SimpleLineChart = ({ cow }) => {
   // Build your labels/data exactly as before
   const labels = [];
   const data = [];
-  for (let i = 0; i <= 33; i += 3) {
-    labels.push(`${i}`);
-    if (i < 6) data.push(10);
-    else if (i < 9) data.push(50);
-    else if (i < 21) data.push(100);
-    else if (i < 27) data.push(50);
-    else data.push(10);
+  for (let i = 0; i <= 28; i += 2) {
+    const hour = H + i;
+    // labels.push(`${hour}`);
+    labels.push(hour.toString());
+    if (i < 6) data.push(10); // Red: 0-6h
+    else if (i < 9) data.push(50); // Yellow: 6-9h
+    else if (i < 24) data.push(100); // Green: 9-24h
+    else if (i <= 28) data.push(50); // Yellow: 24-28h
   }
 
   const chartData = {

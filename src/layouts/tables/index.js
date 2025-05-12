@@ -19,6 +19,7 @@ import Card from "@mui/material/Card";
 
 // Material Dashboard 2 React components
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
@@ -242,8 +243,25 @@ export const mockCows = [
 
 function Tables() {
   // const { searchQuery, setSearchQuery } = useSearch();
-  const [tableSearchInput, setTableSearchInput] = useState(""); // Current input
-  const [tableSearchQuery, setTableSearchQuery] = useState(""); // Query for filtering
+  // const [tableSearchInput, setTableSearchInput] = useState(""); // Current input
+  // const [tableSearchQuery, setTableSearchQuery] = useState(""); // Query for filtering
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialFarmId = searchParams.get("farm_id") || "";
+
+  // seed both input & query from the URL on first render
+  const [tableSearchInput, setTableSearchInput] = useState(initialFarmId);
+  const [tableSearchQuery, setTableSearchQuery] = useState(initialFarmId);
+
+  // if the URL querystring ever changes (e.g. you click another card),
+  // re‑sync both input and query state so your fetch‐effect will fire
+  useEffect(() => {
+    const p = searchParams.get("farm_id") || "";
+    if (p !== tableSearchQuery) {
+      setTableSearchInput(p);
+      setTableSearchQuery(p);
+    }
+  }, [searchParams]);
+
   const [cows, setCows] = useState([]);
   const [assessments, setAssessments] = useState([]); // Store real data
   const [farms, setFarms] = useState([]); // Store farms for ownerName lookup
@@ -379,10 +397,18 @@ function Tables() {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar
+      {/* <DashboardNavbar
         searchValue={tableSearchInput}
         onInputChange={setTableSearchInput}
         onSearch={() => setTableSearchQuery(tableSearchInput)}
+      /> */}
+      <DashboardNavbar
+        searchValue={tableSearchInput}
+        onInputChange={setTableSearchInput}
+        onSearch={() => {
+          setTableSearchQuery(tableSearchInput);
+          setSearchParams({ farm_id: tableSearchInput });
+        }}
       />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>

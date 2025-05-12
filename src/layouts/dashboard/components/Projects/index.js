@@ -37,7 +37,11 @@ function Projects({ cows, farm }) {
   // Generate rows dynamically
   const rows = (cows || []).map((cow) => ({
     cow_id: cow.cow_id || "N/A",
-    gynecological_status: cow.gynecological_status || "N/A",
+    // gynecological_status: cow.gynecological_status || "N/A",
+    gynecological_status:
+      cow.gynecological_status_name /* the string */ ||
+      cow.gynecological_status /* fallback to number */ ||
+      "N/A",
     parity: cow.parity !== undefined ? cow.parity : "N/A", // Check for undefined
     last_date_insemination: cow.last_date_insemination || "N/A",
   }));

@@ -21,14 +21,14 @@ function FarmCards() {
 
   const farmImageMapping = {
     28: "/images/farm-cards/image-1.jpg",
-    31: "/images/farm-cards/image-3.jpg",
+    23: "/images/farm-cards/image-3.jpg",
     24: "/images/farm-cards/image-4.jpg",
     12: "/images/farm-cards/image-5.jpg",
     9: "/images/farm-cards/image-6.jpg",
     4: "/images/farm-cards/image-2.jpg",
     FARM001: "/images/farm-cards/image-2.jpg",
     1: "/images/farm-cards/image-2.jpg",
-    3: "/images/farm-cards/image-2.jpg",
+    3: "/images/farm-cards/image-6.jpg",
     // Add more mappings as needed
   };
 
@@ -47,18 +47,31 @@ function FarmCards() {
 
         // Calculate total cows per farm using cow.farm_id
         const backendFarmCowCounts = allCows.reduce((acc, cow) => {
-          if (cow.farm_id) {
-            acc[cow.farm_id] = (acc[cow.farm_id] || 0) + 1;
+          const fid = cow.farm_id || cow.farm?.farm_id;
+          if (fid) {
+            acc[fid] = (acc[fid] || 0) + 1;
           }
           return acc;
         }, {});
 
-        console.log("Cow Counts:", backendFarmCowCounts); // Debugging cow counts
+        // Newly added
+
+        // 2. Count milking cows per farm (e.g. days_in_milk > 0)
+        const backendFarmMilkingCounts = allCows.reduce((acc, cow) => {
+          const fid = cow.farm_id || cow.farm?.farm_id;
+          if (fid && cow.days_in_milk > 0) {
+            acc[fid] = (acc[fid] || 0) + 1;
+          }
+          return acc;
+        }, {});
 
         // Merge backend farms with calculated totals using farm.farm_id as the key
         const mergedFarms = backendFarms.map((farm) => ({
           ...farm,
-          totalCows: backendFarmCowCounts[farm.farm_id] || 0,
+          // totalCows: backendFarmCowCounts[farm.farm_id] || 0,
+          // image: farm.image || "/images/farm-cards/default-image.jpg",
+          totalAnimals: backendFarmCowCounts[farm.farm_id] || 0,
+          totalMilkingCows: backendFarmMilkingCounts[farm.farm_id] || 0,
           image: farm.image || "/images/farm-cards/default-image.jpg",
         }));
 
@@ -86,7 +99,7 @@ function FarmCards() {
       <MDBox pt={6} pb={3}>
         <Grid container spacing={3}>
           {farms.map((farm) => (
-            <Grid item xs={12} md={6} lg={4} key={farm.id}>
+            <Grid item xs={12} md={6} lg={4} key={farm.farm_id}>
               <Card
                 sx={{
                   cursor: "pointer",
@@ -138,11 +151,29 @@ function FarmCards() {
                       mr={1}
                       sx={{ minWidth: "80px", textAlign: "right" }} // Set the same min width
                     >
-                      Total Cows :
+                      Total Animals :
                     </MDTypography>
                     <MDTypography variant="h6" fontWeight="medium" color="info">
                       {/* {farm.totalCows} */}
-                      {farm.total_number_of_cows}
+                      {/* {farm.total_number_of_cows} */}
+                      {farm.totalAnimals}
+                    </MDTypography>
+                  </MDBox>
+                  {/* milking cows */}
+                  <MDBox display="flex" alignItems="center" justifyContent="center" mb={1}>
+                    <MDTypography
+                      variant="button"
+                      color="text"
+                      fontWeight="medium"
+                      mr={1}
+                      sx={{ minWidth: "80px", textAlign: "right" }} // Set the same min width
+                    >
+                      Total Milking Cows :
+                    </MDTypography>
+                    <MDTypography variant="h6" fontWeight="medium" color="info">
+                      {/* {farm.totalCows} */}
+                      {/* {farm.number_of_milking_cows} */}
+                      {farm.totalMilkingCows}
                     </MDTypography>
                   </MDBox>
                 </MDBox>

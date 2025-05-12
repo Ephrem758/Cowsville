@@ -146,7 +146,7 @@ function Dashboard() {
           const mockCows = [
             {
               cow_id: "COW123",
-              heat_sign_time: "2024-03-21T00:00:00Z",
+              heat_sign_time: "2024-03-21T06:00:00Z",
               // farm: { farm_id: "MOCK", owner_name: "Phos" },
               farm_id: "MOCK",
               owner_name: "Phos Abdi",
@@ -160,7 +160,7 @@ function Dashboard() {
             {
               cow_id: "COW456",
               heat_sign_time: "2024-03-21T08:00:00Z",
-              farm_id: "28",
+              farm_id: "MOCK",
               owner_name: "Abebe Alemayehu",
               heat_signs: "Mounting, Mucus Discharge",
               dalc: "7 days",
@@ -293,7 +293,7 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 icon="leaderboard"
-                title="Daily milk allowance"
+                title="Daily milk allowance (L)"
                 count={firstFarm?.total_daily_milk || "N/A"}
               />
             </MDBox>

@@ -32,7 +32,7 @@ function OrdersOverview({ cow }) {
           color="success"
           icon="notifications"
           title="Heat Signs"
-          description={cow?.heat_signs || "No data"}
+          description={cow?.heat_signs || "N/A"}
         />
         <TimelineItem
           color="error"
@@ -49,8 +49,8 @@ function OrdersOverview({ cow }) {
         <TimelineItem
           color="warning"
           icon="payment"
-          title="Insemination Count"
-          description={cow?.number_of_inseminations || "0"}
+          title="Average milk yield (L)"
+          description={cow?.average_daily_milk || "N/A"}
         />
         <TimelineItem
           color="primary"
@@ -72,7 +72,9 @@ OrdersOverview.propTypes = {
     calving_date: PropTypes.string,
     last_date_insemination: PropTypes.string,
     number_of_inseminations: PropTypes.string,
+    lactation_number: PropTypes.string,
     breed_name: PropTypes.string,
+    average_daily_milk: PropTypes.string,
   }),
 };
 
