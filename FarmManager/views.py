@@ -69,8 +69,9 @@ logger = logging.getLogger(__name__)
 class FarmViewSet(viewsets.ModelViewSet):
     queryset = Farm.objects.all()
     serializer_class = FarmSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["farm_id", "owner_name", "address"]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['farm_id', 'owner_name', 'is_deleted']  # For exact matches
+    search_fields = ["farm_id", "owner_name", "address"]  # For partial matches
     logger = logging.getLogger(__name__)
 
     @action(detail=True, methods=["post"])
