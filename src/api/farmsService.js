@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Base URL from your API documentation
-const API_URL = "http://localhost:8000/api/farms/";
+const API_URL = "http://localhost:8000/api/";
 const FARM_API_URL = "http://localhost:8000/api/farms/";
 const COW_API_URL = "http://localhost:8000/api/cows/";
 const token = localStorage.getItem("authToken") || "mock_token_for_testing";
@@ -68,7 +68,7 @@ export const getDoctorAssessments = async (farmId = null, cowId = null) => {
     const params = {};
     if (farmId) params.farm_id = farmId;
     if (cowId) params.cow_id = cowId;
-    const response = await axios.get(`${API_URL}doctor-assessments/`, {
+    const response = await axios.get(`${API_URL}medical-assessments/`, {
       params,
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -91,19 +91,19 @@ export const getDoctorAssessments = async (farmId = null, cowId = null) => {
 //     return null; // Handle missing data
 //   }
 // };
-export const getCowHeatSign = async (farmId, cowId) => {
-  try {
-    const token = localStorage.getItem("authToken");
-    const response = await axios.get(`${API_URL}cows/heat_sign_records/`, {
-      params: { farm_id: farmId, cow_id: cowId },
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data.heat_sign_time || null;
-  } catch (error) {
-    console.error("Failed to fetch heat sign time:", error);
-    return null;
-  }
-};
+// export const getCowHeatSign = async (farmId, cowId) => {
+//   try {
+//     const token = localStorage.getItem("authToken");
+//     const response = await axios.get(`${API_URL}cows/heat_sign_records/`, {
+//       params: { farm_id: farmId, cow_id: cowId },
+//       headers: { Authorization: `Bearer ${token}` },
+//     });
+//     return response.data.heat_sign_time || null;
+//   } catch (error) {
+//     console.error("Failed to fetch heat sign time:", error);
+//     return null;
+//   }
+// };
 
 // Fetch cow details (breed)
 // export const getCowDetails = async (cowId) => {
@@ -146,10 +146,11 @@ export const getCowDetails = async (cowId) => {
 //     return 0;
 //   }
 // };
+
 export const getInseminationCount = async (farmId, cowId) => {
   try {
     const token = localStorage.getItem("authToken");
-    const response = await axios.get(`${API_URL}cows/monitor_heat_sign/`, {
+    const response = await axios.get("http://127.0.0.1:8000/api/insemination-records/", {
       params: { farm_id: farmId, cow_id: cowId },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -160,16 +161,6 @@ export const getInseminationCount = async (farmId, cowId) => {
   }
 };
 
-// Fetch date of AI (initially from /cows/)
-// export const getDateOfAI = async (cowId) => {
-//   try {
-//     const response = await axios.get(`${COW_API_URL}${cowId}/`);
-//     return response.data.date_of_ai || "N/A"; // Adjust based on your API response
-//   } catch (error) {
-//     console.error("Failed to fetch date of AI:", error);
-//     return "N/A";
-//   }
-// };
 export const getDateOfAI = async (cowId) => {
   try {
     const token = localStorage.getItem("authToken");
@@ -183,72 +174,6 @@ export const getDateOfAI = async (cowId) => {
   }
 };
 
-// // Fetch calving data (monitor_birth)
-// export const getMonitorBirthData = async (farmId = null) => {
-//   try {
-//     const params = {};
-//     if (farmId && farmId !== "ALL") params.farm_id = farmId;
-//     const response = await axios.get(`${COW_API_URL}birth_records/`, { params });
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching calving data:", error);
-//     return [];
-//   }
-// };
-
-// export const getHeatSignData = async (farmId = null) => {
-//   try {
-//     const response = await axios.get(`${COW_API_URL}heat_sign_records/`, {
-//       farm_id: farmId || "ALL", // Use "ALL" for bulk data
-//       cow_id: "ALL",
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching heat sign data:", error);
-//     return [];
-//   }
-// };
-
-// export const getInseminationCountData = async (farmId = null) => {
-//   try {
-//     const response = await axios.get(`${COW_API_URL}monitor_heat_sign/`, {
-//       farm_id: farmId || "ALL", // Use "ALL" for bulk data
-//       cow_id: "ALL",
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching insemination count data:", error);
-//     return [];
-//   }
-// };
-
-// // export const getMonitorPregnancyData = async (farmId = null) => {
-// //   try {
-// //     const response = await axios.post(`${COW_API_URL}monitor_pregnancy/`, {
-// //       farm_id: farmId || "ALL", // Use "ALL" for bulk data
-// //       cow_id: "ALL",
-// //     });
-// //     return response.data;
-// //   } catch (error) {
-// //     console.error("Error fetching pregnancy data:", error);
-// //     return [];
-// //   }
-// // };
-// export const getMonitorPregnancyData = async (farmId = null, cowId = null) => {
-//   try {
-//     const params = {};
-//     if (farmId) params.farm_id = farmId;
-//     if (cowId) params.cow_id = cowId;
-
-//     const response = await axios.get("http://localhost:8000/api/cows/pregnancy_records/", {
-//       params,
-//     });
-//     return response.data.results || []; // Adjust based on API response
-//   } catch (error) {
-//     console.error("Error fetching pregnancy records:", error);
-//     return [];
-//   }
-// };
 // Get Monitor Birth Data (add token)
 export const getMonitorBirthData = async (farmId = null) => {
   try {
@@ -266,28 +191,15 @@ export const getMonitorBirthData = async (farmId = null) => {
   }
 };
 
-// Get Heat Sign Data (add token)
-// export const getHeatSignData = async (farmId, cowId) => {
-//   try {
-//     const token = localStorage.getItem("authToken");
-//     const params = { farm_id: farmId, cow_id: cowId };
-//     const response = await axios.get(`${API_URL}cows/heat_sign_records/`, {
-//       params,
-//       headers: { Authorization: `Bearer ${token}` },
-//     });
-//     // Return the latest heat_sign_time (first item in the array)
-//     return response.data[0]?.heat_sign_time || null;
-//   } catch (error) {
-//     console.error("Error fetching heat sign data:", error);
-//     return null;
-//   }
-// };
-
+// heat sign time with GET(important)
 export const getHeatSignData = async (farmId, cowId) => {
   try {
     const token = localStorage.getItem("authToken");
-    const response = await axios.get(`${API_URL}cows/heat_sign_records/`, {
-      params,
+    const response = await axios.get(`${COW_API_URL}heat_sign_records/`, {
+      params: {
+        farm_id: farmId,
+        cow_id: cowId || "ALL",
+      },
       headers: { Authorization: `Bearer ${token}` },
     });
     // RETURN THE WHOLE ARRAY so you can .find() in Tables
@@ -298,12 +210,30 @@ export const getHeatSignData = async (farmId, cowId) => {
   }
 };
 
+// heat sign time with POST to avoid 400 bad request(important)
+// export const getHeatSignData = async (farmId, cowId) => {
+//   try {
+//     const token = localStorage.getItem("authToken");
+//     // POST to record_heat_sign to ensure we always get back a record
+//     const recordResponse = await axios.post(
+//       `${COW_API_URL}record_heat_sign/`,
+//       { farm_id: farmId, cow_id: cowId, heat_signs: "" },
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     );
+//     // Wrap the single record in an array so Tables/.find() still works
+//     return [recordResponse.data];
+//   } catch (error) {
+//     console.error("Error fetching heat sign data:", error);
+//     return []; // empty array if it fails
+//   }
+// };
+
 // Get Insemination Count Data (add token)
 export const getInseminationCountData = async (farmId = null, cowId = "ALL") => {
   try {
     const token = localStorage.getItem("authToken");
     const params = { farm_id: farmId || "ALL", cow_id: cowId };
-    const response = await axios.get(`${API_URL}cows/monitor_heat_sign/`, {
+    const response = await axios.get("http://127.0.0.1:8000/api/insemination-records/", {
       params,
       headers: { Authorization: `Bearer ${token}` },
     });

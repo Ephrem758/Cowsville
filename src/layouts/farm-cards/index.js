@@ -24,11 +24,11 @@ function FarmCards() {
     23: "/images/farm-cards/image-3.jpg",
     24: "/images/farm-cards/image-4.jpg",
     12: "/images/farm-cards/image-5.jpg",
-    9: "/images/farm-cards/image-6.jpg",
+    "01": "/images/farm-cards/image-6.jpg",
     4: "/images/farm-cards/image-2.jpg",
     FARM001: "/images/farm-cards/image-2.jpg",
     1: "/images/farm-cards/image-2.jpg",
-    3: "/images/farm-cards/image-6.jpg",
+    2: "/images/farm-cards/image-6.jpg",
     // Add more mappings as needed
   };
 
@@ -95,7 +95,12 @@ function FarmCards() {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
+      <DashboardNavbar
+        searchValue=""
+        onInputChange={() => {}}
+        onSearch={() => {}}
+        onSearchChange={() => {}}
+      />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={3}>
           {farms.map((farm) => (

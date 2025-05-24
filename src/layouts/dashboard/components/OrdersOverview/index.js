@@ -71,10 +71,11 @@ OrdersOverview.propTypes = {
     heat_signs: PropTypes.string,
     calving_date: PropTypes.string,
     last_date_insemination: PropTypes.string,
-    number_of_inseminations: PropTypes.string,
-    lactation_number: PropTypes.string,
+    number_of_inseminations: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    lactation_number: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     breed_name: PropTypes.string,
     average_daily_milk: PropTypes.string,
+    insemination_number: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }),
 };
 
