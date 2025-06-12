@@ -1218,3 +1218,668 @@ Traceback (most recent call last):
 rest_framework.exceptions.ValidationError: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
 INFO 2025-05-09 07:39:14,323 views Received cow list request with query params: <QueryDict: {}>
 INFO 2025-05-09 07:39:14,341 views Successfully retrieved 3 cows
+INFO 2025-05-24 07:33:20,925 views Received cow creation request with data: {'_id': 476331899, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': '8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/rootUuid': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T07:38:13', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-24 07:33:20,936 views Error creating cow with reproduction and medical records: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+ERROR 2025-05-24 07:33:20,936 views Error creating cow: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 265, in create
+    instance = super().create(validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1854, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1881, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 265, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 351, in perform_create
+    cow = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 275, in create
+    raise serializers.ValidationError(f"Error creating cow: {str(e)}")
+rest_framework.exceptions.ValidationError: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+INFO 2025-05-24 07:33:57,880 views Received cow creation request with data: {'_id': 476331899, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': '8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/rootUuid': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T07:38:13', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-24 07:33:57,887 views Error creating cow with reproduction and medical records: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+ERROR 2025-05-24 07:33:57,888 views Error creating cow: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 265, in create
+    instance = super().create(validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1854, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1881, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 265, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 351, in perform_create
+    cow = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 275, in create
+    raise serializers.ValidationError(f"Error creating cow: {str(e)}")
+rest_framework.exceptions.ValidationError: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+INFO 2025-05-24 07:34:16,007 views Received cow creation request with data: {'_id': 476331899, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': '8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/rootUuid': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T07:38:13', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-24 07:34:16,017 views Error creating cow with reproduction and medical records: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+ERROR 2025-05-24 07:34:16,017 views Error creating cow: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 265, in create
+    instance = super().create(validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1854, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1881, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 265, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 351, in perform_create
+    cow = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 275, in create
+    raise serializers.ValidationError(f"Error creating cow: {str(e)}")
+rest_framework.exceptions.ValidationError: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+INFO 2025-05-24 07:37:03,849 views Received cow creation request with data: {'_id': 484866060, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '4678', 'breed': 'hf', 'date_of_birth': '2025-05-15', 'sex': 'F', 'parity': '12', 'body_weight': '25.0', 'bcs': '3', 'gynecological_status_name': 'pregnant', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '2', 'average_daily_milk': '2.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '12', 'id_or_breed_bull_used': '3', 'last_calving_date': '2025-05-23', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-15', 'nsc': '23', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-21', 'vaccination_type': '45', 'deworming': 'yes', 'deworming_date': '2025-05-15', 'deworming_type': 'Gh', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:6ca9000f-f062-4297-a901-fa4c50ded536', 'meta/instanceName': '4678', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': '6ca9000f-f062-4297-a901-fa4c50ded536', 'meta/rootUuid': 'uuid:6ca9000f-f062-4297-a901-fa4c50ded536', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-24T07:37:03', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-24 07:37:03,862 views Created new cow: 4678 for farm 01
+INFO 2025-05-24 07:37:03,864 views Created reproduction record for cow 4678
+INFO 2025-05-24 07:37:03,865 views No doctor assigned to farm, using fallback doctor: Dr. John Smith
+ERROR 2025-05-24 07:37:03,866 views Could not find default health status: GeneralHealthStatus matching query does not exist.
+INFO 2025-05-24 07:37:03,869 views Created medical assessment for cow 4678
+INFO 2025-05-24 07:37:03,870 views Successfully created cow with ID: None
+INFO 2025-05-27 21:28:13,500 views Received farm creation request with data: {'_id': 487469937, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'Solomon', 'farm_id': 'Farm2', 'address': 'Kebele2', 'tel_no': '949911940', 'fcc_no': '1', 'herd_size': '15', 'calves': '16', 'heifers': '13', 'milking_cows': '25', 'TDM': '23.0', 'housing': 'free_stall', 'floor': 'concrete', 'feed': 'hay straw green', 'feeding_rate': 'once_day', 'water_source': 'tap_water', 'water_rate': 'once_day', 'hygiene_score': 'two', '__version__': 'vCwj82qfJQ6mh7wwkqQGer', 'meta/instanceID': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/instanceName': 'Farm2', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': 'd730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/rootUuid': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-27T21:16:34', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-27 21:28:13,505 views Invalid farm data: {'telephone_number': [ErrorDetail(string='This field is required.', code='required')], 'fertility_camp_no': [ErrorDetail(string='This field is required.', code='required')], 'total_number_of_cows': [ErrorDetail(string='This field is required.', code='required')], 'number_of_calves': [ErrorDetail(string='This field is required.', code='required')], 'number_of_milking_cows': [ErrorDetail(string='This field is required.', code='required')], 'total_daily_milk': [ErrorDetail(string='This field is required.', code='required')], 'main_feed': [ErrorDetail(string='This field is required.', code='required')], 'farm_hygiene_score': [ErrorDetail(string='This field is required.', code='required')], 'type_of_housing': [ErrorDetail(string='This field is required.', code='required')], 'type_of_floor': [ErrorDetail(string='This field is required.', code='required')], 'rate_of_cow_feeding': [ErrorDetail(string='This field is required.', code='required')], 'source_of_water': [ErrorDetail(string='This field is required.', code='required')], 'rate_of_water_giving': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-27 21:31:15,902 views Received farm creation request with data: {'_id': 487469937, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'Solomon', 'farm_id': 'Farm2', 'address': 'Kebele2', 'tel_no': '949911940', 'fcc_no': '1', 'herd_size': '15', 'calves': '16', 'heifers': '13', 'milking_cows': '25', 'TDM': '23.0', 'housing': 'free_stall', 'floor': 'concrete', 'feed': 'hay straw green', 'feeding_rate': 'once_day', 'water_source': 'tap_water', 'water_rate': 'once_day', 'hygiene_score': 'two', '__version__': 'vCwj82qfJQ6mh7wwkqQGer', 'meta/instanceID': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/instanceName': 'Farm2', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': 'd730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/rootUuid': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-27T21:16:34', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-27 21:31:15,910 views Invalid farm data: {'telephone_number': [ErrorDetail(string='This field is required.', code='required')], 'fertility_camp_no': [ErrorDetail(string='This field is required.', code='required')], 'total_number_of_cows': [ErrorDetail(string='This field is required.', code='required')], 'number_of_calves': [ErrorDetail(string='This field is required.', code='required')], 'number_of_milking_cows': [ErrorDetail(string='This field is required.', code='required')], 'total_daily_milk': [ErrorDetail(string='This field is required.', code='required')], 'main_feed': [ErrorDetail(string='This field is required.', code='required')], 'farm_hygiene_score': [ErrorDetail(string='This field is required.', code='required')], 'type_of_housing': [ErrorDetail(string='This field is required.', code='required')], 'type_of_floor': [ErrorDetail(string='This field is required.', code='required')], 'rate_of_cow_feeding': [ErrorDetail(string='This field is required.', code='required')], 'source_of_water': [ErrorDetail(string='This field is required.', code='required')], 'rate_of_water_giving': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-27 21:32:46,159 views Received farm creation request with data: {'_id': 487469937, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'Solomon', 'farm_id': 'Farm2', 'address': 'Kebele2', 'tel_no': '949911940', 'fcc_no': '1', 'herd_size': '15', 'calves': '16', 'heifers': '13', 'milking_cows': '25', 'TDM': '23.0', 'housing': 'free_stall', 'floor': 'concrete', 'feed': 'hay straw green', 'feeding_rate': 'once_day', 'water_source': 'tap_water', 'water_rate': 'once_day', 'hygiene_score': 'two', '__version__': 'vCwj82qfJQ6mh7wwkqQGer', 'meta/instanceID': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/instanceName': 'Farm2', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': 'd730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/rootUuid': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-27T21:16:34', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-27 21:32:46,166 views Error creating farm: Cannot assign "1": "Farm.type_of_housing" must be a "HousingType" instance.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 86, in create
+    farm = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 661, in create
+    obj = self.model(**kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 545, in __init__
+    _setattr(self, field.name, rel_obj)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/fields/related_descriptors.py", line 288, in __set__
+    raise ValueError(
+    ...<7 lines>...
+    )
+ValueError: Cannot assign "1": "Farm.type_of_housing" must be a "HousingType" instance.
+INFO 2025-05-27 21:33:06,894 views Received farm creation request with data: {'_id': 487469937, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'Solomon', 'farm_id': 'Farm2', 'address': 'Kebele2', 'tel_no': '949911940', 'fcc_no': '1', 'herd_size': '15', 'calves': '16', 'heifers': '13', 'milking_cows': '25', 'TDM': '23.0', 'housing': 'free_stall', 'floor': 'concrete', 'feed': 'hay straw green', 'feeding_rate': 'once_day', 'water_source': 'tap_water', 'water_rate': 'once_day', 'hygiene_score': 'two', '__version__': 'vCwj82qfJQ6mh7wwkqQGer', 'meta/instanceID': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/instanceName': 'Farm2', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': 'd730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/rootUuid': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-27T21:16:34', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-27 21:33:06,902 views Error creating farm: Cannot assign "1": "Farm.type_of_housing" must be a "HousingType" instance.
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 86, in create
+    farm = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 661, in create
+    obj = self.model(**kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 545, in __init__
+    _setattr(self, field.name, rel_obj)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/fields/related_descriptors.py", line 288, in __set__
+    raise ValueError(
+    ...<7 lines>...
+    )
+ValueError: Cannot assign "1": "Farm.type_of_housing" must be a "HousingType" instance.
+INFO 2025-05-27 21:38:23,639 views Received farm creation request with data: {'_id': 487469937, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'Solomon', 'farm_id': 'Farm2', 'address': 'Kebele2', 'tel_no': '949911940', 'fcc_no': '1', 'herd_size': '15', 'calves': '16', 'heifers': '13', 'milking_cows': '25', 'TDM': '23.0', 'housing': 'free_stall', 'floor': 'concrete', 'feed': 'hay straw green', 'feeding_rate': 'once_day', 'water_source': 'tap_water', 'water_rate': 'once_day', 'hygiene_score': 'two', '__version__': 'vCwj82qfJQ6mh7wwkqQGer', 'meta/instanceID': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/instanceName': 'Farm2', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': 'd730ea2e-c635-47b1-8d96-01b3c2b3d639', 'meta/rootUuid': 'uuid:d730ea2e-c635-47b1-8d96-01b3c2b3d639', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-27T21:16:34', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-27 21:38:23,650 views Successfully created farm with ID: Farm2
+INFO 2025-05-27 21:47:18,464 views Received farm creation request with data: {'_id': 484862652, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'Ephrem ', 'farm_id': '1255', 'address': 'Bisho', 'tel_no': '962353656', 'fcc_no': '1', 'herd_size': '12', 'calves': '25', 'heifers': '23', 'milking_cows': '21', 'TDM': '12.0', 'housing': 'free_stall', 'floor': 'concrete', 'feed': 'hay straw', 'feeding_rate': 'once_day', 'water_source': 'tap_water', 'water_rate': 'once_day', 'hygiene_score': 'two', '__version__': 'vQtHAy73itgkn6KjFC2khS', 'meta/instanceID': 'uuid:b3e0cd65-afea-4580-9e4d-75e4c4b2d668', 'meta/instanceName': '1255', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': 'b3e0cd65-afea-4580-9e4d-75e4c4b2d668', 'meta/rootUuid': 'uuid:b3e0cd65-afea-4580-9e4d-75e4c4b2d668', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-24T07:28:57', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-27 21:47:18,474 views Successfully created farm with ID: 1255
+INFO 2025-05-28 07:57:21,647 views Received farm creation request with data: {'_id': 471339518, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'John Souls', 'farm_id': '40', 'address': 'Anor Londo', 'tel_no': '946436734', 'gps': '8.7462015 38.957818 1922.4000244140625 64.1', 'fcc_no': '1', 'herd_size': '40', 'calves': '40', 'heifers': '40', 'milking_cows': '40', 'TDM': '40.0', 'housing': 'tie_stall', 'floor': 'concrete', 'feed': 'hay straw', 'feeding_rate': 'thrice_day', 'water_source': 'tap_water', 'water_rate': 'thrice_day', 'hygiene_score': 'three', '__version__': 'vQtHAy73itgkn6KjFC2khS', 'meta/instanceID': 'uuid:d5e10c89-67b0-4d83-b5f5-f8640e9145f5', 'meta/instanceName': '40', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': 'd5e10c89-67b0-4d83-b5f5-f8640e9145f5', 'meta/rootUuid': 'uuid:d5e10c89-67b0-4d83-b5f5-f8640e9145f5', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [8.7462015, 38.957818], '_submission_time': '2025-04-28T18:01:49', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 07:57:21,660 views Successfully created farm with ID: 40
+INFO 2025-05-28 08:04:15,283 views Received farm creation request with data: {'_id': 471337336, 'formhub/uuid': '77956a848fd046e893e4568611b22947', 'owner_name': 'Arthur Morgan', 'farm_id': '100', 'address': 'Tahiti ', 'tel_no': '946436734', 'gps': '8.7462075 38.9578956 1922.0 14.352', 'fcc_no': '1', 'herd_size': '100', 'calves': '100', 'heifers': '100', 'milking_cows': '100', 'TDM': '100.0', 'housing': 'free_stall', 'floor': 'concrete', 'feed': 'hay straw', 'feeding_rate': 'thrice_day', 'water_source': 'tap_water', 'water_rate': 'twice_day', 'hygiene_score': 'four', '__version__': 'vQtHAy73itgkn6KjFC2khS', 'meta/instanceID': 'uuid:230ccde4-9a25-424d-971b-7cfdc34ab1cd', 'meta/instanceName': '100', '_xform_id_string': 'aQY2ocwp2uGU4FvGsZCAKo', '_uuid': '230ccde4-9a25-424d-971b-7cfdc34ab1cd', 'meta/rootUuid': 'uuid:230ccde4-9a25-424d-971b-7cfdc34ab1cd', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [8.7462075, 38.9578956], '_submission_time': '2025-04-28T17:56:14', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 08:04:15,288 serializers Auto-assigned doctor: Dr. John Smith (ID: 1) to farm 100
+INFO 2025-05-28 08:04:15,289 serializers Auto-assigned inseminator: James Wilson (ID: 1) to farm 100
+INFO 2025-05-28 08:04:15,290 views Successfully created farm with ID: 100
+INFO 2025-05-28 08:08:49,135 views Received cow creation request with data: {'_id': 476331899, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': '01', 'cow_id_input': '56', 'breed': 'hf', 'date_of_birth': '2025-05-09', 'sex': 'F', 'parity': '5', 'body_weight': '56.0', 'bcs': '2', 'gynecological_status_name': 'estrus', 'lactation_number': '2.5', 'has_lameness': 'yes', 'days_in_milk': '25', 'average_daily_milk': '45.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-08', 'number_of_inseminations': '3', 'id_or_breed_bull_used': '2', 'last_calving_date': '2025-05-09', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-09', 'nsc': '2', 'udder_health': '4qt', 'mastitis': 'negative', 'general_health': 'normal', 'reproductive_health': 'abortion', 'metabolic_disease': 'normal', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Cool', 'deworming': 'yes', 'deworming_date': '2025-05-09', 'deworming_type': 'Cool', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/instanceName': '56', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': '8d08c87a-59cd-47d2-9544-9bda46a9cf1c', 'meta/rootUuid': 'uuid:8d08c87a-59cd-47d2-9544-9bda46a9cf1c', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-09T07:38:13', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+ERROR 2025-05-28 08:08:49,144 views Error creating cow with reproduction and medical records: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+ERROR 2025-05-28 08:08:49,145 views Error creating cow: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 576, in create
+    instance = super().create(validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 991, in create
+    instance = ModelClass._default_manager.create(**validated_data)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, fields, returning_fields, raw
+    )
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1854, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1881, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 360, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 334, in create
+    response = super().create(request, *args, **kwargs)
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/views.py", line 420, in perform_create
+    cow = serializer.save()
+  File "/Users/samuel/Cowsville/venv/lib/python3.13/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/samuel/Cowsville/FarmManager/serializers.py", line 586, in create
+    raise serializers.ValidationError(f"Error creating cow: {str(e)}")
+rest_framework.exceptions.ValidationError: [ErrorDetail(string='Error creating cow: UNIQUE constraint failed: FarmManager_cow.farm_id, FarmManager_cow.cow_id', code='invalid')]
+INFO 2025-05-28 08:13:12,745 views Received cow creation request with data: {'_id': 487671437, 'formhub/uuid': '9f2fea78f46c4f04b927bffea9b60d85', 'farm_id_input': 'Farm2', 'cow_id_input': '1', 'breed': 'hf', 'date_of_birth': '2025-01-08', 'sex': 'F', 'parity': '2', 'body_weight': '25.0', 'bcs': '2.5', 'gynecological_status_name': 'pregnant', 'lactation_number': '2', 'has_lameness': 'yes', 'days_in_milk': '15', 'average_daily_milk': '12.0', 'cow_inseminated_before': 'yes', 'last_date_insemination': '2025-05-14', 'number_of_inseminations': '8', 'id_or_breed_bull_used': '3', 'last_calving_date': '2025-05-15', 'is_pregnant': 'yes', 'pregnancy_date': '2025-05-22', 'nsc': '2', 'udder_health': '3qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'still_birth', 'metabolic_disease': 'vit_a_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-09', 'vaccination_type': 'Bully', 'deworming': 'no', '__version__': 'vJoeYtnveya2Q8YuFnTNmY', 'meta/instanceID': 'uuid:7e955263-ba0b-4863-ac3a-c1093ff143be', 'meta/instanceName': '1', '_xform_id_string': 'a3FQz3rEzJRwv9U8ZuAME2', '_uuid': '7e955263-ba0b-4863-ac3a-c1093ff143be', 'meta/rootUuid': 'uuid:7e955263-ba0b-4863-ac3a-c1093ff143be', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T08:13:12', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 08:13:12,753 views Created new cow: 1 for farm Farm2
+INFO 2025-05-28 08:13:12,754 views Created reproduction record for cow 1
+INFO 2025-05-28 08:13:12,755 views No doctor assigned to farm, using fallback doctor: Dr. Samuel
+ERROR 2025-05-28 08:13:12,755 views Could not find default health status: GeneralHealthStatus matching query does not exist.
+INFO 2025-05-28 08:13:12,757 views Created medical assessment for cow 1
+INFO 2025-05-28 08:13:12,758 views Successfully created cow with ID: None
+INFO 2025-05-28 09:47:42,988 views Received heat sign recording request
+WARNING 2025-05-28 09:47:42,997 views Invalid data for heat sign recording: {'heat_start_time': [ErrorDetail(string='Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].', code='invalid')]}
+INFO 2025-05-28 09:51:53,232 views Received heat sign recording request
+WARNING 2025-05-28 09:51:53,236 views Invalid data for heat sign recording: {'heat_start_time': [ErrorDetail(string='Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].', code='invalid')]}
+INFO 2025-05-28 09:53:14,753 views Received heat sign recording request
+INFO 2025-05-28 09:53:14,753 views Raw request data: {'_id': 487733932, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '12:45:00.000+03:00', 'heat_signs': 'bellowing off_feed vaginal_discharge', '__version__': 'vHaN4pT5CAiYf9GdeMNcqQ', 'meta/instanceID': 'uuid:24a9f788-c0d0-448e-b951-98ecd2f73092', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': '24a9f788-c0d0-448e-b951-98ecd2f73092', 'meta/rootUuid': 'uuid:24a9f788-c0d0-448e-b951-98ecd2f73092', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T09:45:33', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 09:53:14,753 views Heat start time received: '12:45:00.000+03:00' (type: <class 'str'>)
+INFO 2025-05-28 09:53:14,753 serializers to_internal_value called with data: {'_id': 487733932, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '12:45:00.000+03:00', 'heat_signs': 'bellowing off_feed vaginal_discharge', '__version__': 'vHaN4pT5CAiYf9GdeMNcqQ', 'meta/instanceID': 'uuid:24a9f788-c0d0-448e-b951-98ecd2f73092', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': '24a9f788-c0d0-448e-b951-98ecd2f73092', 'meta/rootUuid': 'uuid:24a9f788-c0d0-448e-b951-98ecd2f73092', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T09:45:33', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 09:53:14,753 serializers Processing heat_start_time: '12:45:00.000+03:00'
+WARNING 2025-05-28 09:53:14,756 serializers Failed to parse datetime '12:45:00.000+03:00' with any format
+INFO 2025-05-28 09:53:14,756 serializers Calling super().to_internal_value with data: {'_id': 487733932, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '12:45:00.000+03:00', 'heat_signs': 'bellowing off_feed vaginal_discharge', '__version__': 'vHaN4pT5CAiYf9GdeMNcqQ', 'meta/instanceID': 'uuid:24a9f788-c0d0-448e-b951-98ecd2f73092', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': '24a9f788-c0d0-448e-b951-98ecd2f73092', 'meta/rootUuid': 'uuid:24a9f788-c0d0-448e-b951-98ecd2f73092', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T09:45:33', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 09:53:14,757 views Invalid data for heat sign recording: {'heat_start_time': [ErrorDetail(string='Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z].', code='invalid')]}
+INFO 2025-05-28 10:06:28,725 views Received heat sign recording request
+INFO 2025-05-28 10:06:28,727 views Raw request data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:06:28,727 views Heat start time received: '2025-05-21T12:06:00.000+03:00' (type: <class 'str'>)
+INFO 2025-05-28 10:06:28,727 serializers to_internal_value called with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:06:28,728 serializers Processing heat_start_time: '2025-05-21T12:06:00.000+03:00'
+WARNING 2025-05-28 10:06:28,728 serializers Failed to parse datetime '2025-05-21T12:06:00.000+03:00' with any format
+INFO 2025-05-28 10:06:28,728 serializers Calling super().to_internal_value with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 10:06:28,734 views Invalid data for heat sign recording: {'non_field_errors': [ErrorDetail(string="Validation Error: [ErrorDetail(string='No inseminator assigned to this farm', code='invalid')]", code='invalid')]}
+INFO 2025-05-28 10:06:38,711 views Received heat sign recording request
+INFO 2025-05-28 10:06:38,711 views Raw request data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:06:38,711 views Heat start time received: '2025-05-21T12:06:00.000+03:00' (type: <class 'str'>)
+INFO 2025-05-28 10:06:38,711 serializers to_internal_value called with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:06:38,711 serializers Processing heat_start_time: '2025-05-21T12:06:00.000+03:00'
+WARNING 2025-05-28 10:06:38,711 serializers Failed to parse datetime '2025-05-21T12:06:00.000+03:00' with any format
+INFO 2025-05-28 10:06:38,711 serializers Calling super().to_internal_value with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 10:06:38,714 views Invalid data for heat sign recording: {'non_field_errors': [ErrorDetail(string="Validation Error: [ErrorDetail(string='No inseminator assigned to this farm', code='invalid')]", code='invalid')]}
+INFO 2025-05-28 10:06:57,851 views Received heat sign recording request
+INFO 2025-05-28 10:06:57,852 views Raw request data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:06:57,852 views Heat start time received: '2025-05-21T12:06:00.000+03:00' (type: <class 'str'>)
+INFO 2025-05-28 10:06:57,852 serializers to_internal_value called with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:06:57,852 serializers Processing heat_start_time: '2025-05-21T12:06:00.000+03:00'
+WARNING 2025-05-28 10:06:57,853 serializers Failed to parse datetime '2025-05-21T12:06:00.000+03:00' with any format
+INFO 2025-05-28 10:06:57,853 serializers Calling super().to_internal_value with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 10:06:57,858 views Invalid data for heat sign recording: {'non_field_errors': [ErrorDetail(string="Validation Error: [ErrorDetail(string='No inseminator assigned to this farm', code='invalid')]", code='invalid')]}
+INFO 2025-05-28 10:09:14,910 views Received heat sign recording request
+INFO 2025-05-28 10:09:14,912 views Raw request data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:09:14,912 views Heat start time received: '2025-05-21T12:06:00.000+03:00' (type: <class 'str'>)
+INFO 2025-05-28 10:09:14,912 serializers to_internal_value called with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00.000+03:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:09:14,912 serializers Processing heat_start_time: '2025-05-21T12:06:00.000+03:00'
+INFO 2025-05-28 10:09:14,915 serializers Successfully parsed datetime with format '%Y-%m-%dT%H:%M:%S.%f+03:00': 2025-05-21 12:06:00
+INFO 2025-05-28 10:09:14,915 serializers Converted to ISO format: 2025-05-21T12:06:00
+INFO 2025-05-28 10:09:14,915 serializers Calling super().to_internal_value with data: {'_id': 487748719, 'formhub/uuid': '3a690ba22eb54cd5954fe869ad826411', 'farm_id': 'Farm2', 'cow_id': '1', 'heat_shown': 'yes', 'heat_start_time': '2025-05-21T12:06:00', 'heat_signs': 'restlessness vaginal_discharge', '__version__': 'vKd5PBUxEwinM52CKsgxam', 'meta/instanceID': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', 'meta/instanceName': '1', '_xform_id_string': 'ahf754gTCx7XDxdUBhtPuC', '_uuid': 'a7513fbe-027c-4337-912a-7e67e8714651', 'meta/rootUuid': 'uuid:a7513fbe-027c-4337-912a-7e67e8714651', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:06:28', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:09:14,919 views Recording heat sign for cow 1 from farm Farm2
+INFO 2025-05-28 10:09:14,919 views Creating or updating reproduction record for cow 1 from farm Farm2
+INFO 2025-05-28 10:09:14,921 views Successfully created or updated reproduction record for cow 1 from farm Farm2
+INFO 2025-05-28 10:09:16,506 views Successfully sent insemination alert to inseminator
+INFO 2025-05-28 10:09:19,848 views Successfully sent insemination alert to farmer
+INFO 2025-05-28 10:09:19,853 views Successfully recorded heat sign for cow 1 from farm Farm2
+WARNING 2025-05-28 10:12:58,853 views Invalid heat sign monitoring data: {'date_of_insemination': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-05-28 10:13:55,149 views Invalid heat sign monitoring data: {'date_of_insemination': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-28 10:15:35,921 views Received heat sign monitoring request
+INFO 2025-05-28 10:15:35,922 views Raw request data: {'_id': 487752529, 'formhub/uuid': '312378e5b78d446c86bcb0758e34e3b1', 'farm_id': 'Farm2', 'cow_id': '1', 'inseminated_now': 'yes', 'inseminated_time': '10:11:00.000+03:00', 'Date_of_Insemination': '2025-05-28', 'insemination_number': '2', 'lactation_no': '2', '__version__': 'v6HL3V5RPqTFohdw8rNY6P', 'meta/instanceID': 'uuid:dd81fc85-20a8-4fed-a838-568e40c2d55e', 'meta/instanceName': '1', '_xform_id_string': 'a6H6EYtTuhLBG82fNt5BrZ', '_uuid': 'dd81fc85-20a8-4fed-a838-568e40c2d55e', 'meta/rootUuid': 'uuid:dd81fc85-20a8-4fed-a838-568e40c2d55e', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:12:24', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:15:35,922 serializers MonitorHeatSignSerializer received data: {'_id': 487752529, 'formhub/uuid': '312378e5b78d446c86bcb0758e34e3b1', 'farm_id': 'Farm2', 'cow_id': '1', 'inseminated_now': 'yes', 'inseminated_time': '10:11:00.000+03:00', 'Date_of_Insemination': '2025-05-28', 'insemination_number': '2', 'lactation_no': '2', '__version__': 'v6HL3V5RPqTFohdw8rNY6P', 'meta/instanceID': 'uuid:dd81fc85-20a8-4fed-a838-568e40c2d55e', 'meta/instanceName': '1', '_xform_id_string': 'a6H6EYtTuhLBG82fNt5BrZ', '_uuid': 'dd81fc85-20a8-4fed-a838-568e40c2d55e', 'meta/rootUuid': 'uuid:dd81fc85-20a8-4fed-a838-568e40c2d55e', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:12:24', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 10:15:35,926 views Invalid heat sign monitoring data: {'non_field_errors': [ErrorDetail(string='Date of insemination is required when cow is inseminated', code='invalid')]}
+INFO 2025-05-28 10:31:14,702 views Received heat sign monitoring request
+INFO 2025-05-28 10:31:14,703 views Raw request data: {'_id': 487753473, 'formhub/uuid': '312378e5b78d446c86bcb0758e34e3b1', 'farm_id': 'Farm2', 'cow_id': '1', 'inseminated_now': 'yes', 'inseminated_time': '13:13:00.000+03:00', 'Date_of_Insemination': '2025-05-28', 'insemination_number': '3', 'lactation_no': '3', '__version__': 'v6HL3V5RPqTFohdw8rNY6P', 'meta/instanceID': 'uuid:c1fbca50-e6b7-47c9-a26f-0724d9be6d63', 'meta/instanceName': '1', '_xform_id_string': 'a6H6EYtTuhLBG82fNt5BrZ', '_uuid': 'c1fbca50-e6b7-47c9-a26f-0724d9be6d63', 'meta/rootUuid': 'uuid:c1fbca50-e6b7-47c9-a26f-0724d9be6d63', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:13:55', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:31:14,703 serializers MonitorHeatSignSerializer received data: {'_id': 487753473, 'formhub/uuid': '312378e5b78d446c86bcb0758e34e3b1', 'farm_id': 'Farm2', 'cow_id': '1', 'inseminated_now': 'yes', 'inseminated_time': '13:13:00.000+03:00', 'Date_of_Insemination': '2025-05-28', 'insemination_number': '3', 'lactation_no': '3', '__version__': 'v6HL3V5RPqTFohdw8rNY6P', 'meta/instanceID': 'uuid:c1fbca50-e6b7-47c9-a26f-0724d9be6d63', 'meta/instanceName': '1', '_xform_id_string': 'a6H6EYtTuhLBG82fNt5BrZ', '_uuid': 'c1fbca50-e6b7-47c9-a26f-0724d9be6d63', 'meta/rootUuid': 'uuid:c1fbca50-e6b7-47c9-a26f-0724d9be6d63', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:13:55', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:31:14,703 serializers Mapped field Date_of_Insemination to date_of_insemination: 2025-05-28
+INFO 2025-05-28 10:31:14,704 serializers Combined date and time into date_of_insemination: 2025-05-28
+INFO 2025-05-28 10:31:17,098 views Successfully recorded heat sign monitoring for cow 1
+INFO 2025-05-28 10:35:03,096 views Successfully created medical report for cow 1
+WARNING 2025-05-28 10:48:03,400 views Invalid doctor assessment data: {'doctor_id': [ErrorDetail(string='This field is required.', code='required')], 'is_cow_sick': [ErrorDetail(string='This field is required.', code='required')], 'general_health': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'udder_health': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'mastitis': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'body_condition_score': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-28 10:48:41,428 views Received doctor assessment request
+INFO 2025-05-28 10:48:41,429 views Raw request data: {'_id': 487777185, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '1', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/rootUuid': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:47:32', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 10:48:41,429 views Invalid doctor assessment data: {'doctor_id': [ErrorDetail(string='This field is required.', code='required')], 'is_cow_sick': [ErrorDetail(string='This field is required.', code='required')], 'general_health': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'udder_health': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'mastitis': [ErrorDetail(string='A valid integer is required.', code='invalid')], 'body_condition_score': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-28 10:52:30,847 views Received doctor assessment request
+INFO 2025-05-28 10:52:30,848 views Raw request data: {'_id': 487777185, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '1', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/rootUuid': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:47:32', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:52:30,849 serializers DoctorMedicalAssessmentSerializer received data: {'_id': 487777185, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '1', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/rootUuid': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:47:32', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 10:52:30,849 serializers Mapped field cow_sick to is_cow_sick: yes_sick
+INFO 2025-05-28 10:52:30,849 serializers Mapped field bcs to body_condition_score: 1
+INFO 2025-05-28 10:52:30,849 serializers Mapped field is_vaccinated to is_cow_vaccinated: yes
+INFO 2025-05-28 10:52:30,849 serializers Converted is_cow_sick to boolean: True
+INFO 2025-05-28 10:52:30,849 serializers Converted is_cow_vaccinated to boolean: True
+INFO 2025-05-28 10:52:30,849 serializers Converted deworming to has_deworming: True
+WARNING 2025-05-28 10:52:30,851 serializers Could not find general_health status 'Normal': GeneralHealthStatus matching query does not exist.
+INFO 2025-05-28 10:52:30,851 serializers Using fallback general_health ID: 1
+WARNING 2025-05-28 10:52:30,852 serializers Could not find udder_health status '4qt normal': UdderHealthStatus matching query does not exist.
+INFO 2025-05-28 10:52:30,852 serializers Using fallback udder_health ID: 4
+WARNING 2025-05-28 10:52:30,852 serializers Could not find mastitis status 'Clinical mastitis': MastitisStatus matching query does not exist.
+INFO 2025-05-28 10:52:30,853 serializers Using fallback mastitis ID: 2
+INFO 2025-05-28 10:52:30,854 serializers Auto-assigned farm's doctor ID: 1
+INFO 2025-05-28 10:52:30,854 serializers Processed data: {'_id': 487777185, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'sickness_type': 'infectious', 'udder_health': 4, 'mastitis': 2, 'general_health': 1, 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/rootUuid': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:47:32', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'is_cow_sick': True, 'body_condition_score': '1', 'is_cow_vaccinated': True, 'has_deworming': True, 'doctor_id': 1}
+ERROR 2025-05-28 10:52:30,857 views Error in doctor assessment: Cannot assign "1": "MedicalAssessment.general_health" must be a "GeneralHealthStatus" instance.
+INFO 2025-05-28 11:02:47,656 views Received doctor assessment request
+INFO 2025-05-28 11:02:47,657 views Raw request data: {'_id': 487777185, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '1', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/rootUuid': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:47:32', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:02:47,657 serializers DoctorMedicalAssessmentSerializer received data: {'_id': 487777185, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '1', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/rootUuid': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:47:32', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:02:47,658 serializers Mapped field cow_sick to is_cow_sick: yes_sick
+INFO 2025-05-28 11:02:47,658 serializers Mapped field bcs to body_condition_score: 1
+INFO 2025-05-28 11:02:47,658 serializers Mapped field is_vaccinated to is_cow_vaccinated: yes
+INFO 2025-05-28 11:02:47,658 serializers Converted is_cow_sick to boolean: True
+INFO 2025-05-28 11:02:47,658 serializers Converted is_cow_vaccinated to boolean: True
+INFO 2025-05-28 11:02:47,658 serializers Converted deworming to has_deworming: True
+WARNING 2025-05-28 11:02:47,660 serializers Could not find general_health status 'Normal': GeneralHealthStatus matching query does not exist.
+INFO 2025-05-28 11:02:47,660 serializers Using fallback general_health ID: 1
+WARNING 2025-05-28 11:02:47,661 serializers Could not find udder_health status '4qt normal': UdderHealthStatus matching query does not exist.
+INFO 2025-05-28 11:02:47,661 serializers Using fallback udder_health ID: 4
+WARNING 2025-05-28 11:02:47,661 serializers Could not find mastitis status 'Clinical mastitis': MastitisStatus matching query does not exist.
+INFO 2025-05-28 11:02:47,661 serializers Using fallback mastitis ID: 2
+INFO 2025-05-28 11:02:47,663 serializers Using farm's assigned doctor ID: 1
+INFO 2025-05-28 11:02:47,663 serializers Processed data: {'_id': 487777185, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'sickness_type': 'infectious', 'udder_health': 4, 'mastitis': 2, 'general_health': 1, 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', 'meta/rootUuid': 'uuid:8f16dbdb-459a-44cb-94ec-64e6ef2e8d34', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:47:32', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'is_cow_sick': True, 'body_condition_score': '1', 'is_cow_vaccinated': True, 'has_deworming': True, 'doctor_id': 1}
+INFO 2025-05-28 11:02:48,888 views Successfully created medical assessment for cow 1
+INFO 2025-05-28 11:13:15,136 views Received doctor assessment request
+INFO 2025-05-28 11:13:15,224 views Raw request data: {'_id': 487770999, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '01', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '2.5', 'udder_health': '3qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'still_birth', 'metabolic_disease': 'mg_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'To', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'To', '__version__': 'vrGbyb73LodNrf9om2Si59', 'meta/instanceID': 'uuid:4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', 'meta/instanceName': '01', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', 'meta/rootUuid': 'uuid:4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:39:56', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:13:15,224 serializers DoctorMedicalAssessmentSerializer received data: {'_id': 487770999, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '01', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '2.5', 'udder_health': '3qt', 'mastitis': 'cmt1', 'general_health': 'sick', 'reproductive_health': 'still_birth', 'metabolic_disease': 'mg_deficiency', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'To', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'To', '__version__': 'vrGbyb73LodNrf9om2Si59', 'meta/instanceID': 'uuid:4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', 'meta/instanceName': '01', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', 'meta/rootUuid': 'uuid:4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:39:56', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:13:15,225 serializers Mapped field cow_sick to is_cow_sick: yes_sick
+INFO 2025-05-28 11:13:15,225 serializers Mapped field bcs to body_condition_score: 2.5
+INFO 2025-05-28 11:13:15,225 serializers Mapped field is_vaccinated to is_cow_vaccinated: yes
+INFO 2025-05-28 11:13:15,225 serializers Converted is_cow_sick to boolean: True
+INFO 2025-05-28 11:13:15,225 serializers Converted is_cow_vaccinated to boolean: True
+INFO 2025-05-28 11:13:15,226 serializers Converted deworming to has_deworming: True
+INFO 2025-05-28 11:13:15,229 serializers Converted general_health '2' to ID: 2
+WARNING 2025-05-28 11:13:15,230 serializers Could not find udder_health status '3qt normal': UdderHealthStatus matching query does not exist.
+INFO 2025-05-28 11:13:15,231 serializers Using fallback udder_health ID: 4
+WARNING 2025-05-28 11:13:15,232 serializers Could not find mastitis status 'cmt1': MastitisStatus matching query does not exist.
+INFO 2025-05-28 11:13:15,233 serializers Using fallback mastitis ID: 2
+INFO 2025-05-28 11:13:15,235 serializers Using farm's assigned doctor ID: 1
+INFO 2025-05-28 11:13:15,235 serializers Processed data: {'_id': 487770999, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '01', 'sickness_type': 'infectious', 'udder_health': 4, 'mastitis': 2, 'general_health': 2, 'reproductive_health': 'still_birth', 'metabolic_disease': 'mg_deficiency', 'vaccination_date': '2025-05-28', 'vaccination_type': 'To', 'deworming_date': '2025-05-28', 'deworming_type': 'To', '__version__': 'vrGbyb73LodNrf9om2Si59', 'meta/instanceID': 'uuid:4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', 'meta/instanceName': '01', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': '4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', 'meta/rootUuid': 'uuid:4a72e407-be4f-45ca-9b89-ba11e1aa7dc8', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T10:39:56', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'is_cow_sick': True, 'body_condition_score': '2.5', 'is_cow_vaccinated': True, 'has_deworming': True, 'doctor_id': 1}
+WARNING 2025-05-28 11:13:15,237 views Invalid doctor assessment data: {'non_field_errors': [ErrorDetail(string='Cow not found', code='invalid')]}
+INFO 2025-05-28 11:13:21,451 views Received doctor assessment request
+INFO 2025-05-28 11:13:21,452 views Raw request data: {'_id': 487796111, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '1', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:db76bc02-80e5-4264-bec9-8656fe7e0268', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': 'db76bc02-80e5-4264-bec9-8656fe7e0268', 'meta/rootUuid': 'uuid:db76bc02-80e5-4264-bec9-8656fe7e0268', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:13:21', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:13:21,452 serializers DoctorMedicalAssessmentSerializer received data: {'_id': 487796111, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'cow_sick': 'yes_sick', 'sickness_type': 'infectious', 'bcs': '1', 'udder_health': '4qt', 'mastitis': 'clinical_mastitis', 'general_health': 'normal', 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'is_vaccinated': 'yes', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming': 'yes', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:db76bc02-80e5-4264-bec9-8656fe7e0268', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': 'db76bc02-80e5-4264-bec9-8656fe7e0268', 'meta/rootUuid': 'uuid:db76bc02-80e5-4264-bec9-8656fe7e0268', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:13:21', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:13:21,453 serializers Mapped field cow_sick to is_cow_sick: yes_sick
+INFO 2025-05-28 11:13:21,453 serializers Mapped field bcs to body_condition_score: 1
+INFO 2025-05-28 11:13:21,453 serializers Mapped field is_vaccinated to is_cow_vaccinated: yes
+INFO 2025-05-28 11:13:21,453 serializers Converted is_cow_sick to boolean: True
+INFO 2025-05-28 11:13:21,453 serializers Converted is_cow_vaccinated to boolean: True
+INFO 2025-05-28 11:13:21,453 serializers Converted deworming to has_deworming: True
+WARNING 2025-05-28 11:13:21,454 serializers Could not find general_health status 'Normal': GeneralHealthStatus matching query does not exist.
+INFO 2025-05-28 11:13:21,455 serializers Using fallback general_health ID: 1
+WARNING 2025-05-28 11:13:21,455 serializers Could not find udder_health status '4qt normal': UdderHealthStatus matching query does not exist.
+INFO 2025-05-28 11:13:21,456 serializers Using fallback udder_health ID: 4
+WARNING 2025-05-28 11:13:21,456 serializers Could not find mastitis status 'Clinical mastitis': MastitisStatus matching query does not exist.
+INFO 2025-05-28 11:13:21,457 serializers Using fallback mastitis ID: 2
+INFO 2025-05-28 11:13:21,458 serializers Using farm's assigned doctor ID: 1
+INFO 2025-05-28 11:13:21,458 serializers Processed data: {'_id': 487796111, 'formhub/uuid': '86c6ac7887464fa28819c65667c3b794', 'farm_id': 'Farm2', 'cow_id': '1', 'sickness_type': 'infectious', 'udder_health': 4, 'mastitis': 2, 'general_health': 1, 'reproductive_health': 'normal', 'metabolic_disease': 'hypocalcema', 'vaccination_date': '2025-05-28', 'vaccination_type': 'H', 'deworming_date': '2025-05-28', 'deworming_type': 'T', 'notes': 'Very sick', '__version__': 'voZN9Fvhbac4bfNwiTwRGg', 'meta/instanceID': 'uuid:db76bc02-80e5-4264-bec9-8656fe7e0268', 'meta/instanceName': '1', '_xform_id_string': 'a9wb7nMBPLEMwMA6L9M7CF', '_uuid': 'db76bc02-80e5-4264-bec9-8656fe7e0268', 'meta/rootUuid': 'uuid:db76bc02-80e5-4264-bec9-8656fe7e0268', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:13:21', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'is_cow_sick': True, 'body_condition_score': '1', 'is_cow_vaccinated': True, 'has_deworming': True, 'doctor_id': 1}
+INFO 2025-05-28 11:13:23,572 views Successfully created medical assessment for cow 1
+WARNING 2025-05-28 11:20:22,120 views Invalid pregnancy monitoring data: {'pregnancy_date': [ErrorDetail(string='This field is required.', code='required')], 'days_until_calving': [ErrorDetail(string='This field is required.', code='required')], 'service_per_conception': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-05-28 11:22:55,702 views Invalid birth monitoring data: {'calving_date': [ErrorDetail(string='This field is required.', code='required')], 'last_calving_date': [ErrorDetail(string='This field is required.', code='required')], 'calf_sex': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-28 11:30:18,818 views Received birth monitoring request
+INFO 2025-05-28 11:30:18,819 views Raw request data: {'_id': 487800917, 'formhub/uuid': '3520565c9d22483984057e5f0224b4dd', 'start': '2025-05-28T14:19:56.583+03:00', 'end': '2025-05-28T14:20:14.977+03:00', 'farm_id': 'Farm2', 'cow_id': '1', 'Date_of_Calving': '2025-05-28', 'Date_of_last_calving': '2025-05-28', 'What_is_the_Sex_of_the_Calf': 'male', '__version__': 'vpauRmTJTkk2QoNd6jNLVM', 'meta/instanceID': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/instanceName': '1', '_xform_id_string': 'actb56JU5hsqB83WSG79DA', '_uuid': '41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/rootUuid': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:20:21', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 11:30:18,819 views Invalid birth monitoring data: {'calving_date': [ErrorDetail(string='This field is required.', code='required')], 'last_calving_date': [ErrorDetail(string='This field is required.', code='required')], 'calf_sex': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-05-28 11:30:18,819 views Received data keys: ['_id', 'formhub/uuid', 'start', 'end', 'farm_id', 'cow_id', 'Date_of_Calving', 'Date_of_last_calving', 'What_is_the_Sex_of_the_Calf', '__version__', 'meta/instanceID', 'meta/instanceName', '_xform_id_string', '_uuid', 'meta/rootUuid', '_attachments', '_status', '_geolocation', '_submission_time', '_tags', '_notes', '_validation_status', '_submitted_by']
+INFO 2025-05-28 11:32:32,415 views Received birth monitoring request
+INFO 2025-05-28 11:32:32,415 views Raw request data: {'_id': 487800917, 'formhub/uuid': '3520565c9d22483984057e5f0224b4dd', 'start': '2025-05-28T14:19:56.583+03:00', 'end': '2025-05-28T14:20:14.977+03:00', 'farm_id': 'Farm2', 'cow_id': '1', 'Date_of_Calving': '2025-05-28', 'Date_of_last_calving': '2025-05-28', 'What_is_the_Sex_of_the_Calf': 'male', '__version__': 'vpauRmTJTkk2QoNd6jNLVM', 'meta/instanceID': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/instanceName': '1', '_xform_id_string': 'actb56JU5hsqB83WSG79DA', '_uuid': '41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/rootUuid': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:20:21', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:32:32,415 serializers MonitorBirthSerializer received data: {'_id': 487800917, 'formhub/uuid': '3520565c9d22483984057e5f0224b4dd', 'start': '2025-05-28T14:19:56.583+03:00', 'end': '2025-05-28T14:20:14.977+03:00', 'farm_id': 'Farm2', 'cow_id': '1', 'Date_of_Calving': '2025-05-28', 'Date_of_last_calving': '2025-05-28', 'What_is_the_Sex_of_the_Calf': 'male', '__version__': 'vpauRmTJTkk2QoNd6jNLVM', 'meta/instanceID': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/instanceName': '1', '_xform_id_string': 'actb56JU5hsqB83WSG79DA', '_uuid': '41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/rootUuid': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:20:21', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:32:32,415 serializers Mapped field Date_of_Calving to calving_date: 2025-05-28
+INFO 2025-05-28 11:32:32,415 serializers Mapped field Date_of_last_calving to last_calving_date: 2025-05-28
+INFO 2025-05-28 11:32:32,416 serializers Mapped field What_is_the_Sex_of_the_Calf to calf_sex: male
+INFO 2025-05-28 11:32:32,416 serializers Normalized calf_sex to: M
+INFO 2025-05-28 11:32:32,416 serializers Processed birth data: {'_id': 487800917, 'formhub/uuid': '3520565c9d22483984057e5f0224b4dd', 'start': '2025-05-28T14:19:56.583+03:00', 'end': '2025-05-28T14:20:14.977+03:00', 'farm_id': 'Farm2', 'cow_id': '1', '__version__': 'vpauRmTJTkk2QoNd6jNLVM', 'meta/instanceID': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/instanceName': '1', '_xform_id_string': 'actb56JU5hsqB83WSG79DA', '_uuid': '41060f38-daea-4d37-8d19-b56e26aadbb5', 'meta/rootUuid': 'uuid:41060f38-daea-4d37-8d19-b56e26aadbb5', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:20:21', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'calving_date': '2025-05-28', 'last_calving_date': '2025-05-28', 'calf_sex': 'M'}
+INFO 2025-05-28 11:32:33,726 views Successfully recorded birth event for cow 1
+WARNING 2025-05-28 11:37:50,083 views Invalid pregnancy monitoring data: {'pregnancy_date': [ErrorDetail(string='This field is required.', code='required')], 'days_until_calving': [ErrorDetail(string='This field is required.', code='required')], 'service_per_conception': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+INFO 2025-05-28 11:41:59,073 views Received pregnancy monitoring request
+INFO 2025-05-28 11:41:59,073 views Raw request data: {'_id': 487813856, 'formhub/uuid': '351eb622651e4865864c204832094062', 'farm_id': 'Farm2', 'cow_id': '1', 'Date_of_the_pregnancy': '2025-05-28T14:37:00.000+03:00', 'until_claving': '25', 'nsc': '25', 'lactation_no': '2.0', '__version__': 'vQLfpS5fkhGbLLcQXkyrT9', 'meta/instanceID': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/instanceName': '1', '_xform_id_string': 'a5dj6qex78gPm9zCpYnoB2', '_uuid': '478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/rootUuid': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:37:49', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+WARNING 2025-05-28 11:41:59,074 views Invalid pregnancy monitoring data: {'pregnancy_date': [ErrorDetail(string='This field is required.', code='required')], 'days_until_calving': [ErrorDetail(string='This field is required.', code='required')], 'service_per_conception': [ErrorDetail(string='This field is required.', code='required')], 'lactation_number': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-05-28 11:41:59,074 views Received data keys: ['_id', 'formhub/uuid', 'farm_id', 'cow_id', 'Date_of_the_pregnancy', 'until_claving', 'nsc', 'lactation_no', '__version__', 'meta/instanceID', 'meta/instanceName', '_xform_id_string', '_uuid', 'meta/rootUuid', '_attachments', '_status', '_geolocation', '_submission_time', '_tags', '_notes', '_validation_status', '_submitted_by']
+INFO 2025-05-28 11:46:31,880 views Received pregnancy monitoring request
+INFO 2025-05-28 11:46:31,880 views Raw request data: {'_id': 487813856, 'formhub/uuid': '351eb622651e4865864c204832094062', 'farm_id': 'Farm2', 'cow_id': '1', 'Date_of_the_pregnancy': '2025-05-28T14:37:00.000+03:00', 'until_claving': '25', 'nsc': '25', 'lactation_no': '2.0', '__version__': 'vQLfpS5fkhGbLLcQXkyrT9', 'meta/instanceID': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/instanceName': '1', '_xform_id_string': 'a5dj6qex78gPm9zCpYnoB2', '_uuid': '478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/rootUuid': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:37:49', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:46:31,880 serializers MonitorPregnancySerializer received data: {'_id': 487813856, 'formhub/uuid': '351eb622651e4865864c204832094062', 'farm_id': 'Farm2', 'cow_id': '1', 'Date_of_the_pregnancy': '2025-05-28T14:37:00.000+03:00', 'until_claving': '25', 'nsc': '25', 'lactation_no': '2.0', '__version__': 'vQLfpS5fkhGbLLcQXkyrT9', 'meta/instanceID': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/instanceName': '1', '_xform_id_string': 'a5dj6qex78gPm9zCpYnoB2', '_uuid': '478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/rootUuid': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:37:49', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow'}
+INFO 2025-05-28 11:46:31,880 serializers Mapped field Date_of_the_pregnancy to pregnancy_date: 2025-05-28T14:37:00.000+03:00
+INFO 2025-05-28 11:46:31,880 serializers Mapped field until_claving to days_until_calving: 25
+INFO 2025-05-28 11:46:31,881 serializers Mapped field nsc to service_per_conception: 25
+INFO 2025-05-28 11:46:31,881 serializers Mapped field lactation_no to lactation_number: 2.0
+INFO 2025-05-28 11:46:31,881 serializers Converted datetime to date: 2025-05-28
+INFO 2025-05-28 11:46:31,881 serializers Converted days_until_calving to integer: 25
+INFO 2025-05-28 11:46:31,881 serializers Converted service_per_conception to integer: 25
+INFO 2025-05-28 11:46:31,881 serializers Converted lactation_number to integer: 2
+INFO 2025-05-28 11:46:31,881 serializers Processed pregnancy data: {'_id': 487813856, 'formhub/uuid': '351eb622651e4865864c204832094062', 'farm_id': 'Farm2', 'cow_id': '1', '__version__': 'vQLfpS5fkhGbLLcQXkyrT9', 'meta/instanceID': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/instanceName': '1', '_xform_id_string': 'a5dj6qex78gPm9zCpYnoB2', '_uuid': '478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/rootUuid': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:37:49', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'pregnancy_date': datetime.date(2025, 5, 28), 'days_until_calving': 25, 'service_per_conception': 25, 'lactation_number': 2}
+INFO 2025-05-28 11:46:33,262 views Successfully updated pregnancy status for cow 1

@@ -22,6 +22,9 @@ from .models import (
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
 from django.db import models
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class FarmSerializer(serializers.ModelSerializer):
@@ -34,9 +37,317 @@ class FarmSerializer(serializers.ModelSerializer):
     doctor_name = serializers.CharField(source='doctor.name', read_only=True, allow_null=True)
     inseminator_name = serializers.CharField(source='inseminator.name', read_only=True, allow_null=True)
     
+    # Field mappings for incoming data
+    tel_no = serializers.CharField(write_only=True, required=False)
+    fcc_no = serializers.CharField(write_only=True, required=False)
+    herd_size = serializers.CharField(write_only=True, required=False)
+    calves = serializers.CharField(write_only=True, required=False)
+    heifers = serializers.CharField(write_only=True, required=False)
+    milking_cows = serializers.CharField(write_only=True, required=False)
+    TDM = serializers.CharField(write_only=True, required=False)
+    housing = serializers.CharField(write_only=True, required=False)
+    floor = serializers.CharField(write_only=True, required=False)
+    feed = serializers.CharField(write_only=True, required=False)
+    feeding_rate = serializers.CharField(write_only=True, required=False)
+    water_source = serializers.CharField(write_only=True, required=False)
+    water_rate = serializers.CharField(write_only=True, required=False)
+    hygiene_score = serializers.CharField(write_only=True, required=False)
+    
     class Meta:
         model = Farm
-        fields = '__all__'
+        fields = [
+            # Model fields
+            'farm_id', 'owner_name', 'address', 'telephone_number', 'location_gps',
+            'fertility_camp_no', 'total_number_of_cows', 'number_of_calves', 
+            'number_of_milking_cows', 'total_daily_milk', 'type_of_housing', 
+            'type_of_floor', 'main_feed', 'rate_of_cow_feeding', 'source_of_water', 
+            'rate_of_water_giving', 'farm_hygiene_score', 'inseminator', 'doctor',
+            'is_deleted',
+            # Read-only display fields
+            'type_of_housing_name', 'type_of_floor_name', 'source_of_water_name',
+            'rate_of_cow_feeding_name', 'rate_of_water_giving_name', 'doctor_name', 
+            'inseminator_name',
+            # Mapping fields (write-only)
+            'tel_no', 'fcc_no', 'herd_size', 'calves', 'heifers', 'milking_cows',
+            'TDM', 'housing', 'floor', 'feed', 'feeding_rate', 'water_source',
+            'water_rate', 'hygiene_score'
+        ]
+        extra_kwargs = {
+            'telephone_number': {'required': False},
+            'fertility_camp_no': {'required': False},
+            'total_number_of_cows': {'required': False},
+            'number_of_calves': {'required': False},
+            'number_of_milking_cows': {'required': False},
+            'total_daily_milk': {'required': False},
+            'main_feed': {'required': False},
+            'farm_hygiene_score': {'required': False},
+            'type_of_housing': {'required': False},
+            'type_of_floor': {'required': False},
+            'rate_of_cow_feeding': {'required': False},
+            'source_of_water': {'required': False},
+            'rate_of_water_giving': {'required': False},
+        }
+        
+    def _format_phone_number(self, value):
+        """
+        Helper method to format Ethiopian phone numbers by adding +251 prefix
+        """
+        if not value:
+            return value
+            
+        # Remove any spaces, dashes, or other formatting
+        cleaned_number = ''.join(filter(str.isdigit, value.replace('+', '')))
+        
+        # If number already starts with +251, return as is
+        if value.startswith('+251'):
+            return value
+            
+        # If number starts with 251, add + prefix
+        if cleaned_number.startswith('251'):
+            return f'+{cleaned_number}'
+            
+        # If number starts with 0 (Ethiopian local format), replace with +251
+        if cleaned_number.startswith('0') and len(cleaned_number) == 10:
+            return f'+251{cleaned_number[1:]}'
+            
+        # If number is 9 digits (Ethiopian mobile without 0), add +251
+        if len(cleaned_number) == 9 and cleaned_number[0] in ['9']:
+            return f'+251{cleaned_number}'
+            
+        # If none of the above, return original value (will be caught by model validation)
+        return value
+        
+    def validate_telephone_number(self, value):
+        """
+        Automatically format Ethiopian phone numbers by adding +251 prefix
+        """
+        return self._format_phone_number(value)
+        
+    def validate(self, data):
+        """
+        Handle field mapping from incoming form data to model fields
+        """
+        # Map tel_no to telephone_number
+        if 'tel_no' in data and not data.get('telephone_number'):
+            tel_no_value = data.pop('tel_no')
+            # Apply phone number formatting
+            formatted_phone = self._format_phone_number(tel_no_value)
+            data['telephone_number'] = formatted_phone
+            
+        # Map fcc_no to fertility_camp_no
+        if 'fcc_no' in data and not data.get('fertility_camp_no'):
+            try:
+                data['fertility_camp_no'] = int(data.pop('fcc_no'))
+            except (ValueError, TypeError):
+                data['fertility_camp_no'] = 1  # Default value
+                
+        # Map herd_size to total_number_of_cows
+        if 'herd_size' in data and not data.get('total_number_of_cows'):
+            try:
+                data['total_number_of_cows'] = int(data.pop('herd_size'))
+            except (ValueError, TypeError):
+                data['total_number_of_cows'] = 0
+                
+        # Map calves to number_of_calves
+        if 'calves' in data and not data.get('number_of_calves'):
+            try:
+                data['number_of_calves'] = int(data.pop('calves'))
+            except (ValueError, TypeError):
+                data['number_of_calves'] = 0
+                
+        # Map milking_cows to number_of_milking_cows
+        if 'milking_cows' in data and not data.get('number_of_milking_cows'):
+            try:
+                data['number_of_milking_cows'] = int(data.pop('milking_cows'))
+            except (ValueError, TypeError):
+                data['number_of_milking_cows'] = 0
+                
+        # Map TDM to total_daily_milk
+        if 'TDM' in data and not data.get('total_daily_milk'):
+            try:
+                data['total_daily_milk'] = int(float(data.pop('TDM')))
+            except (ValueError, TypeError):
+                data['total_daily_milk'] = 0
+                
+        # Map feed to main_feed
+        if 'feed' in data and not data.get('main_feed'):
+            data['main_feed'] = data.pop('feed')
+            
+        # Map hygiene_score text to number
+        if 'hygiene_score' in data and not data.get('farm_hygiene_score'):
+            hygiene_mapping = {
+                'one': 1, 'two': 2, 'three': 3, 'four': 4,
+                '1': 1, '2': 2, '3': 3, '4': 4
+            }
+            hygiene_value = data.pop('hygiene_score').lower()
+            data['farm_hygiene_score'] = hygiene_mapping.get(hygiene_value, 2)  # Default to 2
+            
+        # Handle housing type mapping
+        if 'housing' in data and not data.get('type_of_housing'):
+            try:
+                from .models import HousingType
+                housing_name = data.pop('housing').replace('_', ' ').title()
+                housing_type = HousingType.objects.filter(
+                    models.Q(name__icontains=housing_name) | 
+                    models.Q(display_name__icontains=housing_name)
+                ).first()
+                if housing_type:
+                    data['type_of_housing'] = housing_type  # Assign the object, not the ID
+                else:
+                    # Get first available housing type as fallback
+                    first_housing = HousingType.objects.first()
+                    if first_housing:
+                        data['type_of_housing'] = first_housing  # Assign the object, not the ID
+            except Exception:
+                pass
+                
+        # Handle floor type mapping
+        if 'floor' in data and not data.get('type_of_floor'):
+            try:
+                from .models import FloorType
+                floor_name = data.pop('floor').replace('_', ' ').title()
+                floor_type = FloorType.objects.filter(
+                    models.Q(name__icontains=floor_name) | 
+                    models.Q(display_name__icontains=floor_name)
+                ).first()
+                if floor_type:
+                    data['type_of_floor'] = floor_type  # Assign the object, not the ID
+                else:
+                    # Get first available floor type as fallback
+                    first_floor = FloorType.objects.first()
+                    if first_floor:
+                        data['type_of_floor'] = first_floor  # Assign the object, not the ID
+            except Exception:
+                pass
+                
+        # Handle feeding rate mapping
+        if 'feeding_rate' in data and not data.get('rate_of_cow_feeding'):
+            try:
+                from .models import FeedingFrequency
+                feeding_name = data.pop('feeding_rate').replace('_', ' ').title()
+                feeding_freq = FeedingFrequency.objects.filter(
+                    models.Q(name__icontains=feeding_name) | 
+                    models.Q(display_name__icontains=feeding_name)
+                ).first()
+                if feeding_freq:
+                    data['rate_of_cow_feeding'] = feeding_freq  # Assign the object, not the ID
+                else:
+                    # Get first available feeding frequency as fallback
+                    first_feeding = FeedingFrequency.objects.first()
+                    if first_feeding:
+                        data['rate_of_cow_feeding'] = first_feeding  # Assign the object, not the ID
+            except Exception:
+                pass
+                
+        # Handle water source mapping
+        if 'water_source' in data and not data.get('source_of_water'):
+            try:
+                from .models import WaterSource
+                water_name = data.pop('water_source').replace('_', ' ').title()
+                water_src = WaterSource.objects.filter(
+                    models.Q(name__icontains=water_name) | 
+                    models.Q(display_name__icontains=water_name)
+                ).first()
+                if water_src:
+                    data['source_of_water'] = water_src  # Assign the object, not the ID
+                else:
+                    # Get first available water source as fallback
+                    first_water = WaterSource.objects.first()
+                    if first_water:
+                        data['source_of_water'] = first_water  # Assign the object, not the ID
+            except Exception:
+                pass
+                
+        # Handle water rate mapping
+        if 'water_rate' in data and not data.get('rate_of_water_giving'):
+            try:
+                from .models import FeedingFrequency
+                water_rate_name = data.pop('water_rate').replace('_', ' ').title()
+                water_freq = FeedingFrequency.objects.filter(
+                    models.Q(name__icontains=water_rate_name) | 
+                    models.Q(display_name__icontains=water_rate_name)
+                ).first()
+                if water_freq:
+                    data['rate_of_water_giving'] = water_freq  # Assign the object, not the ID
+                else:
+                    # Get first available feeding frequency as fallback
+                    first_feeding = FeedingFrequency.objects.first()
+                    if first_feeding:
+                        data['rate_of_water_giving'] = first_feeding  # Assign the object, not the ID
+            except Exception:
+                pass
+                
+        # Clean up any remaining unmapped fields
+        fields_to_remove = ['heifers']  # Fields that don't map to anything
+        for field in fields_to_remove:
+            data.pop(field, None)
+            
+        # Auto-assign first available doctor and inseminator if not provided
+        if not data.get('doctor'):
+            try:
+                from .models import Doctor
+                first_doctor = Doctor.objects.filter(is_active=True).first()
+                if first_doctor:
+                    data['doctor'] = first_doctor
+                    logger.info(f"Auto-assigned doctor: {first_doctor.name} (ID: {first_doctor.id}) to farm {data.get('farm_id', 'Unknown')}")
+                else:
+                    # Try to get any doctor (even inactive) as fallback
+                    fallback_doctor = Doctor.objects.first()
+                    if fallback_doctor:
+                        data['doctor'] = fallback_doctor
+                        logger.warning(f"No active doctors found. Auto-assigned inactive doctor: {fallback_doctor.name} (ID: {fallback_doctor.id}) to farm {data.get('farm_id', 'Unknown')}")
+                    else:
+                        logger.warning(f"No doctors found in database. Farm {data.get('farm_id', 'Unknown')} will be created without a doctor.")
+            except Exception as e:
+                logger.error(f"Could not auto-assign doctor to farm {data.get('farm_id', 'Unknown')}: {e}")
+                
+        if not data.get('inseminator'):
+            try:
+                from .models import Inseminator
+                first_inseminator = Inseminator.objects.filter(is_active=True).first()
+                if first_inseminator:
+                    data['inseminator'] = first_inseminator
+                    logger.info(f"Auto-assigned inseminator: {first_inseminator.name} (ID: {first_inseminator.id}) to farm {data.get('farm_id', 'Unknown')}")
+                else:
+                    # Try to get any inseminator (even inactive) as fallback
+                    fallback_inseminator = Inseminator.objects.first()
+                    if fallback_inseminator:
+                        data['inseminator'] = fallback_inseminator
+                        logger.warning(f"No active inseminators found. Auto-assigned inactive inseminator: {fallback_inseminator.name} (ID: {fallback_inseminator.id}) to farm {data.get('farm_id', 'Unknown')}")
+                    else:
+                        logger.warning(f"No inseminators found in database. Farm {data.get('farm_id', 'Unknown')} will be created without an inseminator.")
+            except Exception as e:
+                logger.error(f"Could not auto-assign inseminator to farm {data.get('farm_id', 'Unknown')}: {e}")
+            
+        # Ensure required fields have values
+        if not data.get('telephone_number'):
+            raise serializers.ValidationError({'telephone_number': 'This field is required.'})
+        if not data.get('fertility_camp_no'):
+            raise serializers.ValidationError({'fertility_camp_no': 'This field is required.'})
+        if not data.get('total_number_of_cows'):
+            raise serializers.ValidationError({'total_number_of_cows': 'This field is required.'})
+        if not data.get('number_of_calves'):
+            raise serializers.ValidationError({'number_of_calves': 'This field is required.'})
+        if not data.get('number_of_milking_cows'):
+            raise serializers.ValidationError({'number_of_milking_cows': 'This field is required.'})
+        if not data.get('total_daily_milk'):
+            raise serializers.ValidationError({'total_daily_milk': 'This field is required.'})
+        if not data.get('main_feed'):
+            raise serializers.ValidationError({'main_feed': 'This field is required.'})
+        if not data.get('farm_hygiene_score'):
+            raise serializers.ValidationError({'farm_hygiene_score': 'This field is required.'})
+        if not data.get('type_of_housing'):
+            raise serializers.ValidationError({'type_of_housing': 'This field is required.'})
+        if not data.get('type_of_floor'):
+            raise serializers.ValidationError({'type_of_floor': 'This field is required.'})
+        if not data.get('rate_of_cow_feeding'):
+            raise serializers.ValidationError({'rate_of_cow_feeding': 'This field is required.'})
+        if not data.get('source_of_water'):
+            raise serializers.ValidationError({'source_of_water': 'This field is required.'})
+        if not data.get('rate_of_water_giving'):
+            raise serializers.ValidationError({'rate_of_water_giving': 'This field is required.'})
+            
+        return data
 
 
 class CowSerializer(serializers.ModelSerializer):
@@ -289,12 +600,82 @@ class DoctorSerializer(serializers.ModelSerializer):
                 "license_number": "VET123"
             }
         }
+        
+    def _format_phone_number(self, value):
+        """
+        Helper method to format Ethiopian phone numbers by adding +251 prefix
+        """
+        if not value:
+            return value
+            
+        # Remove any spaces, dashes, or other formatting
+        cleaned_number = ''.join(filter(str.isdigit, value.replace('+', '')))
+        
+        # If number already starts with +251, return as is
+        if value.startswith('+251'):
+            return value
+            
+        # If number starts with 251, add + prefix
+        if cleaned_number.startswith('251'):
+            return f'+{cleaned_number}'
+            
+        # If number starts with 0 (Ethiopian local format), replace with +251
+        if cleaned_number.startswith('0') and len(cleaned_number) == 10:
+            return f'+251{cleaned_number[1:]}'
+            
+        # If number is 9 digits (Ethiopian mobile without 0), add +251
+        if len(cleaned_number) == 9 and cleaned_number[0] in ['9']:
+            return f'+251{cleaned_number}'
+            
+        # If none of the above, return original value (will be caught by model validation)
+        return value
+        
+    def validate_phone_number(self, value):
+        """
+        Automatically format Ethiopian phone numbers by adding +251 prefix
+        """
+        return self._format_phone_number(value)
 
 
 class InseminatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inseminator
         fields = "__all__"
+        
+    def _format_phone_number(self, value):
+        """
+        Helper method to format Ethiopian phone numbers by adding +251 prefix
+        """
+        if not value:
+            return value
+            
+        # Remove any spaces, dashes, or other formatting
+        cleaned_number = ''.join(filter(str.isdigit, value.replace('+', '')))
+        
+        # If number already starts with +251, return as is
+        if value.startswith('+251'):
+            return value
+            
+        # If number starts with 251, add + prefix
+        if cleaned_number.startswith('251'):
+            return f'+{cleaned_number}'
+            
+        # If number starts with 0 (Ethiopian local format), replace with +251
+        if cleaned_number.startswith('0') and len(cleaned_number) == 10:
+            return f'+251{cleaned_number[1:]}'
+            
+        # If number is 9 digits (Ethiopian mobile without 0), add +251
+        if len(cleaned_number) == 9 and cleaned_number[0] in ['9']:
+            return f'+251{cleaned_number}'
+            
+        # If none of the above, return original value (will be caught by model validation)
+        return value
+        
+    def validate_phone_number(self, value):
+        """
+        Automatically format Ethiopian phone numbers by adding +251 prefix
+        """
+        return self._format_phone_number(value)
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -424,6 +805,78 @@ class HeatSignRecordSerializer(serializers.Serializer):
     heat_start_time = serializers.DateTimeField(required=True)
     heat_sign_recorded_at = serializers.DateTimeField(required=False, allow_null=True)
 
+    def to_internal_value(self, data):
+        """
+        Override to handle custom datetime parsing for heat_start_time
+        """
+        logger.info(f"to_internal_value called with data: {data}")
+        
+        if 'heat_start_time' in data and isinstance(data['heat_start_time'], str):
+            logger.info(f"Processing heat_start_time: '{data['heat_start_time']}'")
+            # Parse different datetime formats
+            datetime_str = data['heat_start_time']
+            parsed_datetime = None
+            
+            # List of common datetime formats to try
+            datetime_formats = [
+                '%Y-%m-%dT%H:%M:%S.%f+03:00',  # 2025-05-21T12:06:00.000+03:00 (specific timezone)
+                '%Y-%m-%dT%H:%M:%S.%f%z',      # 2025-05-21T12:06:00.000+0300 (timezone offset)
+                '%Y-%m-%dT%H:%M:%S%z',         # 2025-05-21T12:06:00+0300 (timezone offset)
+                '%Y-%m-%dT%H:%M:%S.%fZ',       # 2025-05-28T09:47:42.988Z
+                '%Y-%m-%dT%H:%M:%SZ',          # 2025-05-28T09:47:42Z
+                '%Y-%m-%dT%H:%M:%S',           # 2025-05-28T09:47:42
+                '%Y-%m-%d %H:%M:%S.%f',        # 2025-05-28 09:47:42.988
+                '%Y-%m-%d %H:%M:%S',           # 2025-05-28 09:47:42
+                '%Y-%m-%d %H:%M',              # 2025-05-28 09:47
+                '%d/%m/%Y %H:%M:%S',           # 28/05/2025 09:47:42
+                '%d/%m/%Y %H:%M',              # 28/05/2025 09:47
+                '%m/%d/%Y %H:%M:%S',           # 05/28/2025 09:47:42
+                '%m/%d/%Y %H:%M',              # 05/28/2025 09:47
+                '%Y-%m-%d',                    # 2025-05-28 (will add current time)
+                '%H:%M:%S.%f+03:00',           # 12:45:00.000+03:00 (time only - will add today's date)
+                '%H:%M:%S.%f%z',               # 12:45:00.000+0300 (time only with timezone)
+                '%H:%M:%S%z',                  # 12:45:00+0300 (time only with timezone)
+            ]
+            
+            for fmt in datetime_formats:
+                try:
+                    from datetime import datetime
+                    parsed_datetime = datetime.strptime(datetime_str, fmt)
+                    logger.info(f"Successfully parsed datetime with format '{fmt}': {parsed_datetime}")
+                    
+                    # If only date was provided, use current time
+                    if fmt == '%Y-%m-%d':
+                        from datetime import time
+                        now = datetime.now()
+                        parsed_datetime = datetime.combine(parsed_datetime.date(), now.time())
+                        logger.info(f"Combined with current time: {parsed_datetime}")
+                    
+                    # If only time was provided (with timezone), use today's date
+                    elif fmt in ['%H:%M:%S.%f+03:00', '%H:%M:%S.%f%z', '%H:%M:%S%z']:
+                        from datetime import date
+                        today = date.today()
+                        parsed_datetime = datetime.combine(today, parsed_datetime.time())
+                        logger.info(f"Combined time with today's date: {parsed_datetime}")
+                    
+                    # Convert to ISO format that Django expects
+                    iso_format = parsed_datetime.isoformat()
+                    data['heat_start_time'] = iso_format
+                    logger.info(f"Converted to ISO format: {iso_format}")
+                    break
+                except ValueError as e:
+                    logger.debug(f"Format '{fmt}' failed: {e}")
+                    continue
+            
+            if parsed_datetime is None:
+                logger.warning(f"Failed to parse datetime '{datetime_str}' with any format")
+                # If all parsing attempts failed, let Django handle it and show proper error
+                pass
+        else:
+            logger.info(f"heat_start_time not found or not a string: {data.get('heat_start_time')}")
+        
+        logger.info(f"Calling super().to_internal_value with data: {data}")
+        return super().to_internal_value(data)
+
     def validate(self, data):
         try:
             cow = Cow.objects.get(farm__farm_id=data["farm_id"], cow_id=data["cow_id"])
@@ -448,6 +901,70 @@ class MonitorPregnancySerializer(serializers.Serializer):
     days_until_calving = serializers.IntegerField(required=True, help_text="The number of days until expected date of calving")
     service_per_conception = serializers.IntegerField(required=True, help_text="Number of service per conception")
     lactation_number = serializers.IntegerField(required=True, help_text="What is the number of lactation for the cow so far?")
+
+    def to_internal_value(self, data):
+        """
+        Handle field mapping and data conversion
+        """
+        logger.info(f"MonitorPregnancySerializer received data: {data}")
+        
+        # Create a copy of data to avoid modifying the original
+        processed_data = data.copy()
+        
+        # Handle potential field name variations
+        field_mappings = {
+            'farmid': 'farm_id',
+            'farm': 'farm_id',
+            'cowid': 'cow_id',
+            'cow': 'cow_id',
+            'Date_of_the_pregnancy': 'pregnancy_date',  # Added exact frontend field name
+            'pregnancy': 'pregnancy_date',
+            'date_pregnancy': 'pregnancy_date',
+            'until_claving': 'days_until_calving',  # Added exact frontend field name
+            'days_until_calving_date': 'days_until_calving',
+            'days_to_calving': 'days_until_calving',
+            'nsc': 'service_per_conception',  # Added exact frontend field name
+            'services_per_conception': 'service_per_conception',
+            'service_count': 'service_per_conception',
+            'lactation_no': 'lactation_number',  # Added exact frontend field name
+            'lactation': 'lactation_number',
+            'lactation_num': 'lactation_number',
+        }
+        
+        for old_name, new_name in field_mappings.items():
+            if old_name in processed_data and new_name not in processed_data:
+                processed_data[new_name] = processed_data.pop(old_name)
+                logger.info(f"Mapped field {old_name} to {new_name}: {processed_data[new_name]}")
+        
+        # Handle date parsing if it comes as datetime string
+        if 'pregnancy_date' in processed_data:
+            pregnancy_date_value = processed_data['pregnancy_date']
+            if isinstance(pregnancy_date_value, str):
+                try:
+                    from datetime import datetime
+                    # Try to parse datetime string and extract date
+                    if 'T' in pregnancy_date_value:
+                        parsed_datetime = datetime.fromisoformat(pregnancy_date_value.replace('Z', '+00:00'))
+                        processed_data['pregnancy_date'] = parsed_datetime.date()
+                        logger.info(f"Converted datetime to date: {processed_data['pregnancy_date']}")
+                except Exception as e:
+                    logger.warning(f"Could not parse pregnancy_date: {e}")
+                    # Let the normal validation handle it
+        
+        # Handle numeric fields that might come as strings
+        numeric_fields = ['days_until_calving', 'service_per_conception', 'lactation_number']
+        for field in numeric_fields:
+            if field in processed_data and isinstance(processed_data[field], str):
+                try:
+                    # Handle decimal values by converting to int
+                    processed_data[field] = int(float(processed_data[field]))
+                    logger.info(f"Converted {field} to integer: {processed_data[field]}")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"Could not convert {field} to integer: {e}")
+                    # Let the normal validation handle it
+        
+        logger.info(f"Processed pregnancy data: {processed_data}")
+        return super().to_internal_value(processed_data)
 
     def validate(self, data):
         try:
@@ -510,7 +1027,7 @@ class FarmerMedicalAssessmentSerializer(serializers.Serializer):
 class DoctorMedicalAssessmentSerializer(serializers.Serializer):
     farm_id = serializers.CharField(required=True)
     cow_id = serializers.CharField(required=True)
-    doctor_id = serializers.IntegerField(required=True)
+    doctor_id = serializers.IntegerField(required=False)  # Make this optional since we'll use farm.doctor
     is_cow_sick = serializers.BooleanField(required=True)
     sickness_type = serializers.ChoiceField(
         choices=['infectious', 'non_infectious'],
@@ -545,6 +1062,148 @@ class DoctorMedicalAssessmentSerializer(serializers.Serializer):
     next_assessment_date = serializers.DateField(required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True)
 
+    def to_internal_value(self, data):
+        """
+        Handle field mapping and data conversion from frontend format
+        """
+        logger.info(f"DoctorMedicalAssessmentSerializer received data: {data}")
+        
+        # Create a copy of data to avoid modifying the original
+        processed_data = data.copy()
+        
+        # Field mappings
+        field_mappings = {
+            'cow_sick': 'is_cow_sick',
+            'bcs': 'body_condition_score',
+            'is_vaccinated': 'is_cow_vaccinated',
+        }
+        
+        for old_name, new_name in field_mappings.items():
+            if old_name in processed_data and new_name not in processed_data:
+                processed_data[new_name] = processed_data.pop(old_name)
+                logger.info(f"Mapped field {old_name} to {new_name}: {processed_data[new_name]}")
+        
+        # Convert yes/no strings to booleans
+        boolean_fields = ['is_cow_sick', 'is_cow_vaccinated', 'has_deworming']
+        for field in boolean_fields:
+            if field in processed_data and isinstance(processed_data[field], str):
+                if processed_data[field].lower() in ['yes', 'yes_sick']:
+                    processed_data[field] = True
+                elif processed_data[field].lower() in ['no', 'no_sick']:
+                    processed_data[field] = False
+                logger.info(f"Converted {field} to boolean: {processed_data[field]}")
+        
+        # Convert deworming field specifically
+        if 'deworming' in processed_data:
+            processed_data['has_deworming'] = processed_data.pop('deworming').lower() == 'yes'
+            logger.info(f"Converted deworming to has_deworming: {processed_data['has_deworming']}")
+        
+        # Convert health status names to IDs
+        health_status_mappings = {
+            'general_health': {
+                'normal': 'Normal',
+                'poor': 'Poor',
+                'good': 'Good',
+                'excellent': 'Excellent'
+            },
+            'udder_health': {
+                '4qt': '4qt normal',
+                '4qt_normal': '4qt normal',
+                '3qt': '3qt normal',
+                '2qt': '2qt normal',
+                '1qt': '1qt normal'
+            },
+            'mastitis': {
+                'clinical_mastitis': 'Clinical mastitis',
+                'subclinical_mastitis': 'Subclinical mastitis',
+                'no_mastitis': 'No mastitis'
+            }
+        }
+        
+        for field, mapping in health_status_mappings.items():
+            if field in processed_data and isinstance(processed_data[field], str):
+                status_name = mapping.get(processed_data[field].lower(), processed_data[field])
+                try:
+                    if field == 'general_health':
+                        status_obj = GeneralHealthStatus.objects.get(name=status_name)
+                    elif field == 'udder_health':
+                        status_obj = UdderHealthStatus.objects.get(name=status_name)
+                    elif field == 'mastitis':
+                        status_obj = MastitisStatus.objects.get(name=status_name)
+                    
+                    processed_data[field] = status_obj.id
+                    logger.info(f"Converted {field} '{processed_data[field]}' to ID: {status_obj.id}")
+                except Exception as e:
+                    logger.warning(f"Could not find {field} status '{status_name}': {e}")
+                    # Try to get the first available status as fallback
+                    try:
+                        if field == 'general_health':
+                            fallback = GeneralHealthStatus.objects.first()
+                        elif field == 'udder_health':
+                            fallback = UdderHealthStatus.objects.first()
+                        elif field == 'mastitis':
+                            fallback = MastitisStatus.objects.first()
+                        
+                        if fallback:
+                            processed_data[field] = fallback.id
+                            logger.info(f"Using fallback {field} ID: {fallback.id}")
+                    except Exception as fallback_error:
+                        logger.error(f"Could not get fallback for {field}: {fallback_error}")
+        
+        # Auto-assign doctor - always use farm's doctor
+        try:
+            # Get the farm's assigned doctor
+            farm = Farm.objects.get(farm_id=processed_data['farm_id'])
+            if farm.doctor:
+                processed_data['doctor_id'] = farm.doctor.id
+                logger.info(f"Using farm's assigned doctor ID: {farm.doctor.id}")
+            else:
+                # If no doctor assigned to farm, raise an error
+                logger.error(f"No doctor assigned to farm {processed_data['farm_id']}")
+                raise serializers.ValidationError("No doctor assigned to this farm")
+        except Farm.DoesNotExist:
+            logger.error(f"Farm {processed_data['farm_id']} not found")
+            raise serializers.ValidationError("Farm not found")
+        except Exception as e:
+            logger.error(f"Error getting farm's doctor: {e}")
+            raise serializers.ValidationError("Error retrieving farm's doctor")
+        
+        logger.info(f"Processed data: {processed_data}")
+        return super().to_internal_value(processed_data)
+
+    def validate(self, data):
+        try:
+            cow = Cow.objects.get(farm__farm_id=data['farm_id'], cow_id=data['cow_id'])
+            
+            # Use the farm's assigned doctor
+            doctor = cow.farm.doctor
+            if not doctor:
+                raise serializers.ValidationError("No doctor assigned to this farm")
+
+            if not doctor.is_active:
+                raise serializers.ValidationError("Farm's assigned doctor is not active")
+
+            if data['is_cow_sick'] and not data.get('sickness_type'):
+                raise serializers.ValidationError(
+                    "Sickness type is required when cow is sick"
+                )
+
+            if data.get('is_cow_vaccinated') and not data.get('vaccination_date'):
+                raise serializers.ValidationError(
+                    "Vaccination date is required when cow is vaccinated"
+                )
+
+            if data.get('has_deworming') and not data.get('deworming_date'):
+                raise serializers.ValidationError(
+                    "Deworming date is required when cow has deworming"
+                )
+
+            data['cow'] = cow
+            data['doctor'] = doctor
+            return data
+        except Cow.DoesNotExist:
+            raise serializers.ValidationError("Cow not found")
+
     class Meta:
         swagger_schema_fields = {
             "example": {
@@ -574,45 +1233,62 @@ class DoctorMedicalAssessmentSerializer(serializers.Serializer):
             }
         }
 
-    def validate(self, data):
-        try:
-            cow = Cow.objects.get(farm__farm_id=data['farm_id'], cow_id=data['cow_id'])
-            doctor = Doctor.objects.get(id=data['doctor_id'])
-
-            if not doctor.is_active:
-                raise serializers.ValidationError("Doctor is not active")
-
-            if data['is_cow_sick'] and not data.get('sickness_type'):
-                raise serializers.ValidationError(
-                    "Sickness type is required when cow is sick"
-                )
-
-            if data.get('is_cow_vaccinated') and not data.get('vaccination_date'):
-                raise serializers.ValidationError(
-                    "Vaccination date is required when cow is vaccinated"
-                )
-
-            if data.get('has_deworming') and not data.get('deworming_date'):
-                raise serializers.ValidationError(
-                    "Deworming date is required when cow has deworming"
-                )
-
-            data['cow'] = cow
-            data['doctor'] = doctor
-            return data
-        except Cow.DoesNotExist:
-            raise serializers.ValidationError("Cow not found")
-        except Doctor.DoesNotExist:
-            raise serializers.ValidationError("Doctor not found")
-
 
 class MonitorHeatSignSerializer(serializers.Serializer):
     farm_id = serializers.CharField(required=True, help_text="Farm identifier")
     cow_id = serializers.CharField(required=True, help_text="Cow identifier")
     inseminated_now = serializers.CharField(required=True, help_text="Is the cow Inseminated?")
-    date_of_insemination = serializers.DateField(required=True, help_text="Date of Insemination")
+    date_of_insemination = serializers.DateField(required=False, help_text="Date of Insemination")
     insemination_number = serializers.CharField(required=True, help_text="How many times was the cow Inseminated so far?")
     lactation_no = serializers.CharField(required=True, help_text="What is the lactation number for the cow?")
+
+    def to_internal_value(self, data):
+        """
+        Handle field mapping and data conversion
+        """
+        logger.info(f"MonitorHeatSignSerializer received data: {data}")
+        
+        # Create a copy of data to avoid modifying the original
+        processed_data = data.copy()
+        
+        # Handle potential field name variations
+        field_mappings = {
+            'insemination_date': 'date_of_insemination',
+            'inseminated_date': 'date_of_insemination',
+            'date_insemination': 'date_of_insemination',
+            'Date_of_Insemination': 'date_of_insemination',  # Added this mapping
+        }
+        
+        for old_name, new_name in field_mappings.items():
+            if old_name in processed_data and new_name not in processed_data:
+                processed_data[new_name] = processed_data.pop(old_name)
+                logger.info(f"Mapped field {old_name} to {new_name}: {processed_data[new_name]}")
+        
+        # Special handling: If we have both date and time in separate fields, combine them
+        if 'date_of_insemination' in processed_data and 'inseminated_time' in processed_data:
+            try:
+                from datetime import datetime, date
+                
+                # Parse the date
+                if isinstance(processed_data['date_of_insemination'], str):
+                    insemination_date = datetime.strptime(processed_data['date_of_insemination'], '%Y-%m-%d').date()
+                else:
+                    insemination_date = processed_data['date_of_insemination']
+                
+                # Parse the time (keeping only the date, ignoring time for DateField)
+                # Since date_of_insemination is a DateField, we only need the date part
+                processed_data['date_of_insemination'] = insemination_date
+                
+                # Remove the time field since we don't need it for the DateField
+                processed_data.pop('inseminated_time', None)
+                
+                logger.info(f"Combined date and time into date_of_insemination: {processed_data['date_of_insemination']}")
+                
+            except Exception as e:
+                logger.error(f"Error combining date and time fields: {e}")
+                # If parsing fails, let the normal validation handle it
+        
+        return super().to_internal_value(processed_data)
 
     def validate(self, data):
         try:
@@ -628,6 +1304,10 @@ class MonitorHeatSignSerializer(serializers.Serializer):
             if not cow.farm.inseminator.is_active:
                 raise serializers.ValidationError("Assigned inseminator is not active")
 
+            # If cow is inseminated, date_of_insemination should be provided
+            if data['is_inseminated'] and not data.get('date_of_insemination'):
+                raise serializers.ValidationError("Date of insemination is required when cow is inseminated")
+
             data['cow'] = cow
             return data
         except Cow.DoesNotExist:
@@ -642,6 +1322,51 @@ class MonitorBirthSerializer(serializers.Serializer):
     calving_date = serializers.DateField(required=True, help_text="Date of Calving")
     last_calving_date = serializers.DateField(required=True, help_text="Date of last calving")
     calf_sex = serializers.ChoiceField(choices=['M', 'F'], required=True, help_text="What is the Sex of the Calf?")
+
+    def to_internal_value(self, data):
+        """
+        Handle field mapping and data conversion
+        """
+        logger.info(f"MonitorBirthSerializer received data: {data}")
+        
+        # Create a copy of data to avoid modifying the original
+        processed_data = data.copy()
+        
+        # Handle potential field name variations
+        field_mappings = {
+            'farmid': 'farm_id',
+            'farm': 'farm_id',
+            'cowid': 'cow_id',
+            'cow': 'cow_id',
+            'calving': 'calving_date',
+            'birth_date': 'calving_date',
+            'date_of_calving': 'calving_date',
+            'Date_of_Calving': 'calving_date',  # Added exact frontend field name
+            'last_calving': 'last_calving_date',
+            'previous_calving_date': 'last_calving_date',
+            'Date_of_last_calving': 'last_calving_date',  # Added exact frontend field name
+            'sex': 'calf_sex',
+            'calf_gender': 'calf_sex',
+            'gender': 'calf_sex',
+            'What_is_the_Sex_of_the_Calf': 'calf_sex',  # Added exact frontend field name
+        }
+        
+        for old_name, new_name in field_mappings.items():
+            if old_name in processed_data and new_name not in processed_data:
+                processed_data[new_name] = processed_data.pop(old_name)
+                logger.info(f"Mapped field {old_name} to {new_name}: {processed_data[new_name]}")
+        
+        # Handle sex field normalization
+        if 'calf_sex' in processed_data:
+            sex_value = str(processed_data['calf_sex']).upper()
+            if sex_value in ['MALE', 'BULL', 'BOY']:
+                processed_data['calf_sex'] = 'M'
+            elif sex_value in ['FEMALE', 'COW', 'GIRL']:
+                processed_data['calf_sex'] = 'F'
+            logger.info(f"Normalized calf_sex to: {processed_data['calf_sex']}")
+        
+        logger.info(f"Processed birth data: {processed_data}")
+        return super().to_internal_value(processed_data)
 
     def validate(self, data):
         try:

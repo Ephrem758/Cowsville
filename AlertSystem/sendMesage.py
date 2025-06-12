@@ -6,8 +6,10 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Get API token from .env
+# Get API token and sender info from .env
 API_TOKEN = os.getenv("AFROMESSAGE_API_TOKEN")
+SENDER_ID = "AAU-CVMA"  # Optional short code
+SENDER_NAME = os.getenv("AFROMESSAGE_SENDER_NAME", "Cowsville")  # Optional sender name
 
 # Development mode - don't require API token
 if not API_TOKEN:
@@ -36,10 +38,9 @@ def send_alert(phone_number, message):
         return {"status": "success", "response": {"acknowledge": "success", "message": "Development mode - no actual SMS sent"}}
 
     try:
-        # Construct the request URL
-        params = {
-            "from": "",  # Optional sender name
-            "sender": "",  # Optional sender ID
+        # Construct the request URL with proper sender info
+        params = { # Sender name (e.g., "Cowsville")
+            "sender": SENDER_ID,  # Short code/sender ID if you have one
             "to": phone_number,
             "message": message,
             "callback": "",  # Optional callback URL
