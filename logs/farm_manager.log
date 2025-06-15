@@ -1883,3 +1883,9 @@ INFO 2025-05-28 11:46:31,881 serializers Converted service_per_conception to int
 INFO 2025-05-28 11:46:31,881 serializers Converted lactation_number to integer: 2
 INFO 2025-05-28 11:46:31,881 serializers Processed pregnancy data: {'_id': 487813856, 'formhub/uuid': '351eb622651e4865864c204832094062', 'farm_id': 'Farm2', 'cow_id': '1', '__version__': 'vQLfpS5fkhGbLLcQXkyrT9', 'meta/instanceID': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/instanceName': '1', '_xform_id_string': 'a5dj6qex78gPm9zCpYnoB2', '_uuid': '478e7cbe-d6ca-41bf-bf6d-d85df50c322f', 'meta/rootUuid': 'uuid:478e7cbe-d6ca-41bf-bf6d-d85df50c322f', '_attachments': [], '_status': 'submitted_via_web', '_geolocation': [None, None], '_submission_time': '2025-05-28T11:37:49', '_tags': [], '_notes': [], '_validation_status': {}, '_submitted_by': 'agrigrow', 'pregnancy_date': datetime.date(2025, 5, 28), 'days_until_calving': 25, 'service_per_conception': 25, 'lactation_number': 2}
 INFO 2025-05-28 11:46:33,262 views Successfully updated pregnancy status for cow 1
+INFO 2025-06-14 16:13:36,006 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-06-14 16:13:36,030 views Successfully retrieved 5 cows
+INFO 2025-06-14 16:19:11,579 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-06-14 16:19:11,605 views Successfully retrieved 5 cows
+INFO 2025-06-14 22:05:01,794 views Received cow list request with query params: <QueryDict: {}>
+INFO 2025-06-14 22:05:01,813 views Successfully retrieved 5 cows

@@ -17,6 +17,7 @@ from .models import (
     MedicalAssessment,
     InseminationRecord,
     FarmerMedicalReport,
+    Reproduction,
 )
 
 
@@ -83,6 +84,13 @@ class FarmerMedicalReportAdmin(admin.ModelAdmin):
     search_fields = ("farm__farm_id", "cow__cow_id", "sickness_description")
     list_filter = ("is_reviewed",)
     date_hierarchy = "reported_date"
+
+
+@admin.register(Reproduction)
+class ReproductionAdmin(admin.ModelAdmin):
+    list_display = ("cow", "farm", "is_cow_pregnant", "pregnancy_date", "calving_date", "heat_sign_recorded_at")
+    search_fields = ("cow__cow_id", "farm__farm_id")
+    list_filter = ("is_cow_pregnant", "calving_date")
 
 
 # Register choice models
