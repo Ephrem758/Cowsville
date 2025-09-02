@@ -1,3 +1,14 @@
+"""
+FarmManager Serializers - Refactored for better maintainability
+
+This module contains Django REST Framework serializers for the Farm Manager application.
+It has been refactored to use:
+- ValidationService for common validation patterns
+- Base serializer classes to reduce code duplication
+- Consistent phone number formatting
+- Better error handling and logging
+"""
+
 from rest_framework import serializers
 from .models import (
     Farm,
@@ -19,6 +30,7 @@ from .models import (
     FarmerMedicalReport,
     Reproduction,
 )
+from .services import ValidationService, LoggingMixin
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
 from django.db import models
@@ -27,7 +39,43 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class FarmSerializer(serializers.ModelSerializer):
+class BasePhoneNumberMixin:
+    """Mixin for consistent phone number validation across serializers"""
+    
+    def validate_phone_number(self, value):
+        """Format Ethiopian phone numbers consistently"""
+        return ValidationService.format_ethiopian_phone_number(value)
+        
+    def validate_telephone_number(self, value):
+        """Format Ethiopian phone numbers consistently"""
+        return ValidationService.format_ethiopian_phone_number(value)
+
+
+class BaseChoiceModelSerializer(serializers.ModelSerializer):
+    """Base serializer for choice models to ensure consistency"""
+    
+    class Meta:
+        fields = '__all__'
+        
+
+class BaseFieldMappingMixin:
+    """Mixin for handling common field mappings"""
+    
+    def map_integer_field(self, data, source_field, target_field, default=0):
+        """Helper to map string fields to integers with default values"""
+        if source_field in data and not data.get(target_field):
+            try:
+                data[target_field] = int(data.pop(source_field))
+            except (ValueError, TypeError):
+                data[target_field] = default
+                
+    def map_string_field(self, data, source_field, target_field, default=''):
+        """Helper to map string fields with default values"""
+        if source_field in data and not data.get(target_field):
+            data[target_field] = data.pop(source_field) or default
+
+
+class FarmSerializer(BasePhoneNumberMixin, BaseFieldMappingMixin, serializers.ModelSerializer, LoggingMixin):
     # Include nested serialization for related fields
     type_of_housing_name = serializers.CharField(source='type_of_housing.display_name', read_only=True)
     type_of_floor_name = serializers.CharField(source='type_of_floor.display_name', read_only=True)
@@ -88,266 +136,68 @@ class FarmSerializer(serializers.ModelSerializer):
             'rate_of_water_giving': {'required': False},
         }
         
-    def _format_phone_number(self, value):
-        """
-        Helper method to format Ethiopian phone numbers by adding +251 prefix
-        """
-        if not value:
-            return value
-            
-        # Remove any spaces, dashes, or other formatting
-        cleaned_number = ''.join(filter(str.isdigit, value.replace('+', '')))
-        
-        # If number already starts with +251, return as is
-        if value.startswith('+251'):
-            return value
-            
-        # If number starts with 251, add + prefix
-        if cleaned_number.startswith('251'):
-            return f'+{cleaned_number}'
-            
-        # If number starts with 0 (Ethiopian local format), replace with +251
-        if cleaned_number.startswith('0') and len(cleaned_number) == 10:
-            return f'+251{cleaned_number[1:]}'
-            
-        # If number is 9 digits (Ethiopian mobile without 0), add +251
-        if len(cleaned_number) == 9 and cleaned_number[0] in ['9']:
-            return f'+251{cleaned_number}'
-            
-        # If none of the above, return original value (will be caught by model validation)
-        return value
-        
-    def validate_telephone_number(self, value):
-        """
-        Automatically format Ethiopian phone numbers by adding +251 prefix
-        """
-        return self._format_phone_number(value)
-        
     def validate(self, data):
-        """
-        Handle field mapping from incoming form data to model fields
-        """
-        # Map tel_no to telephone_number
-        if 'tel_no' in data and not data.get('telephone_number'):
-            tel_no_value = data.pop('tel_no')
-            # Apply phone number formatting
-            formatted_phone = self._format_phone_number(tel_no_value)
-            data['telephone_number'] = formatted_phone
+        """Handle field mapping from incoming form data to model fields"""
+        try:
+            # Map telephone number
+            if 'tel_no' in data and not data.get('telephone_number'):
+                tel_no_value = data.pop('tel_no')
+                data['telephone_number'] = ValidationService.format_ethiopian_phone_number(tel_no_value)
+                
+            # Map numeric fields
+            self.map_integer_field(data, 'fcc_no', 'fertility_camp_no', 1)
+            self.map_integer_field(data, 'herd_size', 'total_number_of_cows', 0)
+            self.map_integer_field(data, 'calves', 'number_of_calves', 0)
+            self.map_integer_field(data, 'milking_cows', 'number_of_milking_cows', 0)
             
-        # Map fcc_no to fertility_camp_no
-        if 'fcc_no' in data and not data.get('fertility_camp_no'):
-            try:
-                data['fertility_camp_no'] = int(data.pop('fcc_no'))
-            except (ValueError, TypeError):
-                data['fertility_camp_no'] = 1  # Default value
-                
-        # Map herd_size to total_number_of_cows
-        if 'herd_size' in data and not data.get('total_number_of_cows'):
-            try:
-                data['total_number_of_cows'] = int(data.pop('herd_size'))
-            except (ValueError, TypeError):
-                data['total_number_of_cows'] = 0
-                
-        # Map calves to number_of_calves
-        if 'calves' in data and not data.get('number_of_calves'):
-            try:
-                data['number_of_calves'] = int(data.pop('calves'))
-            except (ValueError, TypeError):
-                data['number_of_calves'] = 0
-                
-        # Map milking_cows to number_of_milking_cows
-        if 'milking_cows' in data and not data.get('number_of_milking_cows'):
-            try:
-                data['number_of_milking_cows'] = int(data.pop('milking_cows'))
-            except (ValueError, TypeError):
-                data['number_of_milking_cows'] = 0
-                
-        # Map TDM to total_daily_milk
-        if 'TDM' in data and not data.get('total_daily_milk'):
-            try:
-                data['total_daily_milk'] = int(float(data.pop('TDM')))
-            except (ValueError, TypeError):
-                data['total_daily_milk'] = 0
-                
-        # Map feed to main_feed
-        if 'feed' in data and not data.get('main_feed'):
-            data['main_feed'] = data.pop('feed')
+            # Map TDM to total_daily_milk
+            if 'TDM' in data and not data.get('total_daily_milk'):
+                try:
+                    data['total_daily_milk'] = int(float(data.pop('TDM')))
+                except (ValueError, TypeError):
+                    data['total_daily_milk'] = 0
+                    
+            # Map string fields
+            self.map_string_field(data, 'feed', 'main_feed')
             
-        # Map hygiene_score text to number
-        if 'hygiene_score' in data and not data.get('farm_hygiene_score'):
-            hygiene_mapping = {
-                'one': 1, 'two': 2, 'three': 3, 'four': 4,
-                '1': 1, '2': 2, '3': 3, '4': 4
-            }
-            hygiene_value = data.pop('hygiene_score').lower()
-            data['farm_hygiene_score'] = hygiene_mapping.get(hygiene_value, 2)  # Default to 2
+            # Map hygiene score
+            if 'hygiene_score' in data and not data.get('farm_hygiene_score'):
+                data['farm_hygiene_score'] = ValidationService.map_hygiene_score(data.pop('hygiene_score'))
+                
+            # Handle choice field mappings
+            self._map_choice_fields(data)
             
-        # Handle housing type mapping
-        if 'housing' in data and not data.get('type_of_housing'):
-            try:
-                from .models import HousingType
-                housing_name = data.pop('housing').replace('_', ' ').title()
-                housing_type = HousingType.objects.filter(
-                    models.Q(name__icontains=housing_name) | 
-                    models.Q(display_name__icontains=housing_name)
+            return super().validate(data)
+            
+        except Exception as e:
+            self.get_logger().error(f"Error validating farm data: {str(e)}")
+            raise serializers.ValidationError(f"Invalid farm data: {str(e)}")
+    
+    def _map_choice_fields(self, data):
+        """Map housing, floor, feeding, and water source fields"""
+        choice_mappings = [
+            ('housing', 'type_of_housing', HousingType),
+            ('floor', 'type_of_floor', FloorType),
+            ('feeding_rate', 'rate_of_cow_feeding', FeedingFrequency),
+            ('water_rate', 'rate_of_water_giving', FeedingFrequency),
+            ('water_source', 'source_of_water', WaterSource),
+        ]
+        
+        for source_field, target_field, model_class in choice_mappings:
+            if source_field in data and not data.get(target_field):
+                choice_value = data.pop(source_field).replace('_', ' ').title()
+                choice_obj = model_class.objects.filter(
+                    models.Q(name__icontains=choice_value) | 
+                    models.Q(display_name__icontains=choice_value)
                 ).first()
-                if housing_type:
-                    data['type_of_housing'] = housing_type  # Assign the object, not the ID
-                else:
-                    # Get first available housing type as fallback
-                    first_housing = HousingType.objects.first()
-                    if first_housing:
-                        data['type_of_housing'] = first_housing  # Assign the object, not the ID
-            except Exception:
-                pass
                 
-        # Handle floor type mapping
-        if 'floor' in data and not data.get('type_of_floor'):
-            try:
-                from .models import FloorType
-                floor_name = data.pop('floor').replace('_', ' ').title()
-                floor_type = FloorType.objects.filter(
-                    models.Q(name__icontains=floor_name) | 
-                    models.Q(display_name__icontains=floor_name)
-                ).first()
-                if floor_type:
-                    data['type_of_floor'] = floor_type  # Assign the object, not the ID
+                if choice_obj:
+                    data[target_field] = choice_obj
                 else:
-                    # Get first available floor type as fallback
-                    first_floor = FloorType.objects.first()
-                    if first_floor:
-                        data['type_of_floor'] = first_floor  # Assign the object, not the ID
-            except Exception:
-                pass
-                
-        # Handle feeding rate mapping
-        if 'feeding_rate' in data and not data.get('rate_of_cow_feeding'):
-            try:
-                from .models import FeedingFrequency
-                feeding_name = data.pop('feeding_rate').replace('_', ' ').title()
-                feeding_freq = FeedingFrequency.objects.filter(
-                    models.Q(name__icontains=feeding_name) | 
-                    models.Q(display_name__icontains=feeding_name)
-                ).first()
-                if feeding_freq:
-                    data['rate_of_cow_feeding'] = feeding_freq  # Assign the object, not the ID
-                else:
-                    # Get first available feeding frequency as fallback
-                    first_feeding = FeedingFrequency.objects.first()
-                    if first_feeding:
-                        data['rate_of_cow_feeding'] = first_feeding  # Assign the object, not the ID
-            except Exception:
-                pass
-                
-        # Handle water source mapping
-        if 'water_source' in data and not data.get('source_of_water'):
-            try:
-                from .models import WaterSource
-                water_name = data.pop('water_source').replace('_', ' ').title()
-                water_src = WaterSource.objects.filter(
-                    models.Q(name__icontains=water_name) | 
-                    models.Q(display_name__icontains=water_name)
-                ).first()
-                if water_src:
-                    data['source_of_water'] = water_src  # Assign the object, not the ID
-                else:
-                    # Get first available water source as fallback
-                    first_water = WaterSource.objects.first()
-                    if first_water:
-                        data['source_of_water'] = first_water  # Assign the object, not the ID
-            except Exception:
-                pass
-                
-        # Handle water rate mapping
-        if 'water_rate' in data and not data.get('rate_of_water_giving'):
-            try:
-                from .models import FeedingFrequency
-                water_rate_name = data.pop('water_rate').replace('_', ' ').title()
-                water_freq = FeedingFrequency.objects.filter(
-                    models.Q(name__icontains=water_rate_name) | 
-                    models.Q(display_name__icontains=water_rate_name)
-                ).first()
-                if water_freq:
-                    data['rate_of_water_giving'] = water_freq  # Assign the object, not the ID
-                else:
-                    # Get first available feeding frequency as fallback
-                    first_feeding = FeedingFrequency.objects.first()
-                    if first_feeding:
-                        data['rate_of_water_giving'] = first_feeding  # Assign the object, not the ID
-            except Exception:
-                pass
-                
-        # Clean up any remaining unmapped fields
-        fields_to_remove = ['heifers']  # Fields that don't map to anything
-        for field in fields_to_remove:
-            data.pop(field, None)
-            
-        # Auto-assign first available doctor and inseminator if not provided
-        if not data.get('doctor'):
-            try:
-                from .models import Doctor
-                first_doctor = Doctor.objects.filter(is_active=True).first()
-                if first_doctor:
-                    data['doctor'] = first_doctor
-                    logger.info(f"Auto-assigned doctor: {first_doctor.name} (ID: {first_doctor.id}) to farm {data.get('farm_id', 'Unknown')}")
-                else:
-                    # Try to get any doctor (even inactive) as fallback
-                    fallback_doctor = Doctor.objects.first()
-                    if fallback_doctor:
-                        data['doctor'] = fallback_doctor
-                        logger.warning(f"No active doctors found. Auto-assigned inactive doctor: {fallback_doctor.name} (ID: {fallback_doctor.id}) to farm {data.get('farm_id', 'Unknown')}")
-                    else:
-                        logger.warning(f"No doctors found in database. Farm {data.get('farm_id', 'Unknown')} will be created without a doctor.")
-            except Exception as e:
-                logger.error(f"Could not auto-assign doctor to farm {data.get('farm_id', 'Unknown')}: {e}")
-                
-        if not data.get('inseminator'):
-            try:
-                from .models import Inseminator
-                first_inseminator = Inseminator.objects.filter(is_active=True).first()
-                if first_inseminator:
-                    data['inseminator'] = first_inseminator
-                    logger.info(f"Auto-assigned inseminator: {first_inseminator.name} (ID: {first_inseminator.id}) to farm {data.get('farm_id', 'Unknown')}")
-                else:
-                    # Try to get any inseminator (even inactive) as fallback
-                    fallback_inseminator = Inseminator.objects.first()
-                    if fallback_inseminator:
-                        data['inseminator'] = fallback_inseminator
-                        logger.warning(f"No active inseminators found. Auto-assigned inactive inseminator: {fallback_inseminator.name} (ID: {fallback_inseminator.id}) to farm {data.get('farm_id', 'Unknown')}")
-                    else:
-                        logger.warning(f"No inseminators found in database. Farm {data.get('farm_id', 'Unknown')} will be created without an inseminator.")
-            except Exception as e:
-                logger.error(f"Could not auto-assign inseminator to farm {data.get('farm_id', 'Unknown')}: {e}")
-            
-        # Ensure required fields have values
-        if not data.get('telephone_number'):
-            raise serializers.ValidationError({'telephone_number': 'This field is required.'})
-        if not data.get('fertility_camp_no'):
-            raise serializers.ValidationError({'fertility_camp_no': 'This field is required.'})
-        if not data.get('total_number_of_cows'):
-            raise serializers.ValidationError({'total_number_of_cows': 'This field is required.'})
-        if not data.get('number_of_calves'):
-            raise serializers.ValidationError({'number_of_calves': 'This field is required.'})
-        if not data.get('number_of_milking_cows'):
-            raise serializers.ValidationError({'number_of_milking_cows': 'This field is required.'})
-        if not data.get('total_daily_milk'):
-            raise serializers.ValidationError({'total_daily_milk': 'This field is required.'})
-        if not data.get('main_feed'):
-            raise serializers.ValidationError({'main_feed': 'This field is required.'})
-        if not data.get('farm_hygiene_score'):
-            raise serializers.ValidationError({'farm_hygiene_score': 'This field is required.'})
-        if not data.get('type_of_housing'):
-            raise serializers.ValidationError({'type_of_housing': 'This field is required.'})
-        if not data.get('type_of_floor'):
-            raise serializers.ValidationError({'type_of_floor': 'This field is required.'})
-        if not data.get('rate_of_cow_feeding'):
-            raise serializers.ValidationError({'rate_of_cow_feeding': 'This field is required.'})
-        if not data.get('source_of_water'):
-            raise serializers.ValidationError({'source_of_water': 'This field is required.'})
-        if not data.get('rate_of_water_giving'):
-            raise serializers.ValidationError({'rate_of_water_giving': 'This field is required.'})
-            
-        return data
+                    # Get first available as fallback
+                    first_choice = model_class.objects.first()
+                    if first_choice:
+                        data[target_field] = first_choice
 
 
 class CowSerializer(serializers.ModelSerializer):
@@ -586,7 +436,7 @@ class CowCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Error creating cow: {str(e)}")
 
 
-class DoctorSerializer(serializers.ModelSerializer):
+class DoctorSerializer(BasePhoneNumberMixin, serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = '__all__'
@@ -600,82 +450,12 @@ class DoctorSerializer(serializers.ModelSerializer):
                 "license_number": "VET123"
             }
         }
-        
-    def _format_phone_number(self, value):
-        """
-        Helper method to format Ethiopian phone numbers by adding +251 prefix
-        """
-        if not value:
-            return value
-            
-        # Remove any spaces, dashes, or other formatting
-        cleaned_number = ''.join(filter(str.isdigit, value.replace('+', '')))
-        
-        # If number already starts with +251, return as is
-        if value.startswith('+251'):
-            return value
-            
-        # If number starts with 251, add + prefix
-        if cleaned_number.startswith('251'):
-            return f'+{cleaned_number}'
-            
-        # If number starts with 0 (Ethiopian local format), replace with +251
-        if cleaned_number.startswith('0') and len(cleaned_number) == 10:
-            return f'+251{cleaned_number[1:]}'
-            
-        # If number is 9 digits (Ethiopian mobile without 0), add +251
-        if len(cleaned_number) == 9 and cleaned_number[0] in ['9']:
-            return f'+251{cleaned_number}'
-            
-        # If none of the above, return original value (will be caught by model validation)
-        return value
-        
-    def validate_phone_number(self, value):
-        """
-        Automatically format Ethiopian phone numbers by adding +251 prefix
-        """
-        return self._format_phone_number(value)
 
 
-class InseminatorSerializer(serializers.ModelSerializer):
+class InseminatorSerializer(BasePhoneNumberMixin, serializers.ModelSerializer):
     class Meta:
         model = Inseminator
         fields = "__all__"
-        
-    def _format_phone_number(self, value):
-        """
-        Helper method to format Ethiopian phone numbers by adding +251 prefix
-        """
-        if not value:
-            return value
-            
-        # Remove any spaces, dashes, or other formatting
-        cleaned_number = ''.join(filter(str.isdigit, value.replace('+', '')))
-        
-        # If number already starts with +251, return as is
-        if value.startswith('+251'):
-            return value
-            
-        # If number starts with 251, add + prefix
-        if cleaned_number.startswith('251'):
-            return f'+{cleaned_number}'
-            
-        # If number starts with 0 (Ethiopian local format), replace with +251
-        if cleaned_number.startswith('0') and len(cleaned_number) == 10:
-            return f'+251{cleaned_number[1:]}'
-            
-        # If number is 9 digits (Ethiopian mobile without 0), add +251
-        if len(cleaned_number) == 9 and cleaned_number[0] in ['9']:
-            return f'+251{cleaned_number}'
-            
-        # If none of the above, return original value (will be caught by model validation)
-        return value
-        
-    def validate_phone_number(self, value):
-        """
-        Automatically format Ethiopian phone numbers by adding +251 prefix
-        """
-        return self._format_phone_number(value)
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -702,58 +482,49 @@ class FarmerMedicalReportSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class BreedTypeSerializer(serializers.ModelSerializer):
-    class Meta:
+class BreedTypeSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = BreedType
-        fields = "__all__"
 
 
-class HousingTypeSerializer(serializers.ModelSerializer):
-    class Meta:
+class HousingTypeSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = HousingType
-        fields = "__all__"
 
 
-class FloorTypeSerializer(serializers.ModelSerializer):
-    class Meta:
+class FloorTypeSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = FloorType
-        fields = "__all__"
 
 
-class FeedingFrequencySerializer(serializers.ModelSerializer):
-    class Meta:
+class FeedingFrequencySerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = FeedingFrequency
-        fields = "__all__"
 
 
-class WaterSourceSerializer(serializers.ModelSerializer):
-    class Meta:
+class WaterSourceSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = WaterSource
-        fields = "__all__"
 
 
-class GynecologicalStatusSerializer(serializers.ModelSerializer):
-    class Meta:
+class GynecologicalStatusSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = GynecologicalStatus
-        fields = "__all__"
 
 
-class UdderHealthStatusSerializer(serializers.ModelSerializer):
-    class Meta:
+class UdderHealthStatusSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = UdderHealthStatus
-        fields = "__all__"
 
 
-class MastitisStatusSerializer(serializers.ModelSerializer):
-    class Meta:
+class MastitisStatusSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = MastitisStatus
-        fields = "__all__"
 
 
-class GeneralHealthStatusSerializer(serializers.ModelSerializer):
-    class Meta:
+class GeneralHealthStatusSerializer(BaseChoiceModelSerializer):
+    class Meta(BaseChoiceModelSerializer.Meta):
         model = GeneralHealthStatus
-        fields = "__all__"
 
 
 class ReproductionSerializer(serializers.ModelSerializer):
@@ -1359,11 +1130,11 @@ class MonitorBirthSerializer(serializers.Serializer):
         # Handle sex field normalization
         if 'calf_sex' in processed_data:
             sex_value = str(processed_data['calf_sex']).upper()
-            if sex_value in ['MALE', 'BULL', 'BOY']:
+            if sex_value in ['MALE', 'BULL', 'BOY', 'M', 'MALE_MALE']:
                 processed_data['calf_sex'] = 'M'
-            elif sex_value in ['FEMALE', 'COW', 'GIRL']:
+            elif sex_value in ['FEMALE', 'COW', 'GIRL', 'F', 'FEMALE_FEMALE']:
                 processed_data['calf_sex'] = 'F'
-            logger.info(f"Normalized calf_sex to: {processed_data['calf_sex']}")
+            logger.info(f"Normalized calf_sex from '{processed_data.get('calf_sex')}' to: {processed_data['calf_sex']}")
         
         logger.info(f"Processed birth data: {processed_data}")
         return super().to_internal_value(processed_data)

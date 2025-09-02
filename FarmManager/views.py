@@ -1,3 +1,21 @@
+"""
+FarmManager Views - Refactored for better maintainability
+
+This module contains Django REST Framework ViewSets for the Farm Manager application.
+It has been refactored to use:
+- Service classes for business logic (MessagingService, HealthService, ValidationService)
+- Constants for message templates and API responses
+- LoggingMixin for consistent logging patterns
+- ResponseService for standardized API responses
+
+The refactoring focuses on:
+- Reducing code duplication
+- Improving error handling
+- Centralizing message templates
+- Consistent logging patterns
+- Better separation of concerns
+"""
+
 import logging
 from django.db import transaction
 from django.http import JsonResponse
@@ -12,6 +30,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django_filters.rest_framework import DjangoFilterBackend
 
 from AlertSystem.sendMesage import send_alert
+from .permissions import AdminGetOnlyPermission, ReadOnlyAdminPermission
 from .models import (
     Cow,
     Farm,
@@ -61,96 +80,106 @@ from .serializers import (
     DoctorSerializer,
     MonitorBirthSerializer,
 )
+from .constants import MessageTypes, APIMessages, MessageTemplates
+from .services import MessagingService, LoggingMixin, ResponseService, HealthService, ValidationService
 
 # initiating the logger
 logger = logging.getLogger(__name__)
 
 
-class FarmViewSet(viewsets.ModelViewSet):
+class FarmViewSet(viewsets.ModelViewSet, LoggingMixin):
     queryset = Farm.objects.all()
     serializer_class = FarmSerializer
+    permission_classes = [AdminGetOnlyPermission]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['farm_id', 'owner_name', 'is_deleted']  # For exact matches
     search_fields = ["farm_id", "owner_name", "address"]  # For partial matches
-    logger = logging.getLogger(__name__)
 
     def create(self, request, *args, **kwargs):
         """Create a new farm with logging"""
-        self.logger.info(f"Received farm creation request with data: {request.data}")
+        self.log_request_received("farm creation", request.data)
         try:
             serializer = self.get_serializer(data=request.data)
             if not serializer.is_valid():
-                self.logger.warning(f"Invalid farm data: {serializer.errors}")
+                self.log_validation_error("farm creation", serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
             farm = serializer.save()
-            self.logger.info(f"Successfully created farm with ID: {farm.farm_id}")
+            self.log_operation_success("created farm", f"with ID: {farm.farm_id}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
         except Exception as e:
-            self.logger.error(f"Error creating farm: {str(e)}", exc_info=True)
-            return Response(
-                {"error": f"Failed to create farm: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error("creating farm", e)
+            error_response, error_status = ResponseService.error_response(
+                f"{APIMessages.FAILED_TO_CREATE_FARM}: {str(e)}"
             )
+            return Response(error_response, status=error_status)
 
     def update(self, request, *args, **kwargs):
         """Update a farm with logging"""
-        self.logger.info(f"Received farm update request for farm {kwargs.get('pk')} with data: {request.data}")
+        farm_pk = kwargs.get('pk')
+        self.log_request_received(f"farm update for farm {farm_pk}", request.data)
         try:
             instance = self.get_object()
             serializer = self.get_serializer(instance, data=request.data, partial=kwargs.get('partial', False))
             if not serializer.is_valid():
-                self.logger.warning(f"Invalid farm update data: {serializer.errors}")
+                self.log_validation_error("farm update", serializer.errors)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
             farm = serializer.save()
-            self.logger.info(f"Successfully updated farm {farm.farm_id}")
+            self.log_operation_success("updated farm", farm.farm_id)
             return Response(serializer.data)
+            
         except Exception as e:
-            self.logger.error(f"Error updating farm {kwargs.get('pk')}: {str(e)}", exc_info=True)
-            return Response(
-                {"error": f"Failed to update farm: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error(f"updating farm {farm_pk}", e)
+            error_response, error_status = ResponseService.error_response(
+                f"{APIMessages.FAILED_TO_UPDATE_FARM}: {str(e)}"
             )
+            return Response(error_response, status=error_status)
 
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a single farm with logging"""
-        self.logger.info(f"Received farm retrieve request for farm {kwargs.get('pk')}")
+        farm_pk = kwargs.get('pk')
+        self.log_request_received(f"farm retrieve for farm {farm_pk}")
         try:
             response = super().retrieve(request, *args, **kwargs)
-            self.logger.info(f"Successfully retrieved farm {kwargs.get('pk')}")
+            self.log_operation_success("retrieved farm", farm_pk)
             return response
+            
         except Exception as e:
-            self.logger.error(f"Error retrieving farm {kwargs.get('pk')}: {str(e)}", exc_info=True)
-            return Response(
-                {"error": f"Failed to retrieve farm: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error(f"retrieving farm {farm_pk}", e)
+            error_response, error_status = ResponseService.error_response(
+                f"{APIMessages.FAILED_TO_RETRIEVE_FARM}: {str(e)}"
             )
+            return Response(error_response, status=error_status)
 
     def destroy(self, request, *args, **kwargs):
         """Delete a farm with logging"""
-        self.logger.info(f"Received farm deletion request for farm {kwargs.get('pk')}")
+        farm_pk = kwargs.get('pk')
+        self.log_request_received(f"farm deletion for farm {farm_pk}")
         try:
             instance = self.get_object()
             farm_id = instance.farm_id
             response = super().destroy(request, *args, **kwargs)
-            self.logger.info(f"Successfully deleted farm {farm_id}")
+            self.log_operation_success("deleted farm", farm_id)
             return response
+            
         except Exception as e:
-            self.logger.error(f"Error deleting farm {kwargs.get('pk')}: {str(e)}", exc_info=True)
-            return Response(
-                {"error": f"Failed to delete farm: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error(f"deleting farm {farm_pk}", e)
+            error_response, error_status = ResponseService.error_response(
+                f"{APIMessages.FAILED_TO_DELETE_FARM}: {str(e)}"
             )
+            return Response(error_response, status=error_status)
 
     @action(detail=True, methods=["post"])
     def change_inseminator(self, request, pk=None):
+        """Change inseminator for a farm"""
         farm = self.get_object()
         logger.info(f"Request to change inseminator for farm {farm.farm_id}")
 
         serializer = InseminatorAssignmentSerializer(data=request.data)
         if not serializer.is_valid():
-            logger.warning(f"Invalid data for inseminator change: {serializer.errors}")
+            self.log_validation_error("inseminator change", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         logger.info(f"Validated inseminator change request for farm {farm.farm_id}")
@@ -158,17 +187,18 @@ class FarmViewSet(viewsets.ModelViewSet):
             request,
             "inseminator",
             serializer.validated_data["inseminator_id"],
-            "inseminator_assignment",
+            MessageTypes.INSEMINATOR_ASSIGNMENT,
         )
 
     @action(detail=True, methods=["post"])
     def change_doctor(self, request, pk=None):
+        """Change doctor for a farm"""
         farm = self.get_object()
         logger.info(f"Request to change doctor for farm {farm.farm_id}")
 
         serializer = DoctorAssignmentSerializer(data=request.data)
         if not serializer.is_valid():
-            logger.warning(f"Invalid data for doctor change: {serializer.errors}")
+            self.log_validation_error("doctor change", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         logger.info(f"Validated doctor change request for farm {farm.farm_id}")
@@ -176,149 +206,77 @@ class FarmViewSet(viewsets.ModelViewSet):
             request,
             "doctor",
             serializer.validated_data["doctor_id"],
-            "doctor_assignment",
+            MessageTypes.DOCTOR_ASSIGNMENT,
         )
 
     def _change_staff(self, request, staff_type, staff_id, message_type):
+        """Common method to handle staff changes"""
         farm = self.get_object()
-        logger.info(
-            f"Attempting to change {staff_type} for farm {farm.farm_id} to staff ID {staff_id}"
-        )
+        logger.info(f"Attempting to change {staff_type} for farm {farm.farm_id} to staff ID {staff_id}")
 
         try:
             with transaction.atomic():
+                # Get staff models and current assignments
                 if staff_type == "inseminator":
                     StaffModel = Inseminator
                     old_staff = farm.inseminator
-                    new_staff = StaffModel.objects.get(id=staff_id)
-                    title = ""
                 else:
                     StaffModel = Doctor
                     old_staff = farm.doctor
+
+                try:
                     new_staff = StaffModel.objects.get(id=staff_id)
-                    title = "Dr."
+                except StaffModel.DoesNotExist:
+                    error_msg = f"{staff_type.capitalize()} with ID {staff_id} not found"
+                    logger.error(error_msg)
+                    return Response({"error": error_msg}, status=status.HTTP_404_NOT_FOUND)
 
-                logger.info(
-                    f"Found new {staff_type} : {new_staff.name} (ID: {new_staff.id})"
-                )
+                logger.info(f"Found new {staff_type}: {new_staff.name} (ID: {new_staff.id})")
 
+                # Update assignments
                 if old_staff:
-                    logger.info(
-                        f"Replacing {staff_type} : {old_staff.name} (ID: {old_staff.id}) with {new_staff.name} (ID: {new_staff.id})"
-                    )
+                    logger.info(f"Replacing {staff_type}: {old_staff.name} (ID: {old_staff.id}) with {new_staff.name}")
                     old_staff.is_active = False
                 else:
                     logger.info(f"No existing {staff_type} to replace")
 
+                # Update farm with new staff
                 setattr(farm, staff_type, new_staff)
                 farm.save(update_fields=[staff_type])
+                logger.info(f"Successfully updated farm {farm.farm_id} with new {staff_type}")
 
-                logger.info(
-                    f"Successfully updated farm {farm.farm_id} with new {staff_type}"
+                # Send notifications using the messaging service
+                notification_results = MessagingService.send_staff_change_notifications(
+                    farm, staff_type, old_staff, new_staff, message_type
                 )
 
-                # send message to old staff
-                if old_staff:
-                    old_message = (
-                        f"Notice: You have been unassigned from farm: {farm.farm_id} "
-                        f"({farm.owner_name})"
-                    )
-                    try:
-                        send_alert(old_staff.phone_number, old_message)
-                        logger.info(
-                            f"Notification sent to previous {staff_type} : {old_staff.name}"
-                        )
-                    except Exception as e:
-                        logger.warning(
-                            f"Failed to send notification to previous {staff_type} : {old_staff.name}. Error: {e}"
-                        )
+                logger.info(f"Successfully completed the {staff_type} change process for farm {farm.farm_id}")
 
-                # send message to new staff
-                new_message = (
-                    f"Notice: You have been assigned to a new farm:\n"
-                    f"Farm ID: {farm.farm_id}\n"
-                    f"Owner: {farm.owner_name}\n"
-                    f"Address: {farm.address}\n"
-                    f"Phone: {farm.telephone_number}"
-                )
-                try:
-                    send_alert(new_staff.phone_number, new_message)
-                    logger.info(
-                        f"Notification sent to new {staff_type} : {new_staff.name}"
-                    )
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to send notification to new {staff_type} : {new_staff.name}. Error: {e}"
-                    )
-
-                # Notify the farmer about the doctor change
-                if staff_type == "doctor":
-                    farmer_message = (
-                        f"Notice: Your farm's doctor has been changed to {title}{new_staff.name}. "
-                        f"Contact number: {new_staff.phone_number}"
-                    )
-                    try:
-                        send_alert(farm.telephone_number, farmer_message)
-                        logger.info(f"Notification sent to farmer about doctor change")
-                    except Exception as e:
-                        logger.warning(
-                            f"Failed to send notification to farmer about doctor change. Error: {str(e)}"
-                        )
-
-                # Creating message record
-                try:
-                    Message.objects.create(
-                        farm=farm,
-                        cow=None,
-                        message_text=new_message,
-                        message_type=message_type,
-                        is_sent=True,
-                    )
-                    logger.info(f"Message record created for {staff_type} change")
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to create message record for {staff_type} change. Error: {str(e)}"
-                    )
-                    raise
-
-                logger.info(
-                    f"Successfully compeleted the {staff_type} change process for farm {farm.farm_id}"
-                )
-
-                return Response(
+                response_data = ResponseService.success_response(
+                    f"{staff_type} changed successfully",
                     {
-                        "message": f"{staff_type} changed successfully",
                         "farm_id": farm.farm_id,
                         "new_staff_id": new_staff.id,
                         "old_staff_id": old_staff.id if old_staff else None,
+                        "notifications_sent": notification_results
                     }
                 )
-
-        except StaffModel.DoesNotExist:
-            err_msg = f"{staff_type.capitalize()} with ID {staff_id} not found"
-            logger.error(err_msg)
-
-            return Response({"error": err_msg}, status=status.HTTP_404_NOT_FOUND)
+                return Response(response_data)
 
         except Exception as e:
-            logger.error(
-                f"An error occurred while changing {staff_type} for farm {farm.farm_id}: {str(e)}"
+            logger.error(f"An error occurred while changing {staff_type} for farm {farm.farm_id}: {str(e)}")
+            error_response, error_status = ResponseService.error_response(
+                f"Failed to change {staff_type} for farm {farm.farm_id}: Unexpected error"
             )
-
-            return Response(
-                {
-                    "error": f"Failed to change {staff_type} for farm {farm.farm_id}: Unexpected error"
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return Response(error_response, status=error_status)
 
 
-class CowViewSet(viewsets.ModelViewSet):
+class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
     queryset = Cow.objects.all()
     serializer_class = CowSerializer
+    permission_classes = [AdminGetOnlyPermission]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ["cow_id", "breed__name"]
-    logger = logging.getLogger(__name__)
     filterset_fields = ['farm_id']
 
     def get_serializer_class(self):
@@ -329,76 +287,79 @@ class CowViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Create a new cow with logging"""
-        self.logger.info(f"Received cow creation request with data: {request.data}")
+        self.log_request_received("cow creation", request.data)
         try:
             response = super().create(request, *args, **kwargs)
-            self.logger.info(f"Successfully created cow with ID: {response.data.get('cow_id')}")
+            self.log_operation_success("created cow", f"with ID: {response.data.get('cow_id')}")
             return response
         except Exception as e:
-            self.logger.error(f"Error creating cow: {str(e)}", exc_info=True)
+            self.log_operation_error("creating cow", e)
             raise
 
     def update(self, request, *args, **kwargs):
         """Update a cow with logging"""
-        self.logger.info(f"Received cow update request for cow {kwargs.get('pk')} with data: {request.data}")
+        cow_pk = kwargs.get('pk')
+        self.log_request_received(f"cow update for cow {cow_pk}", request.data)
         try:
             response = super().update(request, *args, **kwargs)
-            self.logger.info(f"Successfully updated cow {kwargs.get('pk')}")
+            self.log_operation_success("updated cow", cow_pk)
             return response
         except Exception as e:
-            self.logger.error(f"Error updating cow {kwargs.get('pk')}: {str(e)}", exc_info=True)
+            self.log_operation_error(f"updating cow {cow_pk}", e)
             raise
 
     def destroy(self, request, *args, **kwargs):
         """Delete a cow with logging"""
-        self.logger.info(f"Received cow deletion request for cow {kwargs.get('pk')}")
+        cow_pk = kwargs.get('pk')
+        self.log_request_received(f"cow deletion for cow {cow_pk}")
         try:
             response = super().destroy(request, *args, **kwargs)
-            self.logger.info(f"Successfully deleted cow {kwargs.get('pk')}")
+            self.log_operation_success("deleted cow", cow_pk)
             return response
         except Exception as e:
-            self.logger.error(f"Error deleting cow {kwargs.get('pk')}: {str(e)}", exc_info=True)
+            self.log_operation_error(f"deleting cow {cow_pk}", e)
             raise
 
     def list(self, request, *args, **kwargs):
         """List cows with logging"""
-        self.logger.info(f"Received cow list request with query params: {request.query_params}")
+        self.log_request_received("cow list", f"query params: {request.query_params}")
         try:
             response = super().list(request, *args, **kwargs)
-            self.logger.info(f"Successfully retrieved {len(response.data)} cows")
+            self.log_operation_success("retrieved", f"{len(response.data)} cows")
             return response
         except Exception as e:
-            self.logger.error(f"Error listing cows: {str(e)}", exc_info=True)
+            self.log_operation_error("listing cows", e)
             raise
 
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a single cow with logging"""
-        self.logger.info(f"Received cow retrieve request for cow {kwargs.get('pk')}")
+        cow_pk = kwargs.get('pk')
+        self.log_request_received(f"cow retrieve for cow {cow_pk}")
         try:
             response = super().retrieve(request, *args, **kwargs)
-            self.logger.info(f"Successfully retrieved cow {kwargs.get('pk')}")
+            self.log_operation_success("retrieved cow", cow_pk)
             return response
         except Exception as e:
-            self.logger.error(f"Error retrieving cow {kwargs.get('pk')}: {str(e)}", exc_info=True)
+            self.log_operation_error(f"retrieving cow {cow_pk}", e)
             raise
 
     @action(detail=False, methods=['GET'])
     def by_farm(self, request):
         """Get all cows for a specific farm with logging"""
         farm_id = request.query_params.get('farm_id')
-        self.logger.info(f"Received by_farm request for farm {farm_id}")
+        self.log_request_received(f"by_farm for farm {farm_id}")
         
         if not farm_id:
-            self.logger.warning("by_farm request missing farm_id parameter")
+            self.get_logger().warning("by_farm request missing farm_id parameter")
             return Response(
-                {"error": "farm_id query parameter is required"},
+                {"error": APIMessages.FARM_ID_REQUIRED},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
             cows = self.get_queryset().filter(farm__farm_id=farm_id)
             serializer = self.get_serializer(cows, many=True)
-            self.logger.info(f"Successfully retrieved {len(serializer.data)} cows for farm {farm_id}")
+            self.log_operation_success("retrieved", f"{len(serializer.data)} cows for farm {farm_id}")
             
             return Response({
                 "farm_id": farm_id,
@@ -406,7 +367,7 @@ class CowViewSet(viewsets.ModelViewSet):
                 "cows": serializer.data
             })
         except Exception as e:
-            self.logger.error(f"Error retrieving cows for farm {farm_id}: {str(e)}", exc_info=True)
+            self.log_operation_error(f"retrieving cows for farm {farm_id}", e)
             return Response(
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -418,132 +379,103 @@ class CowViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 # Save the cow first
                 cow = serializer.save()
-                self.logger.info(f"Created new cow: {cow.cow_id} for farm {cow.farm.farm_id}")
+                self.log_operation_success("created new cow", f"{cow.cow_id} for farm {cow.farm.farm_id}")
 
-                # Get extra fields from serializer context
-                medical_fields = serializer.context.get('medical_fields', {})
-                reproduction_fields = serializer.context.get('reproduction_fields', {})
-
-                # Convert is_pregnant from yes/no to boolean if present
-                is_pregnant = False
-                if 'is_pregnant' in reproduction_fields:
-                    # Check if value is already a boolean
-                    if isinstance(reproduction_fields['is_pregnant'], bool):
-                        is_pregnant = reproduction_fields['is_pregnant']
-                    else:
-                        is_pregnant = reproduction_fields['is_pregnant'].lower() == 'yes'
-
-                # Create reproduction record with data from the request
-                Reproduction.objects.create(
-                    cow=cow,
-                    farm=cow.farm,
-                    is_cow_pregnant=is_pregnant,
-                    pregnancy_date=serializer.validated_data.get('last_date_insemination'),
-                    calving_date=serializer.validated_data.get('last_calving_date'),
-                    heat_sign_start=serializer.validated_data.get('heat_start_date', None),
-                    heat_sign_end=serializer.validated_data.get('heat_end_date', None),
-                    heat_signs_seen=serializer.validated_data.get('heat_signs', None)
-                )
-                self.logger.info(f"Created reproduction record for cow {cow.cow_id}")
-
-                # Get a doctor for the assessment - use the farm's doctor or find a fallback
-                assessed_by = cow.farm.doctor
-                if not assessed_by:
-                    # Try to get the first available active doctor
-                    assessed_by = Doctor.objects.filter(is_active=True).first()
-                    if not assessed_by:
-                        # If no active doctors, get any doctor
-                        assessed_by = Doctor.objects.first()
-                    
-                    if assessed_by:
-                        self.logger.info(f"No doctor assigned to farm, using fallback doctor: {assessed_by.name}")
-                    else:
-                        self.logger.warning(f"No doctors available in the system, skipping medical assessment creation")
-                        return
-                
-                # Get default status objects
-                try:
-                    general_health = GeneralHealthStatus.objects.get(name='Normal')
-                    udder_health = UdderHealthStatus.objects.get(name='4qt normal')
-                    mastitis = MastitisStatus.objects.get(name='Clinical mastitis')
-                except (GeneralHealthStatus.DoesNotExist, UdderHealthStatus.DoesNotExist, MastitisStatus.DoesNotExist) as e:
-                    self.logger.error(f"Could not find default health status: {str(e)}")
-                    # Fallback to first available
-                    general_health = GeneralHealthStatus.objects.first()
-                    udder_health = UdderHealthStatus.objects.first()
-                    mastitis = MastitisStatus.objects.first()
-
-                # Convert medical field values if they're not already booleans
-                has_lameness = False
-                if 'has_lameness' in medical_fields:
-                    if isinstance(medical_fields['has_lameness'], bool):
-                        has_lameness = medical_fields['has_lameness']
-                    else:
-                        has_lameness = medical_fields['has_lameness'].lower() == 'yes'
-                    
-                is_vaccinated = False
-                if 'is_vaccinated' in medical_fields:
-                    if isinstance(medical_fields['is_vaccinated'], bool):
-                        is_vaccinated = medical_fields['is_vaccinated']
-                    else:
-                        is_vaccinated = medical_fields['is_vaccinated'].lower() == 'yes'
-                    
-                has_deworming = False
-                if 'has_deworming' in medical_fields:
-                    if isinstance(medical_fields['has_deworming'], bool):
-                        has_deworming = medical_fields['has_deworming']
-                    else:
-                        has_deworming = medical_fields['has_deworming'].lower() == 'yes'
-                elif 'deworming' in serializer.validated_data:
-                    if isinstance(serializer.validated_data['deworming'], bool):
-                        has_deworming = serializer.validated_data['deworming']
-                    else:
-                        has_deworming = serializer.validated_data['deworming'].lower() == 'yes'
-
-                # Create medical assessment with data from the request
-                MedicalAssessment.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    assessed_by=assessed_by,
-                    is_cow_sick=False,
-                    general_health=general_health,
-                    udder_health=udder_health,
-                    mastitis=mastitis,
-                    has_lameness=has_lameness,
-                    body_condition_score=int(float(cow.bcs)),
-                    reproductive_health=medical_fields.get('reproductive_health', 'Normal'),
-                    metabolic_disease=medical_fields.get('metabolic_disease', 'Normal'),
-                    is_cow_vaccinated=is_vaccinated,
-                    vaccination_date=medical_fields.get('vaccination_date'),
-                    vaccination_type=medical_fields.get('vaccination_type', ''),
-                    has_deworming=has_deworming,
-                    deworming_date=medical_fields.get('deworming_date'),
-                    deworming_type=medical_fields.get('deworming_type', ''),
-                    diagnosis='',
-                    treatment='',
-                    prescription=''
-                )
-                self.logger.info(f"Created medical assessment for cow {cow.cow_id}")
+                # Create related records
+                self._create_reproduction_record(cow, serializer)
+                self._create_medical_assessment_record(cow, serializer)
 
         except Exception as e:
-            self.logger.error(f"Error creating cow with reproduction and medical records: {str(e)}")
+            self.log_operation_error("creating cow with reproduction and medical records", e)
             raise
+
+    def _create_reproduction_record(self, cow, serializer):
+        """Create reproduction record for the cow"""
+        medical_fields = serializer.context.get('medical_fields', {})
+        reproduction_fields = serializer.context.get('reproduction_fields', {})
+
+        # Convert is_pregnant from yes/no to boolean if present
+        is_pregnant = ValidationService.convert_yes_no_to_boolean(
+            reproduction_fields.get('is_pregnant', False)
+        )
+
+        # Create reproduction record with data from the request
+        Reproduction.objects.create(
+            cow=cow,
+            farm=cow.farm,
+            is_cow_pregnant=is_pregnant,
+            pregnancy_date=serializer.validated_data.get('last_date_insemination'),
+            calving_date=serializer.validated_data.get('last_calving_date'),
+            heat_sign_start=serializer.validated_data.get('heat_start_date', None),
+            heat_sign_end=serializer.validated_data.get('heat_end_date', None),
+            heat_signs_seen=serializer.validated_data.get('heat_signs', None)
+        )
+        self.log_operation_success("created reproduction record", f"for cow {cow.cow_id}")
+
+    def _create_medical_assessment_record(self, cow, serializer):
+        """Create medical assessment record for the cow"""
+        medical_fields = serializer.context.get('medical_fields', {})
+
+        # Get a doctor for the assessment
+        assessed_by = HealthService.get_doctor_for_assessment(cow.farm)
+        if not assessed_by:
+            self.get_logger().warning("No doctors available in the system, skipping medical assessment creation")
+            return
+
+        # Get default health status objects
+        general_health, udder_health, mastitis = HealthService.get_default_health_statuses()
+
+        # Convert medical field values using validation service
+        has_lameness = ValidationService.convert_yes_no_to_boolean(
+            medical_fields.get('has_lameness')
+        )
+        is_vaccinated = ValidationService.convert_yes_no_to_boolean(
+            medical_fields.get('is_vaccinated')
+        )
+        
+        # Handle deworming from multiple possible sources
+        has_deworming = ValidationService.convert_yes_no_to_boolean(
+            medical_fields.get('has_deworming') or serializer.validated_data.get('deworming')
+        )
+
+        # Create medical assessment with data from the request
+        MedicalAssessment.objects.create(
+            farm=cow.farm,
+            cow=cow,
+            assessed_by=assessed_by,
+            is_cow_sick=False,
+            general_health=general_health,
+            udder_health=udder_health,
+            mastitis=mastitis,
+            has_lameness=has_lameness,
+            body_condition_score=ValidationService.safe_int_conversion(cow.bcs),
+            reproductive_health=medical_fields.get('reproductive_health', 'Normal'),
+            metabolic_disease=medical_fields.get('metabolic_disease', 'Normal'),
+            is_cow_vaccinated=is_vaccinated,
+            vaccination_date=medical_fields.get('vaccination_date'),
+            vaccination_type=medical_fields.get('vaccination_type', ''),
+            has_deworming=has_deworming,
+            deworming_date=medical_fields.get('deworming_date'),
+            deworming_type=medical_fields.get('deworming_type', ''),
+            diagnosis='',
+            treatment='',
+            prescription=''
+        )
+        self.log_operation_success("created medical assessment", f"for cow {cow.cow_id}")
 
     @action(detail=False, methods=["post"])
     def record_heat_sign(self, request):
-
-        self.logger.info("Received heat sign recording request")
-        self.logger.info(f"Raw request data: {request.data}")
+        """Record heat sign for a cow and send notifications"""
+        self.log_request_received("heat sign recording")
+        self.get_logger().info(f"Raw request data: {request.data}")
         
         # Log the specific heat_start_time format being received
         if 'heat_start_time' in request.data:
-            self.logger.info(f"Heat start time received: '{request.data['heat_start_time']}' (type: {type(request.data['heat_start_time'])})")
+            self.get_logger().info(f"Heat start time received: '{request.data['heat_start_time']}' (type: {type(request.data['heat_start_time'])})")
 
         serializer = HeatSignRecordSerializer(data=request.data)
         if not serializer.is_valid():
-            self.logger.warning(
-                f"Invalid data for heat sign recording: {serializer.errors}"
-            )
+            self.log_validation_error("heat sign recording", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -551,46 +483,38 @@ class CowViewSet(viewsets.ModelViewSet):
             heat_signs = serializer.validated_data["heat_signs"]
             heat_start_time = serializer.validated_data["heat_start_time"]
             heat_sign_recorded_at = serializer.validated_data["heat_sign_recorded_at"]
-            self.logger.info(
-                f"Recording heat sign for cow {cow.cow_id} from farm {cow.farm.farm_id}"
-            )
+            
+            self.log_operation_success("recording heat sign", f"for cow {cow.cow_id} from farm {cow.farm.farm_id}")
 
             # record heat sign
             reproduction = self._create_or_update_reproduction(cow, heat_signs, heat_start_time, heat_sign_recorded_at)
 
-            # send message to farmer
-            self._send_heat_sign_message(cow, heat_signs)
+            # Send notifications using messaging service
+            notification_results = MessagingService.send_heat_sign_notifications(cow, heat_signs)
 
-            self.logger.info(
-                f"Successfully recorded heat sign for cow {cow.cow_id} from farm {cow.farm.farm_id}"
-            )
+            self.log_operation_success("recorded heat sign", f"for cow {cow.cow_id} from farm {cow.farm.farm_id}")
 
-            return Response(
+            response_data = ResponseService.success_response(
+                APIMessages.HEAT_SIGN_RECORDED,
                 {
-                    "message": "Heat sign recorded and alert sent successfully",
                     "cow_id": cow.cow_id,
                     "farm_id": cow.farm.farm_id,
                     "heat_sign_start": reproduction.heat_sign_start,
                     "heat_sign_recorded_at": reproduction.heat_sign_recorded_at,
-                    "alert_sent": True,
-                },
-                status=status.HTTP_200_OK,
+                    "notifications_sent": notification_results,
+                }
             )
+            return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            self.logger.error(
-                f"An error occurred while recording heat sign for cow {cow.cow_id} from farm {cow.farm.farm_id}: {str(e)}"
-            )
-
+            self.log_operation_error(f"recording heat sign for cow {cow.cow_id} from farm {cow.farm.farm_id}", e)
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     def _create_or_update_reproduction(self, cow, heat_signs, heat_start_time, heat_sign_recorded_at=None):
-        """create or update reproduction record based on heat signs"""
-        self.logger.info(
-            f"Creating or updating reproduction record for cow {cow.cow_id} from farm {cow.farm.farm_id}"
-        )
+        """Create or update reproduction record based on heat signs"""
+        self.log_operation_success("creating or updating reproduction record", f"for cow {cow.cow_id} from farm {cow.farm.farm_id}")
 
         reproduction, created = Reproduction.objects.get_or_create(
             cow=cow,
@@ -610,84 +534,19 @@ class CowViewSet(viewsets.ModelViewSet):
                 reproduction.heat_sign_recorded_at = heat_sign_recorded_at
             reproduction.save()
 
-        self.logger.info(
-            f"Successfully created or updated reproduction record for cow {cow.cow_id} from farm {cow.farm.farm_id}"
-        )
-
+        self.log_operation_success("created or updated reproduction record", f"for cow {cow.cow_id} from farm {cow.farm.farm_id}")
         return reproduction
-
-    def _send_heat_sign_message(self, cow, heat_signs):
-        """Send notifications to inseminator and farmer."""
-        self.logger.debug(f"Sending notifications for cow {cow.cow_id}")
-
-        # Prepare messages
-        inseminator_message = (
-            f"🐄 Insemination Alert!\n"
-            f"Farm: {cow.farm.farm_id} - {cow.farm.owner_name}\n"
-            f"Address: {cow.farm.address}\n"
-            f"Phone: {cow.farm.telephone_number}\n"
-            f"Cow ID: {cow.cow_id}\n"
-            f"Heat Signs: {heat_signs}\n"
-            f"Please visit for insemination check."
-        )
-
-        farmer_message = (
-            f"🔔 Alert: Your inseminator ({cow.farm.inseminator.name}) "
-            f"has been notified about your cow (Cow ID: {cow.cow_id}) "
-            f"showing heat signs. They will visit your farm soon."
-        )
-
-        # send messages
-        try:
-            # notify inseminator
-            inseminator_response = send_alert(
-                cow.farm.inseminator.phone_number, inseminator_message    # TODO: change to inseminator's phone number
-            )
-            if inseminator_response.get("status") == "success":
-                self.logger.info(f"Successfully sent insemination alert to inseminator")
-                self._create_message(
-                    cow.farm, cow, inseminator_message, "insemination_alert"
-                )
-            else:
-                self.logger.warning(f"Failed to send insemination alert to inseminator")
-
-            # notify farmer
-            farmer_response = send_alert("+251952137166", farmer_message)
-            if farmer_response.get("status") == "success":
-                self.logger.info(f"Successfully sent insemination alert to farmer")
-                self._create_message(
-                    cow.farm, cow, farmer_message, "insemination_alert"
-                )
-            else:
-                self.logger.warning(f"Failed to send insemination alert to farmer")
-
-        except Exception as e:
-            self.logger.error(f"Error sending notification alert: {str(e)}")
-
-    def _create_message(self, farm, cow, message_text, message_type):
-        """Create a message record."""
-        try:
-            Message.objects.create(
-                farm=farm,
-                cow=cow,
-                message_text=message_text,
-                message_type=message_type,
-                is_sent=True,
-            )
-        except Exception as e:
-            self.logger.error(f"Error creating message record: {str(e)}", exc_info=True)
-            raise
 
     @action(detail=False, methods=["post"])
     def monitor_pregnancy(self, request):
         """Monitor pregnancy status of a cow"""
-        self.logger.info("Received pregnancy monitoring request")
-        self.logger.info(f"Raw request data: {request.data}")
+        self.log_request_received("pregnancy monitoring")
+        self.get_logger().info(f"Raw request data: {request.data}")
         
         serializer = MonitorPregnancySerializer(data=request.data)
         if not serializer.is_valid():
-            self.logger.warning(f"Invalid pregnancy monitoring data: {serializer.errors}")
-            self.logger.warning(f"Received data keys: {list(request.data.keys()) if hasattr(request.data, 'keys') else 'No keys method'}")
+            self.log_validation_error("pregnancy monitoring", serializer.errors)
+            self.get_logger().warning(f"Received data keys: {list(request.data.keys()) if hasattr(request.data, 'keys') else 'No keys method'}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -720,53 +579,54 @@ class CowViewSet(viewsets.ModelViewSet):
                 cow.lactation_number = validated_data['lactation_number']
                 cow.save()
 
-                # Send notification
-                farmer_message = (
-                    f"🐄 Pregnancy Recorded!\n"
-                    f"Cow: {cow.cow_id}\n"
-                    f"Pregnancy Date: {validated_data['pregnancy_date'].strftime('%Y-%m-%d')}\n"
-                    f"Expected Calving Date: {expected_calving_date.strftime('%Y-%m-%d')}\n"
-                    f"Lactation Number: {validated_data['lactation_number']}"
+                # Send notification using message template
+                farmer_message = MessageTemplates.pregnancy_confirmation(
+                    cow.cow_id,
+                    validated_data['pregnancy_date'].strftime('%Y-%m-%d'),
+                    expected_calving_date.strftime('%Y-%m-%d'),
+                    validated_data['lactation_number']
                 )
 
-                Message.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    message_text=farmer_message,
-                    message_type="pregnancy_update",
-                    is_sent=True
+                # Send notification and create message record
+                MessagingService.send_notification_with_message_record(
+                    cow.farm.telephone_number,
+                    farmer_message,
+                    MessageTypes.PREGNANCY_UPDATE,
+                    cow.farm,
+                    cow,
+                    f"Pregnancy confirmation for cow {cow.cow_id}:"
                 )
 
-                # Send alert to farmer
-                send_alert(cow.farm.telephone_number, farmer_message)
-
-                self.logger.info(f"Successfully updated pregnancy status for cow {cow.cow_id}")
-                return Response(
+                self.log_operation_success("updated pregnancy status", f"for cow {cow.cow_id}")
+                
+                response_data = ResponseService.success_response(
+                    APIMessages.PREGNANCY_UPDATED,
                     {
-                        "message": "Pregnancy monitoring record updated successfully",
                         "cow_id": cow.cow_id,
                         "farm_id": cow.farm.farm_id,
                         "pregnancy_date": validated_data['pregnancy_date'],
                         "expected_calving_date": expected_calving_date,
                         "service_per_conception": validated_data['service_per_conception'],
                         "lactation_number": validated_data['lactation_number']
-                    },
-                    status=status.HTTP_200_OK
+                    }
                 )
+                return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            self.logger.error(f"Error in pregnancy monitoring: {str(e)}")
-            return Response(
-                {"error": "Failed to update pregnancy status"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error("pregnancy monitoring", e)
+            error_response, error_status = ResponseService.error_response(
+                APIMessages.FAILED_TO_UPDATE_PREGNANCY
             )
+            return Response(error_response, status=error_status)
 
     @action(detail=False, methods=["post"])
     def farmer_medical_assessment(self, request):
         """Record farmer's medical assessment"""
+        self.log_request_received("farmer medical assessment")
+        
         serializer = FarmerMedicalAssessmentSerializer(data=request.data)
         if not serializer.is_valid():
-            self.logger.warning(f"Invalid farmer medical assessment data: {serializer.errors}")
+            self.log_validation_error("farmer medical assessment", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -781,70 +641,63 @@ class CowViewSet(viewsets.ModelViewSet):
                     sickness_description=sickness_description
                 )
 
-                # Notify farm's doctor
+                # Notify farm's doctor using message template
                 if cow.farm.doctor:
-                    doctor_message = (
-                        f"🚨 New Farmer Medical Report!\n"
-                        f"Farm: {cow.farm.farm_id}\n"
-                        f"Cow: {cow.cow_id}\n"
-                        f"Reported Issue: {sickness_description}\n"
-                        f"Please review this report."
+                    doctor_message = MessageTemplates.doctor_medical_report_alert(
+                        cow.cow_id, cow.farm.farm_id, cow.farm.owner_name, sickness_description
                     )
-                    send_alert(cow.farm.doctor.phone_number, doctor_message) # TODO: change to doctor's phone number
-
-                    Message.objects.create(
-                        farm=cow.farm,
-                        cow=cow,
-                        message_text=doctor_message,
-                        message_type="health_alert",
-                        is_sent=True
+                    MessagingService.send_notification_with_message_record(
+                        cow.farm.doctor.phone_number,
+                        doctor_message,
+                        MessageTypes.HEALTH_ALERT,
+                        cow.farm,
+                        cow,
+                        f"Doctor medical report alert for cow {cow.cow_id}:"
                     )
 
-                # Send confirmation to farmer
-                farmer_message = (
-                    f"✅ Medical Report Received\n"
-                    f"Cow: {cow.cow_id}\n"
-                    f"Issue Reported: {sickness_description}\n"
-                    f"Your report has been sent to Dr. {cow.farm.doctor.name if cow.farm.doctor else 'the assigned doctor'}.\n"
-                    f"You will receive an update after the assessment."
+                # Send confirmation to farmer using message template
+                doctor_name = cow.farm.doctor.name if cow.farm.doctor else 'the assigned doctor'
+                farmer_message = MessageTemplates.farmer_medical_report_confirmation(
+                    cow.cow_id, sickness_description, doctor_name
                 )
-                send_alert(cow.farm.telephone_number, farmer_message) # TODO: change to farmer's phone number
-                Message.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    message_text=farmer_message,
-                    message_type="farmer_alert",
-                    is_sent=True
+                MessagingService.send_notification_with_message_record(
+                    cow.farm.telephone_number,
+                    farmer_message,
+                    MessageTypes.FARMER_ALERT,
+                    cow.farm,
+                    cow,
+                    f"Farmer medical report confirmation for cow {cow.cow_id}:"
                 )
 
-                self.logger.info(f"Successfully created medical report for cow {cow.cow_id}")
-                return Response(
+                self.log_operation_success("created medical report", f"for cow {cow.cow_id}")
+                
+                response_data = ResponseService.success_response(
+                    APIMessages.MEDICAL_ASSESSMENT_SUBMITTED,
                     {
-                        "message": "Medical assessment submitted successfully",
                         "report_id": report.id,
                         "farm_id": cow.farm.farm_id,
                         "cow_id": cow.cow_id,
                         "reported_date": report.reported_date
-                    },
-                    status=status.HTTP_200_OK
+                    }
                 )
+                return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            self.logger.error(f"Error in farmer medical assessment: {str(e)}")
-            return Response(
-                {"error": "Failed to submit medical assessment"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error("farmer medical assessment", e)
+            error_response, error_status = ResponseService.error_response(
+                APIMessages.FAILED_TO_SUBMIT_MEDICAL_ASSESSMENT
             )
+            return Response(error_response, status=error_status)
 
     @action(detail=False, methods=["post"])
     def doctor_assessment(self, request):
         """Record doctor's medical assessment"""
-        self.logger.info("Received doctor assessment request")
-        self.logger.info(f"Raw request data: {request.data}")
+        self.log_request_received("doctor assessment")
+        self.get_logger().info(f"Raw request data: {request.data}")
         
         serializer = DoctorMedicalAssessmentSerializer(data=request.data)
         if not serializer.is_valid():
-            self.logger.warning(f"Invalid doctor assessment data: {serializer.errors}")
+            self.log_validation_error("doctor assessment", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -876,69 +729,61 @@ class CowViewSet(viewsets.ModelViewSet):
                     **assessment_data
                 )
 
-                # Notify farmer
-                farmer_message = (
-                    f"Medical Assessment Complete\n"
-                    f"Cow: {cow.cow_id}\n"
-                    f"Doctor: Dr. {doctor.name}\n"
-                    f"Health Status: {'Sick' if validated_data['is_cow_sick'] else 'Healthy'}\n"
-                    f"Lameness: {'Yes' if validated_data.get('has_lameness', False) else 'No'}\n"
-                    f"Notes: {validated_data.get('notes', 'N/A')}"
+                # Notify farmer using message template
+                farmer_message = MessageTemplates.medical_assessment_complete(
+                    cow.cow_id, doctor.name, validated_data['is_cow_sick'],
+                    validated_data.get('has_lameness', False), validated_data.get('notes')
+                )
+                MessagingService.send_notification_with_message_record(
+                    cow.farm.telephone_number,
+                    farmer_message,
+                    MessageTypes.HEALTH_ALERT,
+                    cow.farm,
+                    cow,
+                    f"Medical assessment complete for cow {cow.cow_id}:"
                 )
 
-                send_alert(cow.farm.telephone_number, farmer_message)
-                Message.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    message_text=farmer_message,
-                    message_type="health_alert",
-                    is_sent=True
+                # Send confirmation to doctor using message template
+                doctor_confirmation = MessageTemplates.doctor_assessment_confirmation(
+                    cow.farm.farm_id, cow.farm.owner_name, cow.cow_id, validated_data['is_cow_sick']
+                )
+                MessagingService.send_notification_with_message_record(
+                    doctor.phone_number,
+                    doctor_confirmation,
+                    MessageTypes.DOCTOR_CONFIRMATION,
+                    cow.farm,
+                    cow,
+                    f"Doctor assessment confirmation for cow {cow.cow_id}:"
                 )
 
-                # Send confirmation to doctor
-                doctor_confirmation = (
-                    f"✅ Assessment Recorded\n"
-                    f"Farm: {cow.farm.farm_id} - {cow.farm.owner_name}\n"
-                    f"Cow: {cow.cow_id}\n"
-                    f"Status: {'Sick' if validated_data['is_cow_sick'] else 'Healthy'}\n"
-                    f"Farmer has been notified of the assessment results."
-                )
-                send_alert(doctor.phone_number, doctor_confirmation)
-                Message.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    message_text=doctor_confirmation,
-                    message_type="doctor_confirmation",
-                    is_sent=True
-                )
-
-                self.logger.info(f"Successfully created medical assessment for cow {cow.cow_id}")
-                return Response(
+                self.log_operation_success("created medical assessment", f"for cow {cow.cow_id}")
+                
+                response_data = ResponseService.success_response(
+                    APIMessages.MEDICAL_ASSESSMENT_RECORDED,
                     {
-                        "message": "Medical assessment recorded successfully",
                         "assessment_id": assessment.id,
                         "farm_id": cow.farm.farm_id,
                         "cow_id": cow.cow_id
-                    },
-                    status=status.HTTP_200_OK
+                    }
                 )
+                return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            self.logger.error(f"Error in doctor assessment: {str(e)}")
-            return Response(
-                {"error": "Failed to record medical assessment"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error("doctor assessment", e)
+            error_response, error_status = ResponseService.error_response(
+                APIMessages.FAILED_TO_RECORD_MEDICAL_ASSESSMENT
             )
+            return Response(error_response, status=error_status)
 
     @action(detail=False, methods=["post"])
     def monitor_heat_sign(self, request):
         """Monitor heat signs and record insemination"""
-        self.logger.info("Received heat sign monitoring request")
-        self.logger.info(f"Raw request data: {request.data}")
+        self.log_request_received("heat sign monitoring")
+        self.get_logger().info(f"Raw request data: {request.data}")
         
         serializer = MonitorHeatSignSerializer(data=request.data)
         if not serializer.is_valid():
-            self.logger.warning(f"Invalid heat sign monitoring data: {serializer.errors}")
+            self.log_validation_error("heat sign monitoring", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -968,77 +813,68 @@ class CowViewSet(viewsets.ModelViewSet):
                     reproduction.pregnancy_date = validated_data['date_of_insemination']
                     reproduction.save()
 
-                # Notify farmer
-                farmer_message = (
-                    f"Heat Sign Monitoring Update\n"
-                    f"Cow: {cow.cow_id}\n"
-                    f"Status: {'Inseminated' if validated_data['is_inseminated'] else 'Not inseminated'}\n"
-                    f"Lactation Number: {validated_data['lactation_number']}\n"
-                    f"Insemination Count: {validated_data['insemination_count']}"
+                # Format date for messages
+                insemination_date = None
+                if validated_data['is_inseminated'] and 'date_of_insemination' in validated_data:
+                    insemination_date = validated_data['date_of_insemination'].strftime('%Y-%m-%d')
+
+                # Notify farmer using message template
+                farmer_message = MessageTemplates.heat_monitoring_farmer(
+                    cow.cow_id, cow.farm.farm_id, cow.farm.owner_name,
+                    validated_data['is_inseminated'], validated_data['insemination_count'], insemination_date
+                )
+                MessagingService.send_notification_with_message_record(
+                    cow.farm.telephone_number,
+                    farmer_message,
+                    MessageTypes.HEAT_ALERT,
+                    cow.farm,
+                    cow,
+                    f"Heat monitoring farmer alert for cow {cow.cow_id}:"
                 )
 
-                if validated_data['is_inseminated']:
-                    farmer_message += f"\nDate of Insemination: {validated_data['date_of_insemination'].strftime('%Y-%m-%d')}"
-
-                send_alert(cow.farm.telephone_number, farmer_message) # TODO: change to farmer's phone number
-                Message.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    message_text=farmer_message,
-                    message_type="heat_alert",
-                    is_sent=True
+                # Notify inseminator using message template
+                inseminator_message = MessageTemplates.heat_monitoring_inseminator(
+                    cow.farm.farm_id, cow.cow_id, validated_data['is_inseminated'],
+                    validated_data['lactation_number'], validated_data['insemination_count'], insemination_date
+                )
+                MessagingService.send_notification_with_message_record(
+                    cow.farm.inseminator.phone_number,
+                    inseminator_message,
+                    MessageTypes.INSEMINATION_ALERT,
+                    cow.farm,
+                    cow,
+                    f"Heat monitoring inseminator alert for cow {cow.cow_id}:"
                 )
 
-                # Notify inseminator
-                inseminator_message = (
-                    f"✅ Record Received\n"
-                    f"Farm: {cow.farm.farm_id}\n"
-                    f"Cow: {cow.cow_id}\n"
-                    f"Status: {'Inseminated' if validated_data['is_inseminated'] else 'Not inseminated'}\n"
-                    f"Lactation Number: {validated_data['lactation_number']}\n"
-                    f"Insemination Count: {validated_data['insemination_count']}"
-                )
-
-                if validated_data['is_inseminated']:
-                    inseminator_message += f"\nDate of Insemination: {validated_data['date_of_insemination'].strftime('%Y-%m-%d')}"
-
-                send_alert(cow.farm.inseminator.phone_number, inseminator_message) # TODO: change to inseminator's phone number
-                Message.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    message_text=inseminator_message,
-                    message_type="inseminator_alert",
-                    is_sent=True
-                )
-
-                self.logger.info(f"Successfully recorded heat sign monitoring for cow {cow.cow_id}")
-                return Response(
+                self.log_operation_success("recorded heat sign monitoring", f"for cow {cow.cow_id}")
+                
+                response_data = ResponseService.success_response(
+                    APIMessages.HEAT_SIGN_MONITORING_RECORDED,
                     {
-                        "message": "Heat sign monitoring recorded successfully",
                         "record_id": record.id,
                         "farm_id": cow.farm.farm_id,
                         "cow_id": cow.cow_id
-                    },
-                    status=status.HTTP_200_OK
+                    }
                 )
+                return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            self.logger.error(f"Error in heat sign monitoring: {str(e)}")
-            return Response(
-                {"error": "Failed to record heat sign monitoring"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error("heat sign monitoring", e)
+            error_response, error_status = ResponseService.error_response(
+                APIMessages.FAILED_TO_RECORD_HEAT_MONITORING
             )
+            return Response(error_response, status=error_status)
 
     @action(detail=False, methods=["post"])
     def monitor_birth(self, request):
         """Record birth event for a cow"""
-        self.logger.info("Received birth monitoring request")
-        self.logger.info(f"Raw request data: {request.data}")
+        self.log_request_received("birth monitoring")
+        self.get_logger().info(f"Raw request data: {request.data}")
         
         serializer = MonitorBirthSerializer(data=request.data)
         if not serializer.is_valid():
-            self.logger.warning(f"Invalid birth monitoring data: {serializer.errors}")
-            self.logger.warning(f"Received data keys: {list(request.data.keys()) if hasattr(request.data, 'keys') else 'No keys method'}")
+            self.log_validation_error("birth monitoring", serializer.errors)
+            self.get_logger().warning(f"Received data keys: {list(request.data.keys()) if hasattr(request.data, 'keys') else 'No keys method'}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -1059,45 +895,45 @@ class CowViewSet(viewsets.ModelViewSet):
                 cow.last_calving_date = validated_data['last_calving_date']
                 cow.save()
 
-                # Create message for farmer
-                farmer_message = (
-                    f"🎉 Birth Event Recorded!\n"
-                    f"Cow: {cow.cow_id}\n"
-                    f"Calving Date: {validated_data['calving_date']}\n"
-                    f"Last Calving Date: {validated_data['last_calving_date']}\n"
-                    f"Calf Sex: {'Male' if validated_data['calf_sex'] == 'M' else 'Female'}"
+                # Create message for farmer using template
+                farmer_message = MessageTemplates.birth_event(
+                    cow.cow_id,
+                    validated_data['calving_date'],
+                    validated_data['last_calving_date'],
+                    validated_data['calf_sex']
                 )
 
-                # Send notifications
-                send_alert(cow.farm.telephone_number, farmer_message)
-                Message.objects.create(
-                    farm=cow.farm,
-                    cow=cow,
-                    message_text=farmer_message,
-                    message_type="birth_alert",
-                    is_sent=True
+                # Send notifications using messaging service
+                MessagingService.send_notification_with_message_record(
+                    cow.farm.telephone_number,
+                    farmer_message,
+                    MessageTypes.BIRTH_ALERT,
+                    cow.farm,
+                    cow,
+                    f"Birth event notification for cow {cow.cow_id}:"
                 )
 
-                self.logger.info(f"Successfully recorded birth event for cow {cow.cow_id}")
-                return Response(
+                self.log_operation_success("recorded birth event", f"for cow {cow.cow_id}")
+                
+                response_data = ResponseService.success_response(
+                    APIMessages.BIRTH_EVENT_RECORDED,
                     {
-                        "message": "Birth event recorded successfully",
                         "cow_id": cow.cow_id,
                         "farm_id": cow.farm.farm_id,
                         "calving_date": validated_data['calving_date'],
                         "last_calving_date": validated_data['last_calving_date'],
                         "calf_sex": validated_data['calf_sex'],
                         "parity": cow.parity
-                    },
-                    status=status.HTTP_200_OK
+                    }
                 )
+                return Response(response_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            self.logger.error(f"Error in birth monitoring: {str(e)}")
-            return Response(
-                {"error": "Failed to record birth event"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            self.log_operation_error("birth monitoring", e)
+            error_response, error_status = ResponseService.error_response(
+                APIMessages.FAILED_TO_RECORD_BIRTH
             )
+            return Response(error_response, status=error_status)
 
     @action(detail=False, methods=["get"])
     def pregnancy_records(self, request):
@@ -1286,6 +1122,7 @@ class CowViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ["message_text", "message_type"]
 
@@ -1310,6 +1147,7 @@ class MessageViewSet(viewsets.ReadOnlyModelViewSet):
 class InseminatorViewSet(viewsets.ModelViewSet):
     queryset = Inseminator.objects.all()
     serializer_class = InseminatorSerializer
+    permission_classes = [AdminGetOnlyPermission]
 
     @action(detail=True, methods=["post"])
     def replace_inseminator(self, request, pk=None):
@@ -1365,6 +1203,7 @@ class InseminatorViewSet(viewsets.ModelViewSet):
 class ReproductionViewSet(viewsets.ModelViewSet):
     queryset = Reproduction.objects.all()
     serializer_class = ReproductionSerializer
+    permission_classes = [AdminGetOnlyPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ["cow__cow_id", "farm__farm_id"]
 
@@ -1388,6 +1227,7 @@ class ReproductionViewSet(viewsets.ModelViewSet):
 class BreedTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = BreedType.objects.all()
     serializer_class = BreedTypeSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ["name", "display_name"]
 
@@ -1395,54 +1235,63 @@ class BreedTypeViewSet(viewsets.ReadOnlyModelViewSet):
 class HousingTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = HousingType.objects.all()
     serializer_class = HousingTypeSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class FloorTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = FloorType.objects.all()
     serializer_class = FloorTypeSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class FeedingFrequencyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = FeedingFrequency.objects.all()
     serializer_class = FeedingFrequencySerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class WaterSourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = WaterSource.objects.all()
     serializer_class = WaterSourceSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class GynecologicalStatusViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = GynecologicalStatus.objects.all()
     serializer_class = GynecologicalStatusSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class UdderHealthStatusViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UdderHealthStatus.objects.all()
     serializer_class = UdderHealthStatusSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class MastitisStatusViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MastitisStatus.objects.all()
     serializer_class = MastitisStatusSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class GeneralHealthStatusViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = GeneralHealthStatus.objects.all()
     serializer_class = GeneralHealthStatusSerializer
+    permission_classes = [ReadOnlyAdminPermission]
     search_fields = ["name", "display_name"]
 
 
 class FarmerMedicalReportViewSet(viewsets.ModelViewSet):
     queryset = FarmerMedicalReport.objects.all()
     serializer_class = FarmerMedicalReportSerializer
+    permission_classes = [AdminGetOnlyPermission]
 
     def get_queryset(self):
         queryset = FarmerMedicalReport.objects.all()
@@ -1463,6 +1312,7 @@ class FarmerMedicalReportViewSet(viewsets.ModelViewSet):
 class MedicalAssessmentViewSet(viewsets.ModelViewSet):
     queryset = MedicalAssessment.objects.all()
     serializer_class = MedicalAssessmentSerializer
+    permission_classes = [AdminGetOnlyPermission]
 
     def get_queryset(self):
         queryset = MedicalAssessment.objects.all()
@@ -1486,6 +1336,7 @@ class MedicalAssessmentViewSet(viewsets.ModelViewSet):
 class InseminationRecordViewSet(viewsets.ModelViewSet):
     queryset = InseminationRecord.objects.all()
     serializer_class = InseminationRecordSerializer
+    permission_classes = [AdminGetOnlyPermission]
 
     def get_queryset(self):
         queryset = InseminationRecord.objects.all()
@@ -1506,15 +1357,15 @@ class InseminationRecordViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class DoctorViewSet(viewsets.ModelViewSet):
+class DoctorViewSet(viewsets.ModelViewSet, LoggingMixin):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-    logger = logging.getLogger(__name__)
+    permission_classes = [AdminGetOnlyPermission]
 
     def perform_create(self, serializer):
         doctor = serializer.save()
-        self.logger.info(f"Created new doctor: {doctor.name} (ID: {doctor.id})")
+        self.log_operation_success("created new doctor", f"{doctor.name} (ID: {doctor.id})")
 
     def perform_update(self, serializer):
         doctor = serializer.save()
-        self.logger.info(f"Updated doctor: {doctor.name} (ID: {doctor.id})")
+        self.log_operation_success("updated doctor", f"{doctor.name} (ID: {doctor.id})")

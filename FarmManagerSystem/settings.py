@@ -123,9 +123,10 @@ USE_TZ = True
 
 # STATIC_URL = 'static/'
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "FarmManagerSystem/myapp/static",
-]
+# Comment out non-existent static directory
+# STATICFILES_DIRS = [
+#     BASE_DIR / "FarmManagerSystem/myapp/static",
+# ]
 
 
 # Default primary key field type
@@ -184,3 +185,14 @@ LOGGING = {
 }
 
 # APScheduler settings have been removed since we're using MemoryJobStore
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
