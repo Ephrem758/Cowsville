@@ -37,8 +37,12 @@ import {
   getCows,
   getCowDetails,
   getHeatSignData,
-  getInseminationCount,
+  getInseminationRecords,
   getDateOfAI,
+  getReproductionRecords,
+  getHeatSignWindow,
+  getBirthRecords,
+  getPregnancyRecords,
 } from "api/farmsService";
 import SimpleLineChart from "layouts/dashboard/data/SimpleLineChart";
 
@@ -78,10 +82,6 @@ function Dashboard() {
     fetchFarms();
   }, [searchQuery]); // Only re-run on searchQuery change
 
-  useEffect(() => {
-    console.log("Current cows:", cows); // Check if mock cow is present
-  }, [cows]);
-
   const filteredFarms = farms.filter((farm) => {
     return (
       farm.farm_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -97,46 +97,6 @@ function Dashboard() {
   }, [firstFarm]);
 
   // Fetch cows when a farm is selected
-  // useEffect(() => {
-  //   const fetchCows = async () => {
-  //     if (!selectedFarm) return;
-
-  //     try {
-  //       const farmId = selectedFarm?.farm_id;
-  //       const apiCows = await getCows(farmId);
-
-  //       // Add mock cows for testing
-  //       const mockCows = [
-  //         {
-  //           cow_id: "COW123",
-  //           heat_sign_time: "2024-03-21T06:00:00Z",
-  //           farm_id: "MOCK",
-  //           heat_signs: "Bellowing, Restlessness, Off-Feed",
-  //           dalc: "5 days",
-  //           date_of_ai: "21 DEC 9:34 PM",
-  //           insemination_number: "3",
-  //           breed: "Zebu",
-  //         },
-  //         {
-  //           cow_id: "COW456",
-  //           heat_sign_time: "2024-03-21T08:00:00Z",
-  //           farm_id: "MOCK",
-  //           heat_signs: "Mounting, Mucus Discharge",
-  //           dalc: "7 days",
-  //           date_of_ai: "15 MAR 2:15 PM",
-  //           insemination_number: "2",
-  //           breed: "Holstein",
-  //         },
-  //       ];
-  //       setCows([...apiCows, ...mockCows]);
-  //     } catch (err) {
-  //       console.error("Failed to fetch cows:", err);
-  //       setCows([]);
-  //     }
-  //   };
-  //   fetchCows();
-  // }, [selectedFarm]);
-
   useEffect(() => {
     const fetchCows = async () => {
       if (!selectedFarm) {
@@ -147,7 +107,6 @@ function Dashboard() {
             {
               cow_id: "COW123",
               heat_sign_time: "2024-03-21T06:00:00Z",
-              // farm: { farm_id: "MOCK", owner_name: "Phos" },
               farm_id: "MOCK",
               owner_name: "Phos Abdi",
               heat_signs: "Bellowing, Restlessness, Off-Feed",
@@ -197,7 +156,64 @@ function Dashboard() {
       }
     };
     fetchCows();
-  }, [selectedFarm]);
+  }, [selectedFarm?.farm_id]); // Only depend on farm_id
+
+  // Update the search button click handler
+  const handleSearchClick = async () => {
+    const foundCow = cows.find(
+      (cow) =>
+        cow.cow_id.toLowerCase() === cowSearchInput.toLowerCase() &&
+        (cow.farm_id === "MOCK" || cow.farm?.farm_id === selectedFarm?.farm_id)
+    );
+
+    if (foundCow) {
+      if (foundCow.farm_id === "MOCK") {
+        setSelectedCow(foundCow);
+      } else {
+        try {
+          console.log("Searching for cow:", foundCow.cow_id, "in farm:", foundCow.farm_id);
+
+          const [heatSignWindow, pregnancyRecords, birthRecords] = await Promise.all([
+            getHeatSignWindow(foundCow.farm_id, foundCow.cow_id),
+            getPregnancyRecords(foundCow.farm_id, foundCow.cow_id),
+            getBirthRecords(foundCow.farm_id, foundCow.cow_id),
+          ]);
+
+          console.log("Search results for cow", foundCow.cow_id, ":", {
+            heatSignWindow,
+            pregnancyRecords,
+            birthRecords,
+          });
+
+          const firstHeat = heatSignWindow[0] || {};
+          const firstPreg = pregnancyRecords[0] || {};
+          const firstBirth = birthRecords[0] || {};
+
+          const updatedCow = {
+            ...foundCow,
+            heat_sign_time: heatSignWindow.length > 0 ? firstHeat.start : "N/A",
+            heat_signs: heatSignWindow.length > 0 ? firstHeat.signs : "No heat signs recorded",
+            fertility_window: heatSignWindow,
+            pregnancies: pregnancyRecords,
+            births: birthRecords,
+            calving_date: birthRecords.length > 0 ? firstBirth.calvingDate : "N/A",
+            last_date_insemination: pregnancyRecords.length > 0 ? firstPreg.date : "N/A",
+            breed_name: String(foundCow.breed || "N/A"),
+            average_daily_milk: String(foundCow.average_daily_milk || "N/A"),
+            lactation_number: String(foundCow.lactation_number || "N/A"),
+          };
+
+          console.log("Updated cow data:", updatedCow);
+          setSelectedCow(updatedCow);
+        } catch (err) {
+          console.error("Error fetching cow data:", err);
+          setSelectedCow(null);
+        }
+      }
+    } else {
+      setSelectedCow(null);
+    }
+  };
 
   // Handle cow search functionality
   const handleCowSearch = async () => {
@@ -210,7 +226,9 @@ function Dashboard() {
         return;
       }
 
-      const farmId = cowDetails.farm?.farm_id || cowDetails.farm_id; // Get the farm ID of the cow
+      console.log("Found cow details:", cowDetails);
+
+      const farmId = cowDetails.farm?.farm_id || cowDetails.farm_id;
 
       // Check if the current farm matches the cow's farm
       if (!selectedFarm || selectedFarm.farm_id !== farmId) {
@@ -227,31 +245,55 @@ function Dashboard() {
         }
       }
 
-      // Fetch additional data for the cow
-      const [heatSigns, inseminationCount, dateOfAI] = await Promise.all([
-        getHeatSignData(farmId, cowDetails.cow_id, token),
-        getInseminationCount(farmId, cowDetails.cow_id, token),
-        getDateOfAI(cowDetails.cow_id, token),
-      ]);
+      // Fetch additional data for the cow using the new reproduction API
+      const [inseminationRecords, heatSignWindow, pregnancyRecords, birthRecords] =
+        await Promise.all([
+          getInseminationRecords(farmId, cowDetails.cow_id),
+          getHeatSignWindow(farmId, cowDetails.cow_id),
+          getPregnancyRecords(farmId, cowDetails.cow_id),
+          getBirthRecords(farmId, cowDetails.cow_id),
+        ]);
 
-      // Update the selected cow with all required fields
-      setSelectedCow({
-        ...cowDetails,
-        heat_signs: heatSigns || "No heat signs recorded",
-        number_of_inseminations: inseminationCount || foundCow.number_of_inseminations || 0,
-        date_of_ai: dateOfAI || "N/A",
-        breed: cowDetails.breed || "N/A",
-        // owner_name: selectedFarm?.owner_name || "Unknown",
-        heat_sign_time: heatSignTime || foundCow.heat_sign_time || "06:00",
-        last_date_insemination: dateOfAI || foundCow.last_date_insemination || "N/A",
-        breed_name: foundCow.breed_name || "N/A",
-        owner_name: cowDetails.farm?.owner_name || "N/A",
+      console.log("Fetched data for cow:", cowDetails.cow_id, {
+        heatSignWindow,
+        pregnancyRecords,
+        birthRecords,
       });
 
-      // Add the cow to the cows state if it doesn't already exist
+      // Get the first records for display
+      const firstHeat = heatSignWindow[0] || {};
+      const firstPreg = pregnancyRecords[0] || {};
+      const firstBirth = birthRecords[0] || {};
+
+      // Update the selected cow with all required fields
+      const updatedCow = {
+        ...cowDetails,
+        farm_id: cowDetails.farm?.farm_id || cowDetails.farm_id,
+        heat_sign_time: heatSignWindow.length > 0 ? firstHeat.start : "N/A",
+        heat_signs: heatSignWindow.length > 0 ? firstHeat.signs : "No heat signs recorded",
+        number_of_inseminations: inseminationRecords.length || 0,
+        date_of_ai: pregnancyRecords.length > 0 ? firstPreg.date : "N/A",
+        breed: String(cowDetails.breed || "N/A"),
+        owner_name: cowDetails.farm?.owner_name || "N/A",
+        fertility_window: heatSignWindow,
+        pregnancies: pregnancyRecords,
+        births: birthRecords,
+        heat_sign_end: heatSignWindow.length > 0 ? firstHeat.end : "N/A",
+        heat_signs_seen: heatSignWindow.length > 0 ? firstHeat.signs : "No heat signs recorded",
+        calving_date: birthRecords.length > 0 ? firstBirth.calvingDate : "N/A",
+        last_date_insemination: pregnancyRecords.length > 0 ? firstPreg.date : "N/A",
+        breed_name: String(cowDetails.breed || "N/A"),
+        average_daily_milk: String(cowDetails.average_daily_milk || "N/A"),
+        lactation_number: String(cowDetails.lactation_number || "N/A"),
+      };
+
+      console.log("Updated cow data:", updatedCow);
+      setSelectedCow(updatedCow);
+
+      // Only add to cows if it doesn't exist
       setCows((prevCows) => {
         const exists = prevCows.some((cow) => cow.cow_id === cowDetails.cow_id);
-        return exists ? prevCows : [...prevCows, cowDetails];
+        return exists ? prevCows : [...prevCows, updatedCow];
       });
     } catch (err) {
       console.error("Failed to fetch cow details:", err);
@@ -336,38 +378,7 @@ function Dashboard() {
               sx={{ width: "100%", maxWidth: "400px", marginRight: 1 }}
               placeholder="Enter Cow ID..."
             />
-            <MDButton
-              variant="gradient"
-              color="info"
-              onClick={async () => {
-                const foundCow = cows.find(
-                  (cow) =>
-                    cow.cow_id.toLowerCase() === cowSearchInput.toLowerCase() &&
-                    (cow.farm_id === "MOCK" || cow.farm?.farm_id === selectedFarm?.farm_id)
-                );
-
-                if (foundCow) {
-                  if (foundCow.farm_id === "MOCK") {
-                    // Use mock cow's heat_sign_time directly
-                    setSelectedCow(foundCow);
-                  } else {
-                    // Fetch heat_sign_time from API for real cows
-                    const heatSignTime = await getHeatSignData(foundCow.farm_id, foundCow.cow_id);
-                    setSelectedCow({
-                      ...foundCow,
-                      heat_sign_time: heatSignTime || "06:00",
-                    });
-                    // const updatedCow = {
-                    //   ...foundCow,
-                    //   heat_sign_time: heatSignTime || "06:00",
-                    // };
-                    // setSelectedCow(updatedCow);
-                  }
-                } else {
-                  setSelectedCow(null);
-                }
-              }}
-            >
+            <MDButton variant="gradient" color="info" onClick={handleSearchClick}>
               Search
             </MDButton>
           </MDBox>

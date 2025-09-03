@@ -241,6 +241,26 @@ export const mockCows = [
   },
 ];
 
+const GENERAL_HEALTH_LABELS = {
+  1: "Normal",
+  2: "Sick",
+};
+
+const UDDER_HEALTH_LABELS = {
+  1: "4qt Normal",
+  2: "3qt Normal",
+  3: "2qt Normal",
+  4: "1qt Normal",
+};
+
+const MASTITIS_LABELS = {
+  1: "Negative",
+  2: "Clinical Mastitis",
+  3: "CMT+",
+  4: "CMT++",
+  5: "CMT+++",
+};
+
 function Tables() {
   // const { searchQuery, setSearchQuery } = useSearch();
   // const [tableSearchInput, setTableSearchInput] = useState(""); // Current input
@@ -298,10 +318,18 @@ function Tables() {
         // Merge all data into a unified structure
         const mergedCows = cowsData.map((cow) => {
           // Find matching assessment for the cow
+          // const assessment =
+          //   assessments.find(
+          //     (a) => a.cow_id === cow.cow_id && a.farm?.farm_id === cow.farm?.farm_id
+          //   ) || {};
           const assessment =
-            assessments.find(
-              (a) => a.cow_id === cow.cow_id && a.farm?.farm_id === cow.farm?.farm_id
-            ) || {};
+            assessments.find((a) => {
+              // a.cow is a number, cow.cow_id might be a string
+              const cowMatch = String(a.cow) === String(cow.cow_id);
+              // a.farm is a string like "28", cow.farm.farm_id is also a string
+              const farmMatch = String(a.farm) === String(cow.farm?.farm_id || cow.farm_id);
+              return cowMatch && farmMatch;
+            }) || {};
 
           return {
             ...cow,
@@ -322,15 +350,43 @@ function Tables() {
               pregnancyData.find((p) => p.cow_id === cow.cow_id)?.is_pregnant || cow.is_pregnant,
             // Merge doctor assessment fields
             vaccination_date: assessment.vaccination_date || cow.vaccination_date || "N/A",
-            mastitis: assessment.mastitis || cow.mastitis || "N/A",
+            // mastitis: assessment.mastitis || cow.mastitis || "N/A",
             reproductive_health: assessment.reproductive_health || cow.reproductive_health || "N/A",
-            udder_health: assessment.udder_health || cow.udder_health || "N/A",
+            // udder_health: assessment.udder_health || cow.udder_health || "N/A",
             body_condition_score:
               assessment.body_condition_score || cow.body_condition_score || "N/A",
             deworming_date: assessment.deworming_date || cow.deworming_date || "N/A",
             date_of_birth: assessment.date_of_birth || cow.date_of_birth || "N/A",
-            lameness: assessment.lameness || cow.lameness || "N/A",
-            general_health: assessment.general_health || cow.general_health || "N/A",
+            // lameness: assessment.lameness || cow.has_lameness || "N/A",
+            // general_health: assessment.general_health || cow.general_health || "N/A",
+            lameness:
+              assessment.has_lameness === true
+                ? "Yes"
+                : assessment.has_lameness === false
+                ? "No"
+                : cow.lameness !== undefined
+                ? cow.lameness
+                : "N/A",
+            general_health:
+              assessment.general_health !== undefined
+                ? GENERAL_HEALTH_LABELS[assessment.general_health] || "Unknown"
+                : cow.general_health !== undefined
+                ? GENERAL_HEALTH_LABELS[cow.general_health] || "Unknown"
+                : "N/A",
+            udder_health:
+              assessment.udder_health !== undefined
+                ? UDDER_HEALTH_LABELS[assessment.udder_health] || "Unknown"
+                : cow.udder_health !== undefined
+                ? UDDER_HEALTH_LABELS[cow.udder_health] || "Unknown"
+                : "N/A",
+
+            // Mastitis: map 1→None, 2→Mild, etc.
+            mastitis:
+              assessment.mastitis !== undefined
+                ? MASTITIS_LABELS[assessment.mastitis] || "Unknown"
+                : cow.mastitis !== undefined
+                ? MASTITIS_LABELS[cow.mastitis] || "Unknown"
+                : "N/A",
           };
         });
 

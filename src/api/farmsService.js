@@ -48,31 +48,46 @@ export const getCows = async (farmId = null) => {
     return [];
   }
 };
+
 // export const getDoctorAssessments = async (farmId = null, cowId = null) => {
 //   try {
+//     const token = localStorage.getItem("authToken");
 //     const params = {};
-//     if (farmId) params.farm_id = farmId; // Required parameter
-//     if (cowId) params.cow_id = cowId; // Optional parameter
-
-//     const response = await axios.get("http://localhost:8000/api/doctor-assessments/", { params });
-//     return response.data.results || []; // Adjust based on your API response
+//     if (farmId) params.farm_id = farmId;
+//     if (cowId) params.cow_id = cowId;
+//     const response = await axios.get(`${API_URL}medical-assessments/`, {
+//       params,
+//       headers: { Authorization: `Bearer ${token}` },
+//     });
+//     return response.data.results || [];
 //   } catch (error) {
 //     console.error("Error fetching doctor assessments:", error);
 //     return [];
 //   }
 // };
-
 export const getDoctorAssessments = async (farmId = null, cowId = null) => {
   try {
     const token = localStorage.getItem("authToken");
     const params = {};
     if (farmId) params.farm_id = farmId;
-    if (cowId) params.cow_id = cowId;
+    if (cowId) params.cow = cowId;
+
     const response = await axios.get(`${API_URL}medical-assessments/`, {
       params,
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data.results || [];
+
+    const payload = response.data;
+    if (Array.isArray(payload)) {
+      // the endpoint directly returned an array
+      return payload;
+    }
+    if (Array.isArray(payload.results)) {
+      // your view is paginated
+      return payload.results;
+    }
+    // It was a single object – wrap it in an array
+    return [payload];
   } catch (error) {
     console.error("Error fetching doctor assessments:", error);
     return [];
@@ -121,11 +136,35 @@ export const getCowDetails = async (cowId) => {
     const response = await axios.get(`${API_URL}cows/${cowId}/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    // Log the breed data structure for debugging
+    console.log("Raw breed data:", response.data.breed);
+
+    // Handle breed data properly
+    let breedName = "N/A";
+    if (response.data.breed) {
+      if (typeof response.data.breed === "object" && response.data.breed.name) {
+        breedName = response.data.breed.name;
+      } else if (typeof response.data.breed === "string") {
+        breedName = response.data.breed;
+      } else if (typeof response.data.breed === "number") {
+        // If it's a number, we need to map it to a breed name
+        const breedMap = {
+          1: "Holstein",
+          2: "Jersey",
+          3: "Zebu",
+          4: "Crossbreed",
+          // Add more mappings as needed
+        };
+        breedName = breedMap[response.data.breed] || "Unknown Breed";
+      }
+    }
+
     // Flatten nested fields for compatibility
     return {
       ...response.data,
-      farm_id: response.data.farm?.farm_id || "N/A", // Flatten farm ID
-      breed: response.data.breed?.name || "N/A", // Flatten breed name
+      farm_id: response.data.farm?.farm_id || "N/A",
+      breed: breedName,
       owner_name: response.data.farm?.owner_name || "N/A",
     };
   } catch (error) {
@@ -133,12 +172,13 @@ export const getCowDetails = async (cowId) => {
     return null;
   }
 };
-// Fetch insemination count
+
 // export const getInseminationCount = async (farmId, cowId) => {
 //   try {
-//     const response = await axios.post(`${COW_API_URL}monitor_heat_sign/`, {
-//       farm_id: farmId,
-//       cow_id: cowId,
+//     const token = localStorage.getItem("authToken");
+//     const response = await axios.get("http://127.0.0.1:8000/api/insemination-records/", {
+//       params: { farm_id: farmId, cow_id: cowId },
+//       headers: { Authorization: `Bearer ${token}` },
 //     });
 //     return response.data.insemination_count || 0;
 //   } catch (error) {
@@ -147,17 +187,18 @@ export const getCowDetails = async (cowId) => {
 //   }
 // };
 
-export const getInseminationCount = async (farmId, cowId) => {
+export const getInseminationRecords = async (farmId, cowId) => {
   try {
     const token = localStorage.getItem("authToken");
     const response = await axios.get("http://127.0.0.1:8000/api/insemination-records/", {
       params: { farm_id: farmId, cow_id: cowId },
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data.insemination_count || 0;
+    // response.data is an array of record objects
+    return Array.isArray(response.data) ? response.data : response.data.results || [];
   } catch (error) {
-    console.error("Failed to fetch insemination count:", error);
-    return 0;
+    console.error("Failed to fetch insemination records:", error);
+    return [];
   }
 };
 
@@ -180,7 +221,7 @@ export const getMonitorBirthData = async (farmId = null) => {
     const token = localStorage.getItem("authToken");
     const params = {};
     if (farmId) params.farm_id = farmId;
-    const response = await axios.get("http://localhost:8000/api/cows/birth_records/", {
+    const response = await axios.get("http://localhost:8000/api/cows/reproduction/", {
       params,
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -195,7 +236,7 @@ export const getMonitorBirthData = async (farmId = null) => {
 export const getHeatSignData = async (farmId, cowId) => {
   try {
     const token = localStorage.getItem("authToken");
-    const response = await axios.get(`${COW_API_URL}heat_sign_records/`, {
+    const response = await axios.get(`${COW_API_URL}reproduction/`, {
       params: {
         farm_id: farmId,
         cow_id: cowId || "ALL",
@@ -249,13 +290,127 @@ export const getMonitorPregnancyData = async (farmId = null, cowId = "ALL") => {
   try {
     const token = localStorage.getItem("authToken");
     const params = { farm_id: farmId, cow_id: cowId };
-    const response = await axios.get("http://localhost:8000/api/cows/pregnancy_records/", {
+    const response = await axios.get("http://localhost:8000/api/cows/reproduction/", {
       params,
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   } catch (error) {
     console.error("Error fetching pregnancy data:", error);
+    return [];
+  }
+};
+
+export const getReproductionRecords = async (farmId, cowId) => {
+  try {
+    const token = localStorage.getItem("authToken");
+    const response = await axios.get(`${API_URL}reproduction/`, {
+      params: { farm: farmId, cow: cowId },
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log("Reproduction Records Response:", response.data);
+    // returns an array of objects like { heat_sign_start, heat_sign_end, …, pregnancy_date, calving_date }
+    return Array.isArray(response.data) ? response.data : response.data.results || [];
+  } catch (error) {
+    console.error("Error fetching reproduction data:", error);
+    return [];
+  }
+};
+
+/**
+ * Convenience wrappers if you'd rather name them for each form type:
+ */
+
+// heat sign monitoring window
+export const getHeatSignWindow = async (farmId, cowId) => {
+  try {
+    const response = await axios.get(`${API_URL}reproduction/`, {
+      params: { farm: farmId, cow: cowId },
+    });
+    console.log("Raw API Response for Heat Signs:", response.data);
+    console.log("Looking for cowId:", cowId);
+
+    const filteredData = response.data.filter((record) => {
+      console.log("Checking record:", record);
+      console.log("Record cow ID:", record.cow, "Type:", typeof record.cow);
+      console.log("Searching for cowId:", cowId, "Type:", typeof cowId);
+      return String(record.cow) === String(cowId);
+    });
+
+    console.log("Filtered Heat Sign Data:", filteredData);
+
+    const mappedData = filteredData.map((record) => ({
+      start: record.heat_sign_start,
+      end: record.heat_sign_end,
+      signs: record.heat_signs_seen,
+      recordedAt: record.heat_sign_recorded_at,
+    }));
+
+    console.log("Final Mapped Heat Sign Data:", mappedData);
+    return mappedData;
+  } catch (error) {
+    console.error("Error fetching heat sign window:", error);
+    return [];
+  }
+};
+
+// pregnancy monitor
+export const getPregnancyRecords = async (farmId, cowId) => {
+  try {
+    const response = await axios.get(`${API_URL}reproduction/`, {
+      params: { farm: farmId, cow: cowId },
+    });
+    console.log("Raw API Response for Pregnancy:", response.data);
+    console.log("Looking for cowId:", cowId);
+
+    const filteredData = response.data.filter((record) => {
+      console.log("Checking record:", record);
+      console.log("Record cow ID:", record.cow, "Type:", typeof record.cow);
+      console.log("Searching for cowId:", cowId, "Type:", typeof cowId);
+      return String(record.cow) === String(cowId);
+    });
+
+    console.log("Filtered Pregnancy Data:", filteredData);
+
+    const mappedData = filteredData.map((record) => ({
+      date: record.pregnancy_date,
+      calving: record.calving_date,
+    }));
+
+    console.log("Final Mapped Pregnancy Data:", mappedData);
+    return mappedData;
+  } catch (error) {
+    console.error("Error fetching pregnancy records:", error);
+    return [];
+  }
+};
+
+// birth monitoring
+export const getBirthRecords = async (farmId, cowId) => {
+  try {
+    const response = await axios.get(`${API_URL}reproduction/`, {
+      params: { farm: farmId, cow: cowId },
+    });
+    console.log("Raw API Response for Birth:", response.data);
+    console.log("Looking for cowId:", cowId);
+
+    const filteredData = response.data.filter((record) => {
+      console.log("Checking record:", record);
+      console.log("Record cow ID:", record.cow, "Type:", typeof record.cow);
+      console.log("Searching for cowId:", cowId, "Type:", typeof cowId);
+      return String(record.cow) === String(cowId);
+    });
+
+    console.log("Filtered Birth Data:", filteredData);
+
+    const mappedData = filteredData.map((record) => ({
+      calvingDate: record.calving_date,
+    }));
+
+    console.log("Final Mapped Birth Data:", mappedData);
+    return mappedData;
+  } catch (error) {
+    console.error("Error fetching birth records:", error);
     return [];
   }
 };
