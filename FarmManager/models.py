@@ -98,6 +98,13 @@ class Farm(SoftDeleteModel):
         ],
     )
     location_gps = models.CharField(max_length=255, blank=True, null=True)
+    cluster_number = models.CharField(
+        max_length=50, 
+        blank=True, 
+        null=True,
+        db_index=True,  # Add index for faster filtering
+        help_text=_("Cluster identifier for grouping farms")
+    )
     fertility_camp_no = models.PositiveIntegerField(
         help_text=_("Number of fertility camps")
     )

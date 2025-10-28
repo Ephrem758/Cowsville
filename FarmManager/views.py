@@ -88,12 +88,14 @@ logger = logging.getLogger(__name__)
 
 
 class FarmViewSet(viewsets.ModelViewSet, LoggingMixin):
-    queryset = Farm.objects.all()
+    queryset = Farm.objects.select_related('type_of_housing', 'type_of_floor', 'source_of_water', 
+                                          'rate_of_cow_feeding', 'rate_of_water_giving', 
+                                          'inseminator', 'doctor')
     serializer_class = FarmSerializer
     permission_classes = [AdminGetOnlyPermission]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['farm_id', 'owner_name', 'is_deleted']  # For exact matches
-    search_fields = ["farm_id", "owner_name", "address"]  # For partial matches
+    filterset_fields = ['farm_id', 'owner_name', 'is_deleted', 'cluster_number']  # For exact matches
+    search_fields = ["farm_id", "owner_name", "address", "cluster_number"]  # For partial matches
 
     def create(self, request, *args, **kwargs):
         """Create a new farm with logging"""
@@ -272,7 +274,9 @@ class FarmViewSet(viewsets.ModelViewSet, LoggingMixin):
 
 
 class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
-    queryset = Cow.objects.all()
+    queryset = Cow.objects.select_related('farm', 'breed', 'gynecological_status', 
+                                         'farm__type_of_housing', 'farm__type_of_floor',
+                                         'farm__inseminator', 'farm__doctor')
     serializer_class = CowSerializer
     permission_classes = [AdminGetOnlyPermission]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -1120,14 +1124,14 @@ class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
 
 
 class MessageViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Message.objects.all()
+    queryset = Message.objects.select_related('farm', 'cow')
     serializer_class = MessageSerializer
     permission_classes = [ReadOnlyAdminPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ["message_text", "message_type"]
 
     def get_queryset(self):
-        queryset = Message.objects.all()
+        queryset = Message.objects.select_related('farm', 'cow')
         farm_id = self.request.query_params.get("farm_id", None)
         cow_id = self.request.query_params.get("cow_id", None)
 
@@ -1201,14 +1205,14 @@ class InseminatorViewSet(viewsets.ModelViewSet):
 
 
 class ReproductionViewSet(viewsets.ModelViewSet):
-    queryset = Reproduction.objects.all()
+    queryset = Reproduction.objects.select_related('cow', 'farm')
     serializer_class = ReproductionSerializer
     permission_classes = [AdminGetOnlyPermission]
     filter_backends = [filters.SearchFilter]
     search_fields = ["cow__cow_id", "farm__farm_id"]
 
     def get_queryset(self):
-        queryset = Reproduction.objects.all()
+        queryset = Reproduction.objects.select_related('cow', 'farm')
         farm_id = self.request.query_params.get("farm_id", None)
         cow_id = self.request.query_params.get("cow_id", None)
         is_pregnant = self.request.query_params.get("is_pregnant", None)
@@ -1289,12 +1293,12 @@ class GeneralHealthStatusViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class FarmerMedicalReportViewSet(viewsets.ModelViewSet):
-    queryset = FarmerMedicalReport.objects.all()
+    queryset = FarmerMedicalReport.objects.select_related('farm', 'cow', 'reviewed_by')
     serializer_class = FarmerMedicalReportSerializer
     permission_classes = [AdminGetOnlyPermission]
 
     def get_queryset(self):
-        queryset = FarmerMedicalReport.objects.all()
+        queryset = FarmerMedicalReport.objects.select_related('farm', 'cow', 'reviewed_by')
         farm_id = self.request.query_params.get("farm_id", None)
         cow_id = self.request.query_params.get("cow_id", None)
         is_reviewed = self.request.query_params.get("is_reviewed", None)
@@ -1310,12 +1314,14 @@ class FarmerMedicalReportViewSet(viewsets.ModelViewSet):
 
 
 class MedicalAssessmentViewSet(viewsets.ModelViewSet):
-    queryset = MedicalAssessment.objects.all()
+    queryset = MedicalAssessment.objects.select_related('farm', 'cow', 'assessed_by', 
+                                                         'general_health', 'udder_health', 'mastitis')
     serializer_class = MedicalAssessmentSerializer
     permission_classes = [AdminGetOnlyPermission]
 
     def get_queryset(self):
-        queryset = MedicalAssessment.objects.all()
+        queryset = MedicalAssessment.objects.select_related('farm', 'cow', 'assessed_by',
+                                                            'general_health', 'udder_health', 'mastitis')
         farm_id = self.request.query_params.get("farm_id", None)
         cow_id = self.request.query_params.get("cow_id", None)
         doctor_id = self.request.query_params.get("doctor_id", None)
@@ -1334,12 +1340,12 @@ class MedicalAssessmentViewSet(viewsets.ModelViewSet):
 
 
 class InseminationRecordViewSet(viewsets.ModelViewSet):
-    queryset = InseminationRecord.objects.all()
+    queryset = InseminationRecord.objects.select_related('farm', 'cow', 'inseminator')
     serializer_class = InseminationRecordSerializer
     permission_classes = [AdminGetOnlyPermission]
 
     def get_queryset(self):
-        queryset = InseminationRecord.objects.all()
+        queryset = InseminationRecord.objects.select_related('farm', 'cow', 'inseminator')
         farm_id = self.request.query_params.get("farm_id", None)
         cow_id = self.request.query_params.get("cow_id", None)
         inseminator_id = self.request.query_params.get("inseminator_id", None)

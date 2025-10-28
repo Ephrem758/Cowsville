@@ -106,7 +106,7 @@ class FarmSerializer(BasePhoneNumberMixin, BaseFieldMappingMixin, serializers.Mo
         fields = [
             # Model fields
             'farm_id', 'owner_name', 'address', 'telephone_number', 'location_gps',
-            'fertility_camp_no', 'total_number_of_cows', 'number_of_calves', 
+            'cluster_number', 'fertility_camp_no', 'total_number_of_cows', 'number_of_calves', 
             'number_of_milking_cows', 'total_daily_milk', 'type_of_housing', 
             'type_of_floor', 'main_feed', 'rate_of_cow_feeding', 'source_of_water', 
             'rate_of_water_giving', 'farm_hygiene_score', 'inseminator', 'doctor',
@@ -207,8 +207,9 @@ class CowSerializer(serializers.ModelSerializer):
     breed_name = serializers.CharField(source='breed.display_name', read_only=True)
     gynecological_status_name = serializers.CharField(source='gynecological_status.display_name', read_only=True)
     
-    # Explicitly include nested farm details
-    farm = FarmSerializer(read_only=True)
+    # Use simplified farm representation instead of full nested serializer to prevent N+1
+    farm_id = serializers.CharField(source='farm.farm_id', read_only=True)
+    farm_owner = serializers.CharField(source='farm.owner_name', read_only=True)
 
     class Meta:
         model = Cow

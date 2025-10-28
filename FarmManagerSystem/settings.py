@@ -48,6 +48,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "FarmManager.middleware.RequestTimeoutMiddleware",  # Request timeout enforcement
+    "FarmManager.middleware.PerformanceMonitoringMiddleware",  # Performance tracking
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,6 +57,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Request timeout settings
+REQUEST_TIMEOUT = 30  # Maximum time (seconds) for a request to complete
+ENABLE_REQUEST_TIMEOUT = True  # Enable/disable request timeout middleware
+SLOW_REQUEST_THRESHOLD = 2.0  # Log warning for requests slower than this (seconds)
+QUERY_COUNT_WARNING_THRESHOLD = 20  # Warn if query count exceeds this
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -92,6 +100,23 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+        # Connection timeout settings for SQLite
+        "CONN_MAX_AGE": 600,  # Keep connections alive for 10 minutes
+        "OPTIONS": {
+            "timeout": 20,  # 20 seconds timeout for database operations
+        }
+    }
+}
+
+# Caching Configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'farmmanager-cache',
+        'TIMEOUT': 300,  # 5 minutes default timeout
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
     }
 }
 
@@ -199,5 +224,27 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+    ],
+    # Pagination settings - prevents returning all records at once
+    'DEFAULT_PAGINATION_CLASS': 'FarmManager.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 50,  # Default page size (can be overridden via ?page_size=)
+    # Filtering backends
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    # Throttling to prevent abuse
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',  # Anonymous users: 100 requests per hour
+        'user': '1000/hour'  # Authenticated users: 1000 requests per hour
+    },
+    # Renderer settings
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
     ],
 }
