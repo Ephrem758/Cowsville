@@ -46,6 +46,9 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import FarmCards from "layouts/farm-cards";
 
+// Components
+import ProtectedRoute from "components/ProtectedRoute";
+
 // @mui icons
 import Icon from "@mui/material/Icon";
 
@@ -56,7 +59,11 @@ const routes = [
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
-    component: <Dashboard />,
+    component: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
   },
   {
     type: "collapse",
@@ -64,7 +71,11 @@ const routes = [
     key: "tables",
     icon: <Icon fontSize="small">table_view</Icon>,
     route: "/tables",
-    component: <Tables />,
+    component: (
+      <ProtectedRoute>
+        <Tables />
+      </ProtectedRoute>
+    ),
   },
   {
     type: "collapse",
@@ -72,7 +83,11 @@ const routes = [
     key: "AverageStatistics",
     icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/averagestatistics",
-    component: <AverageStatistics />,
+    component: (
+      <ProtectedRoute>
+        <AverageStatistics />
+      </ProtectedRoute>
+    ),
   },
   // {
   //   type: "collapse",
@@ -88,7 +103,11 @@ const routes = [
     key: "notifications",
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/notifications",
-    component: <Notifications />,
+    component: (
+      <ProtectedRoute>
+        <Notifications />
+      </ProtectedRoute>
+    ),
   },
   {
     type: "collapse",
@@ -96,7 +115,11 @@ const routes = [
     key: "farm-cards",
     icon: <Icon fontSize="small">view_module</Icon>,
     route: "/farm-cards",
-    component: <FarmCards />,
+    component: (
+      <ProtectedRoute>
+        <FarmCards />
+      </ProtectedRoute>
+    ),
   },
   // {
   //   type: "collapse",

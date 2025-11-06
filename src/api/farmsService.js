@@ -1,18 +1,231 @@
 import axios from "axios";
 
 // Base URL from your API documentation
-const API_URL = "http://localhost:8000/api/";
-const FARM_API_URL = "http://localhost:8000/api/farms/";
-const COW_API_URL = "http://localhost:8000/api/cows/";
-const token = localStorage.getItem("authToken") || "mock_token_for_testing";
+// const API_URL = "https://apiv2.cowsville-aau-cvma.com/api/";
+// const FARM_API_URL = "https://apiv2.cowsville-aau-cvma.com/api/farms/";
+// const COW_API_URL = "https://apiv2.cowsville-aau-cvma.com/api/cows/";
+// const token = localStorage.getItem("authToken") || "mock_token_for_testing";
+
+// Base URL from environment variables
+const API_URL = process.env.REACT_APP_API_BASE_URL || "https://apiv2.cowsville-aau-cvma.com/api/";
+const FARM_API_URL = `${API_URL}${process.env.REACT_APP_FARMS_ENDPOINT || "farms/"}`;
+const COW_API_URL = `${API_URL}${process.env.REACT_APP_COWS_ENDPOINT || "cows/"}`;
+
+// Default credentials from environment
+const DEFAULT_USERNAME = process.env.REACT_APP_USERNAME || "farmadmin";
+const DEFAULT_PASSWORD = process.env.REACT_APP_PASSWORD || "SecurePass123";
+
+// Create base64 encoded credentials for Basic Auth
+const createBasicAuthCredentials = (username, password) => {
+  return btoa(`${username}:${password}`);
+};
+
+// Get stored credentials or use defaults
+const getStoredCredentials = () => {
+  const storedUsername = localStorage.getItem("username") || DEFAULT_USERNAME;
+  const storedPassword = localStorage.getItem("password") || DEFAULT_PASSWORD;
+  return { username: storedUsername, password: storedPassword };
+};
+
+// Create an axios instance with proper cookie handling
+const apiClient = axios.create({
+  baseURL: API_URL,
+  withCredentials: true, // CRITICAL: This sends cookies with requests
+});
+
+// Basic Auth login function
+export const login = async (username, password) => {
+  try {
+    console.log("Attempting Basic Auth login to:", API_URL);
+    console.log("With credentials:", { username, password: "***" });
+
+    // Test the credentials by making a request to a protected endpoint
+    const credentials = createBasicAuthCredentials(username, password);
+    const response = await axios.get(`${API_URL}farms/`, {
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Login successful! API response:", response.status);
+
+    // Store credentials for future requests
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
+    localStorage.setItem("authToken", credentials); // Store the base64 credentials as "token"
+
+    return credentials; // Return the base64 credentials
+  } catch (error) {
+    console.error("Login failed - Full error:", error);
+    console.error("Error response:", error.response?.data);
+    console.error("Error status:", error.response?.status);
+    console.error("Error URL:", error.config?.url);
+
+    // Provide more specific error messages
+    if (error.response?.status === 401) {
+      throw new Error("Invalid username or password.");
+    } else if (error.response?.status === 404) {
+      throw new Error("API endpoint not found. Please check the API URL.");
+    } else if (error.response?.status === 403) {
+      throw new Error("Access forbidden. Please check your credentials.");
+    } else {
+      throw new Error(error.response?.data?.message || error.message || "Login failed");
+    }
+  }
+};
+
+// Function to display current environment configuration
+export const displayEnvironmentConfig = () => {
+  console.log("🔧 Environment Configuration:");
+  console.log(`  API Base URL: ${API_URL}`);
+  console.log(`  Authentication Method: Basic Auth`);
+  console.log(`  Default Username: ${DEFAULT_USERNAME}`);
+  console.log(`  Default Password: ${DEFAULT_PASSWORD ? "***" : "Not set"}`);
+  console.log(`  Farms URL: ${FARM_API_URL}`);
+  console.log(`  Cows URL: ${COW_API_URL}`);
+
+  const stored = getStoredCredentials();
+  console.log(`  Stored Username: ${stored.username}`);
+  console.log(`  Stored Password: ${stored.password ? "***" : "Not set"}`);
+};
+
+// Function to test what endpoints are available
+export const testApiEndpoints = async () => {
+  console.log("🔍 Testing API endpoints to find authentication...");
+
+  // Display current configuration
+  displayEnvironmentConfig();
+
+  // Test the base API first
+  try {
+    const baseResponse = await axios.get(API_URL);
+    console.log("✅ Base API is accessible:", baseResponse.status);
+    console.log("Base API response:", baseResponse.data);
+
+    // Log all available endpoints
+    const endpoints = baseResponse.data;
+    console.log("📋 Available endpoints:");
+    Object.keys(endpoints).forEach((key) => {
+      console.log(`  - ${key}: ${endpoints[key]}`);
+    });
+  } catch (error) {
+    console.log("❌ Base API error:", error.response?.status, error.message);
+  }
+
+  // Test if we can access farms without auth (to see what error we get)
+  try {
+    const farmsResponse = await axios.get(`${API_URL}farms/`);
+    console.log("✅ Farms endpoint accessible without auth:", farmsResponse.status);
+  } catch (error) {
+    console.log("🔒 Farms endpoint requires auth:", error.response?.status, error.response?.data);
+  }
+
+  // Test some common authentication patterns that might not be in the base response
+  const authEndpoints = [
+    `${API_URL}auth/`,
+    `${API_URL}login/`,
+    `${API_URL}token/`,
+    `${API_URL}user/`,
+    `${API_URL}admin/`,
+    `${API_URL}authentication/`,
+  ];
+
+  console.log("🔍 Testing potential auth endpoints not in base response:");
+  for (const endpoint of authEndpoints) {
+    try {
+      const response = await axios.get(endpoint);
+      console.log(`✅ ${endpoint} - Status: ${response.status}`);
+      console.log(`   Response:`, response.data);
+    } catch (error) {
+      console.log(`❌ ${endpoint} - Status: ${error.response?.status}`);
+    }
+  }
+};
+
+// Alternative login function that tries different common endpoints
+export const loginAlternative = async (username, password) => {
+  const endpoints = [
+    `${API_URL}auth/login/`,
+    `${API_URL}login/`,
+    `${API_URL}auth/token/`,
+    `${API_URL}api-token-auth/`,
+    `${API_URL}obtain-auth-token/`,
+    // Try some other common patterns
+    `${API_URL}authenticate/`,
+    `${API_URL}signin/`,
+    `${API_URL}user/login/`,
+    `${API_URL}admin/login/`,
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      console.log("Trying endpoint:", endpoint);
+      const response = await axios.post(endpoint, {
+        username,
+        password,
+      });
+
+      console.log("Login successful at:", endpoint);
+      console.log("Response:", response.data);
+
+      const token = response.data.access || response.data.token || response.data.key;
+      if (token) {
+        localStorage.setItem("authToken", token);
+        return token;
+      }
+    } catch (error) {
+      console.log(`Failed at ${endpoint}:`, error.response?.status);
+      continue;
+    }
+  }
+
+  throw new Error(
+    "All authentication endpoints failed. Please check with backend team for correct endpoint."
+  );
+};
+
+// Temporary mock authentication for testing frontend functionality
+export const mockLogin = async (username, password) => {
+  console.log("🔧 Using mock authentication for testing...");
+
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  // Check credentials against environment variables
+  if (username === DEFAULT_USERNAME && password === DEFAULT_PASSWORD) {
+    const credentials = createBasicAuthCredentials(username, password);
+    console.log("✅ Mock login successful with Basic Auth credentials");
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
+    localStorage.setItem("authToken", credentials);
+    return credentials;
+  } else {
+    throw new Error("Invalid username or password");
+  }
+};
 
 export const getFarms = async (searchQuery = "") => {
   try {
-    const token = localStorage.getItem("authToken"); // Retrieve token
-    const response = await axios.get("http://localhost:8000/api/farms/", {
+    const { username, password } = getStoredCredentials();
+    const credentials = createBasicAuthCredentials(username, password);
+
+    const response = await axios.get(`${API_URL}farms/`, {
       params: { search: searchQuery },
-      headers: { Authorization: `Bearer ${token}` }, // Add token
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/json",
+      },
     });
+
+    const responses = await axios.get(`${API_URL}doctors/`, {
+      params: { search: searchQuery },
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Doctor", responses.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching farms:", error);
@@ -20,11 +233,26 @@ export const getFarms = async (searchQuery = "") => {
   }
 };
 
+// export const getdoctor = async (searchQuery = "") => {
+//   try {
+//     const token = localStorage.getItem("authToken"); // Retrieve token
+//     const response = await axios.get("https://apiv2.cowsville-aau-cvma.com/api/doctors/", {
+//       params: { search: searchQuery },
+//       headers: { Authorization: `Bearer ${token}` }, // Add token
+//     });
+//     console.log("Doctor", data.Doctor);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching farms:", error);
+//     return [];
+//   }
+// };
+
 // export const getCows = async (farmId = null) => {
 //   try {
-//     let url = "http://localhost:8000/api/cows/";
+//     let url = "https://apiv2.cowsville-aau-cvma.com/api/api/cows/";
 //     if (farmId) {
-//       url = `http://localhost:8000/api/cows/?farm_id=${farmId}`;
+//       url = `https://apiv2.cowsville-aau-cvma.com/api/api/cows/?farm_id=${farmId}`;
 //     }
 //     const response = await axios.get(url);
 //     return farmId ? response.data.cows : response.data; // Handle API response structure
@@ -37,7 +265,7 @@ export const getFarms = async (searchQuery = "") => {
 export const getCows = async (farmId = null) => {
   try {
     const token = localStorage.getItem("authToken");
-    let url = "http://localhost:8000/api/cows/";
+    let url = "https://apiv2.cowsville-aau-cvma.com/api/cows/";
     if (farmId) {
       url = `${url}?farm_id=${farmId}`; // Correct endpoint for filtering
     }
@@ -96,7 +324,7 @@ export const getDoctorAssessments = async (farmId = null, cowId = null) => {
 
 // export const getCowHeatSign = async (farmId, cowId) => {
 //   try {
-//     const response = await axios.get("http://localhost:8000/api/cows/heat_sign_records/", {
+//     const response = await axios.get("https://apiv2.cowsville-aau-cvma.com/api/api/cows/heat_sign_records/", {
 //       farm_id: farmId,
 //       cow_id: cowId,
 //     });
@@ -221,10 +449,13 @@ export const getMonitorBirthData = async (farmId = null) => {
     const token = localStorage.getItem("authToken");
     const params = {};
     if (farmId) params.farm_id = farmId;
-    const response = await axios.get("http://localhost:8000/api/cows/reproduction/", {
-      params,
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.get(
+      "https://apiv2.cowsville-aau-cvma.com/api/cows/reproduction/",
+      {
+        params,
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching calving data:", error);
@@ -290,10 +521,13 @@ export const getMonitorPregnancyData = async (farmId = null, cowId = "ALL") => {
   try {
     const token = localStorage.getItem("authToken");
     const params = { farm_id: farmId, cow_id: cowId };
-    const response = await axios.get("http://localhost:8000/api/cows/reproduction/", {
-      params,
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.get(
+      "https://apiv2.cowsville-aau-cvma.com/api/cows/reproduction/",
+      {
+        params,
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching pregnancy data:", error);
