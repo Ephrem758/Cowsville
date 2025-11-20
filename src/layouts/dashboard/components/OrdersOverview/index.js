@@ -83,14 +83,14 @@ function OrdersOverview({ cow }) {
           color="error"
           icon="inventory_2"
           title="Calving Date"
-          description={cow?.calving_date || "N/A"}
+          description={cow?.last_calving_date || "N/A"}
         />
-        <TimelineItem
+        {/* <TimelineItem
           color="info"
           icon="shopping_cart"
           title="Date of AI"
           description={cow?.last_date_insemination || "N/A"}
-        />
+        /> */}
         <TimelineItem
           color="warning"
           icon="payment"
@@ -119,6 +119,7 @@ OrdersOverview.propTypes = {
     }),
     heat_signs: PropTypes.string,
     calving_date: PropTypes.string,
+    last_calving_date: PropTypes.string,
     last_date_insemination: PropTypes.string,
     number_of_inseminations: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     lactation_number: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

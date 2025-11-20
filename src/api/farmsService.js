@@ -7,7 +7,8 @@ import axios from "axios";
 // const token = localStorage.getItem("authToken") || "mock_token_for_testing";
 
 // Base URL from environment variables
-const API_URL = process.env.REACT_APP_API_BASE_URL || "https://apiv2.cowsville-aau-cvma.com/api/";
+const API_URL = process.env.REACT_APP_API_BASE_URL || "https://apiv3.cowsville-aau-cvma.com/api/";
+// const API_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000/api/";
 const FARM_API_URL = `${API_URL}${process.env.REACT_APP_FARMS_ENDPOINT || "farms/"}`;
 const COW_API_URL = `${API_URL}${process.env.REACT_APP_COWS_ENDPOINT || "cows/"}`;
 
@@ -226,7 +227,20 @@ export const getFarms = async (searchQuery = "") => {
       },
     });
     console.log("Doctor", responses.data);
-    return response.data;
+
+    // Ensure we always return an array
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && Array.isArray(data.results)) {
+      // Handle paginated responses
+      return data.results;
+    } else if (data && typeof data === "object") {
+      // If it's a single object, wrap it in an array
+      return [data];
+    }
+    // Fallback to empty array
+    return [];
   } catch (error) {
     console.error("Error fetching farms:", error);
     return [];
@@ -264,15 +278,36 @@ export const getFarms = async (searchQuery = "") => {
 
 export const getCows = async (farmId = null) => {
   try {
-    const token = localStorage.getItem("authToken");
-    let url = "https://apiv2.cowsville-aau-cvma.com/api/cows/";
+    const { username, password } = getStoredCredentials();
+    const credentials = createBasicAuthCredentials(username, password);
+
+    const params = {};
     if (farmId) {
-      url = `${url}?farm_id=${farmId}`; // Correct endpoint for filtering
+      params.farm_id = farmId; // Use farm_id as query parameter
     }
-    const response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
-    return farmId ? response.data : response.data; // Adjust based on backend response
+
+    const response = await axios.get(COW_API_URL, {
+      params,
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Handle paginated response structure
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && Array.isArray(data.results)) {
+      return data.results;
+    } else if (data && typeof data === "object") {
+      return [data];
+    }
+    return [];
   } catch (error) {
-    console.error("API Error:", error);
+    console.error("API Error fetching cows:", error);
+    console.error("Error response:", error.response?.data);
+    console.error("Error status:", error.response?.status);
     return [];
   }
 };
@@ -456,7 +491,14 @@ export const getMonitorBirthData = async (farmId = null) => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return response.data;
+    // Handle paginated response structure
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    return [];
   } catch (error) {
     console.error("Error fetching calving data:", error);
     return [];
@@ -474,8 +516,14 @@ export const getHeatSignData = async (farmId, cowId) => {
       },
       headers: { Authorization: `Bearer ${token}` },
     });
-    // RETURN THE WHOLE ARRAY so you can .find() in Tables
-    return response.data;
+    // Handle paginated response structure
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    return [];
   } catch (error) {
     console.error("Error fetching heat sign data:", error);
     return []; // return empty array on failure
@@ -509,7 +557,14 @@ export const getInseminationCountData = async (farmId = null, cowId = "ALL") => 
       params,
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data;
+    // Handle paginated response structure
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    return [];
   } catch (error) {
     console.error("Error fetching insemination count data:", error);
     return [];
@@ -528,7 +583,14 @@ export const getMonitorPregnancyData = async (farmId = null, cowId = "ALL") => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return response.data;
+    // Handle paginated response structure
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    return [];
   } catch (error) {
     console.error("Error fetching pregnancy data:", error);
     return [];
@@ -564,7 +626,11 @@ export const getHeatSignWindow = async (farmId, cowId) => {
     console.log("Raw API Response for Heat Signs:", response.data);
     console.log("Looking for cowId:", cowId);
 
-    const filteredData = response.data.filter((record) => {
+    // Handle paginated response structure
+    const data = response.data;
+    const records = Array.isArray(data) ? data : data?.results || [];
+
+    const filteredData = records.filter((record) => {
       console.log("Checking record:", record);
       console.log("Record cow ID:", record.cow, "Type:", typeof record.cow);
       console.log("Searching for cowId:", cowId, "Type:", typeof cowId);
@@ -597,7 +663,11 @@ export const getPregnancyRecords = async (farmId, cowId) => {
     console.log("Raw API Response for Pregnancy:", response.data);
     console.log("Looking for cowId:", cowId);
 
-    const filteredData = response.data.filter((record) => {
+    // Handle paginated response structure
+    const data = response.data;
+    const records = Array.isArray(data) ? data : data?.results || [];
+
+    const filteredData = records.filter((record) => {
       console.log("Checking record:", record);
       console.log("Record cow ID:", record.cow, "Type:", typeof record.cow);
       console.log("Searching for cowId:", cowId, "Type:", typeof cowId);
@@ -628,7 +698,11 @@ export const getBirthRecords = async (farmId, cowId) => {
     console.log("Raw API Response for Birth:", response.data);
     console.log("Looking for cowId:", cowId);
 
-    const filteredData = response.data.filter((record) => {
+    // Handle paginated response structure
+    const data = response.data;
+    const records = Array.isArray(data) ? data : data?.results || [];
+
+    const filteredData = records.filter((record) => {
       console.log("Checking record:", record);
       console.log("Record cow ID:", record.cow, "Type:", typeof record.cow);
       console.log("Searching for cowId:", cowId, "Type:", typeof cowId);

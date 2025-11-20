@@ -146,5 +146,4 @@ const routes = [
   //   component: <SignUp />,
   // },
 ];
-
 export default routes;

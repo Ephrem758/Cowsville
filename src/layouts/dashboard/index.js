@@ -71,9 +71,11 @@ function Dashboard() {
       setLoading(true);
       try {
         const farmsData = await getFarms(searchQuery);
-        setFarms(farmsData);
+        // Ensure farmsData is always an array
+        setFarms(Array.isArray(farmsData) ? farmsData : []);
       } catch (err) {
         setError(err.message);
+        setFarms([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -82,12 +84,15 @@ function Dashboard() {
     fetchFarms();
   }, [searchQuery]); // Only re-run on searchQuery change
 
-  const filteredFarms = farms.filter((farm) => {
-    return (
-      farm.farm_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      farm.owner_name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
+  // Ensure farms is always an array before filtering
+  const filteredFarms = Array.isArray(farms)
+    ? farms.filter((farm) => {
+        return (
+          farm.farm_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          farm.owner_name?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      })
+    : [];
 
   // Get firstFarm (derive after filteredFarms)
   const firstFarm = filteredFarms.length > 0 ? filteredFarms[0] : null;
@@ -147,7 +152,9 @@ function Dashboard() {
         // If a real farm is selected, fetch only its cows (no mocks)
         try {
           const farmId = selectedFarm.farm_id;
+          console.log("Fetching cows for farm ID:", farmId);
           const apiCows = await getCows(farmId);
+          console.log("Fetched cows:", apiCows);
           setCows(apiCows); // Only real cows for the selected farm
         } catch (err) {
           console.error("Failed to fetch cows:", err);
@@ -158,70 +165,65 @@ function Dashboard() {
     fetchCows();
   }, [selectedFarm?.farm_id]); // Only depend on farm_id
 
-  // Update the search button click handler
-  const handleSearchClick = async () => {
-    const foundCow = cows.find(
-      (cow) =>
-        cow.cow_id.toLowerCase() === cowSearchInput.toLowerCase() &&
-        (cow.farm_id === "MOCK" || cow.farm?.farm_id === selectedFarm?.farm_id)
-    );
-
-    if (foundCow) {
-      if (foundCow.farm_id === "MOCK") {
-        setSelectedCow(foundCow);
-      } else {
-        try {
-          console.log("Searching for cow:", foundCow.cow_id, "in farm:", foundCow.farm_id);
-
-          const [heatSignWindow, pregnancyRecords, birthRecords] = await Promise.all([
-            getHeatSignWindow(foundCow.farm_id, foundCow.cow_id),
-            getPregnancyRecords(foundCow.farm_id, foundCow.cow_id),
-            getBirthRecords(foundCow.farm_id, foundCow.cow_id),
-          ]);
-
-          console.log("Search results for cow", foundCow.cow_id, ":", {
-            heatSignWindow,
-            pregnancyRecords,
-            birthRecords,
-          });
-
-          const firstHeat = heatSignWindow[0] || {};
-          const firstPreg = pregnancyRecords[0] || {};
-          const firstBirth = birthRecords[0] || {};
-
-          const updatedCow = {
-            ...foundCow,
-            heat_sign_time: heatSignWindow.length > 0 ? firstHeat.start : "N/A",
-            heat_signs: heatSignWindow.length > 0 ? firstHeat.signs : "No heat signs recorded",
-            fertility_window: heatSignWindow,
-            pregnancies: pregnancyRecords,
-            births: birthRecords,
-            calving_date: birthRecords.length > 0 ? firstBirth.calvingDate : "N/A",
-            last_date_insemination: pregnancyRecords.length > 0 ? firstPreg.date : "N/A",
-            breed_name: String(foundCow.breed || "N/A"),
-            average_daily_milk: String(foundCow.average_daily_milk || "N/A"),
-            lactation_number: String(foundCow.lactation_number || "N/A"),
-          };
-
-          console.log("Updated cow data:", updatedCow);
-          setSelectedCow(updatedCow);
-        } catch (err) {
-          console.error("Error fetching cow data:", err);
-          setSelectedCow(null);
-        }
-      }
-    } else {
-      setSelectedCow(null);
-    }
-  };
-
   // Handle cow search functionality
   const handleCowSearch = async () => {
     try {
+      const trimmedInput = cowSearchInput.trim();
+      if (!trimmedInput) {
+        setSelectedCow(null);
+        return;
+      }
+
+      // 1. Try to find the cow in the already-fetched list for the selected farm
+      const localCow = cows.find((cow) => {
+        const cowFarmId = cow.farm?.farm_id || cow.farm_id;
+        return (
+          cow.cow_id?.toLowerCase() === trimmedInput.toLowerCase() &&
+          (cow.farm_id === "MOCK" || cowFarmId === selectedFarm?.farm_id)
+        );
+      });
+
+      if (localCow) {
+        if (localCow.farm_id === "MOCK") {
+          setSelectedCow(localCow);
+          return;
+        }
+
+        const farmId = localCow.farm?.farm_id || localCow.farm_id;
+        console.log("Using cached cow data for:", localCow.cow_id, "farm:", farmId);
+
+        const [heatSignWindow, pregnancyRecords, birthRecords] = await Promise.all([
+          getHeatSignWindow(farmId, localCow.cow_id),
+          getPregnancyRecords(farmId, localCow.cow_id),
+          getBirthRecords(farmId, localCow.cow_id),
+        ]);
+
+        const firstHeat = heatSignWindow[0] || {};
+        const firstPreg = pregnancyRecords[0] || {};
+        const firstBirth = birthRecords[0] || {};
+
+        const updatedCowFromCache = {
+          ...localCow,
+          heat_sign_time: heatSignWindow.length > 0 ? firstHeat.start : "N/A",
+          heat_signs: heatSignWindow.length > 0 ? firstHeat.signs : "No heat signs recorded",
+          fertility_window: heatSignWindow,
+          pregnancies: pregnancyRecords,
+          births: birthRecords,
+          calving_date: birthRecords.length > 0 ? firstBirth.calvingDate : "N/A",
+          last_date_insemination: pregnancyRecords.length > 0 ? firstPreg.date : "N/A",
+          breed_name: String(localCow.breed || "N/A"),
+          average_daily_milk: String(localCow.average_daily_milk || "N/A"),
+          lactation_number: String(localCow.lactation_number || "N/A"),
+        };
+
+        setSelectedCow(updatedCowFromCache);
+        return;
+      }
+
       // Fetch cow details directly from the backend
-      const cowDetails = await getCowDetails(cowSearchInput);
+      const cowDetails = await getCowDetails(trimmedInput);
       if (!cowDetails) {
-        console.warn("Cow not found for ID:", cowSearchInput);
+        console.warn("Cow not found for ID:", trimmedInput);
         setSelectedCow(null);
         return;
       }
@@ -375,10 +377,15 @@ function Dashboard() {
             <MDInput
               value={cowSearchInput}
               onChange={(e) => setCowSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleCowSearch();
+                }
+              }}
               sx={{ width: "100%", maxWidth: "400px", marginRight: 1 }}
               placeholder="Enter Cow ID..."
             />
-            <MDButton variant="gradient" color="info" onClick={handleSearchClick}>
+            <MDButton variant="gradient" color="info" onClick={handleCowSearch}>
               Search
             </MDButton>
           </MDBox>
@@ -422,7 +429,11 @@ function Dashboard() {
               <Projects
                 cows={
                   selectedFarm
-                    ? cows.filter((cow) => cow.farm?.farm_id === selectedFarm.farm_id)
+                    ? cows.filter((cow) => {
+                        // Handle both nested farm object and direct farm_id
+                        const cowFarmId = cow.farm?.farm_id || cow.farm_id;
+                        return cowFarmId === selectedFarm.farm_id;
+                      })
                     : []
                 }
                 farm={firstFarm}
