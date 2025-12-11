@@ -411,10 +411,11 @@ class InseminationRecord(SoftDeleteModel):
         Inseminator, on_delete=models.PROTECT, related_name="insemination_records"
     )
     is_inseminated = models.BooleanField(default=False)
+    insemination_date = models.DateField(null=True, blank=True, help_text="Actual date when insemination was performed")
     insemination_time = models.TimeField(null=True, blank=True)
     insemination_count = models.IntegerField(default=0)
     lactation_number = models.IntegerField()
-    recorded_date = models.DateTimeField(auto_now_add=True)
+    recorded_date = models.DateTimeField(auto_now_add=True, help_text="Date when this record was created in the system")
 
     def __str__(self):
         return f"Insemination Record - Farm {self.farm.farm_id} - Cow {self.cow.cow_id}"

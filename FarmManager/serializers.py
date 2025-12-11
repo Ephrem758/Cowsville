@@ -1011,6 +1011,7 @@ class MonitorHeatSignSerializer(serializers.Serializer):
     cow_id = serializers.CharField(required=True, help_text="Cow identifier")
     inseminated_now = serializers.CharField(required=True, help_text="Is the cow Inseminated?")
     date_of_insemination = serializers.DateField(required=False, help_text="Date of Insemination")
+    insemination_time = serializers.TimeField(required=False, help_text="Time of Insemination")
     insemination_number = serializers.CharField(required=True, help_text="How many times was the cow Inseminated so far?")
     lactation_no = serializers.CharField(required=True, help_text="What is the lactation number for the cow?")
 
@@ -1028,7 +1029,8 @@ class MonitorHeatSignSerializer(serializers.Serializer):
             'insemination_date': 'date_of_insemination',
             'inseminated_date': 'date_of_insemination',
             'date_insemination': 'date_of_insemination',
-            'Date_of_Insemination': 'date_of_insemination',  # Added this mapping
+            'Date_of_Insemination': 'date_of_insemination',  # From form
+            'inseminated_time': 'insemination_time',  # From form
         }
         
         for old_name, new_name in field_mappings.items():
@@ -1036,28 +1038,22 @@ class MonitorHeatSignSerializer(serializers.Serializer):
                 processed_data[new_name] = processed_data.pop(old_name)
                 logger.info(f"Mapped field {old_name} to {new_name}: {processed_data[new_name]}")
         
-        # Special handling: If we have both date and time in separate fields, combine them
-        if 'date_of_insemination' in processed_data and 'inseminated_time' in processed_data:
+        # Handle insemination time field - keep it for saving to model
+        if 'inseminated_time' in processed_data:
             try:
-                from datetime import datetime, date
+                from datetime import datetime, time
                 
-                # Parse the date
-                if isinstance(processed_data['date_of_insemination'], str):
-                    insemination_date = datetime.strptime(processed_data['date_of_insemination'], '%Y-%m-%d').date()
-                else:
-                    insemination_date = processed_data['date_of_insemination']
-                
-                # Parse the time (keeping only the date, ignoring time for DateField)
-                # Since date_of_insemination is a DateField, we only need the date part
-                processed_data['date_of_insemination'] = insemination_date
-                
-                # Remove the time field since we don't need it for the DateField
-                processed_data.pop('inseminated_time', None)
-                
-                logger.info(f"Combined date and time into date_of_insemination: {processed_data['date_of_insemination']}")
+                time_str = processed_data['inseminated_time']
+                # Handle time with timezone offset (e.g., "11:08:00.000+03:00")
+                if isinstance(time_str, str):
+                    # Remove timezone info and milliseconds for TimeField
+                    time_str = time_str.split('+')[0].split('.')[0]  # "11:08:00"
+                    insemination_time = datetime.strptime(time_str, '%H:%M:%S').time()
+                    processed_data['insemination_time'] = insemination_time
+                    logger.info(f"Parsed insemination_time: {insemination_time}")
                 
             except Exception as e:
-                logger.error(f"Error combining date and time fields: {e}")
+                logger.error(f"Error parsing insemination time: {e}")
                 # If parsing fails, let the normal validation handle it
         
         return super().to_internal_value(processed_data)

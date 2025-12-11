@@ -239,6 +239,8 @@ class FarmViewSet(viewsets.ModelViewSet, LoggingMixin):
                 if old_staff:
                     logger.info(f"Replacing {staff_type}: {old_staff.name} (ID: {old_staff.id}) with {new_staff.name}")
                     old_staff.is_active = False
+                    old_staff.save(update_fields=['is_active'])
+                    logger.info(f"Deactivated old {staff_type}: {old_staff.name}")
                 else:
                     logger.info(f"No existing {staff_type} to replace")
 
@@ -323,6 +325,26 @@ class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
         except Exception as e:
             self.log_operation_error(f"deleting cow {cow_pk}", e)
             raise
+    
+    def _update_cow_gynecological_status(self, cow, status_name):
+        """
+        Helper method to update cow's gynecological status
+        
+        Args:
+            cow: Cow instance to update
+            status_name: Name of the gynecological status (e.g., 'pregnant', 'fresh', 'estrus', 'ai')
+        
+        Returns:
+            bool: True if status was updated successfully, False otherwise
+        """
+        try:
+            gynecological_status = GynecologicalStatus.objects.get(name=status_name)
+            cow.gynecological_status = gynecological_status
+            self.get_logger().info(f"Updated gynecological status to '{status_name}' for cow {cow.cow_id}")
+            return True
+        except GynecologicalStatus.DoesNotExist:
+            self.get_logger().warning(f"Gynecological status '{status_name}' not found in database")
+            return False
 
     def list(self, request, *args, **kwargs):
         """List cows with logging"""
@@ -581,6 +603,10 @@ class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
                 # Update cow record
                 cow.number_of_inseminations = validated_data['service_per_conception']
                 cow.lactation_number = validated_data['lactation_number']
+                
+                # Update gynecological status to "pregnant"
+                self._update_cow_gynecological_status(cow, "pregnant")
+                
                 cow.save()
 
                 # Send notification using message template
@@ -801,6 +827,8 @@ class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
                     cow=cow,
                     inseminator=cow.farm.inseminator,
                     is_inseminated=validated_data['is_inseminated'],
+                    insemination_date=validated_data.get('date_of_insemination'),
+                    insemination_time=validated_data.get('insemination_time'),
                     insemination_count=validated_data['insemination_count'],
                     lactation_number=validated_data['lactation_number']
                 )
@@ -816,6 +844,20 @@ class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
                     )
                     reproduction.pregnancy_date = validated_data['date_of_insemination']
                     reproduction.save()
+                    
+                    # Update cow's last insemination date and insemination status
+                    cow.last_date_insemination = validated_data['date_of_insemination']
+                    cow.cow_inseminated_before = True
+                    cow.number_of_inseminations = validated_data['insemination_count']
+                    
+                    # Update gynecological status to "ai" (Artificial Insemination)
+                    self._update_cow_gynecological_status(cow, "ai")
+                    cow.save()
+                    self.get_logger().info(f"Updated cow {cow.cow_id} with insemination date: {validated_data['date_of_insemination']}")
+                else:
+                    # Update gynecological status to "estrus" (heat detected but not inseminated)
+                    self._update_cow_gynecological_status(cow, "estrus")
+                    cow.save()
 
                 # Format date for messages
                 insemination_date = None
@@ -897,6 +939,10 @@ class CowViewSet(viewsets.ModelViewSet, LoggingMixin):
                 # Update cow record
                 cow.parity += 1  # Increment number of births
                 cow.last_calving_date = validated_data['last_calving_date']
+                
+                # Update gynecological status to "birth" after calving
+                self._update_cow_gynecological_status(cow, "birth")
+                
                 cow.save()
 
                 # Create message for farmer using template
